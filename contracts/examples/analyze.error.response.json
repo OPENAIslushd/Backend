@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "3.0.0",
+  "runId": null,
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "intakeId geçerli bir UUID olmalıdır.",
+    "retryable": false
+  }
+}

@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:slushd:events:3.0.0",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "settledSteps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "totalSteps": {
+              "const": 10
+            }
+          },
+          "required": [
+            "settledSteps",
+            "totalSteps"
+          ],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "run.accepted"
+        },
+        "payload": {
+          "$ref": "urn:slushd:analysis:3.0.0#/$defs/Accepted"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "sequence",
+        "timestamp",
+        "message",
+        "progress",
+        "type",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "settledSteps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "totalSteps": {
+              "const": 10
+            }
+          },
+          "required": [
+            "settledSteps",
+            "totalSteps"
+          ],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "run.started"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "running"
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "sequence",
+        "timestamp",
+        "message",
+        "progress",
+        "type",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "settledSteps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "totalSteps": {
+              "const": 10
+            }
+          },
+          "required": [
+            "settledSteps",
+            "totalSteps"
+          ],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "step.started"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "step": {
+              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Step"
+            }
+          },
+          "required": [
+            "step"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "sequence",
+        "timestamp",
+        "message",
+        "progress",
+        "type",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "settledSteps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "totalSteps": {
+              "const": 10
+            }
+          },
+          "required": [
+            "settledSteps",
+            "totalSteps"
+          ],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "step.finished"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "step": {
+              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Step"
+            }
+          },
+          "required": [
+            "step"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "sequence",
+        "timestamp",
+        "message",
+        "progress",
+        "type",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "settledSteps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "totalSteps": {
+              "const": 10
+            }
+          },
+          "required": [
+            "settledSteps",
+            "totalSteps"
+          ],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "run.finished"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "result": {
+              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Response"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "sequence",
+        "timestamp",
+        "message",
+        "progress",
+        "type",
+        "payload"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

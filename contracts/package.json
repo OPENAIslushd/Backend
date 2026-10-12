@@ -1,0 +1,12 @@
+{
+  "name": "slushd-contracts",
+  "private": true,
+  "version": "3.0.0",
+  "scripts": {
+    "test": "node validate.cjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  }
+}

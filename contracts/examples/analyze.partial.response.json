@@ -1,0 +1,409 @@
+{
+  "schemaVersion": "3.0.0",
+  "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
+  "status": "partial",
+  "createdAt": "2026-10-12T09:00:00Z",
+  "finishedAt": "2026-10-12T09:00:22Z",
+  "durationMs": 22000,
+  "input": {
+    "schemaVersion": "3.0.0",
+    "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
+    "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+    "intakeRevision": 2,
+    "language": "tr",
+    "mode": "demo",
+    "testMode": "simulation",
+    "product": {
+      "productDescription": {
+        "status": "provided",
+        "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+        "sourceMessageIds": [
+          "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+        ]
+      },
+      "website": {
+        "status": "not_applicable",
+        "value": null,
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "targetCustomer": {
+        "status": "provided",
+        "value": "Üniversite öğrencileri",
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "targetMarket": {
+        "status": "provided",
+        "value": "Türkiye",
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "currentFeatures": {
+        "status": "provided",
+        "value": [
+          "Bütçe girişi",
+          "Haftalık yemek planı",
+          "Alışveriş listesi"
+        ],
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "pricing": {
+        "status": "provided",
+        "value": {
+          "model": "subscription",
+          "amount": 200,
+          "currency": "TRY",
+          "billingPeriod": "monthly"
+        },
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "userGoal": {
+        "status": "provided",
+        "value": "Deneme kullanıcılarını ücretli aboneye dönüştürmek.",
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "knownCompetitors": {
+        "status": "not_applicable",
+        "value": null,
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      }
+    },
+    "limitations": [],
+    "allowIncomplete": false
+  },
+  "memoryContext": {
+    "status": "completed",
+    "origin": "derived",
+    "data": {
+      "namespace": "demo",
+      "similarIdeas": [],
+      "matchMethod": "none"
+    },
+    "error": null
+  },
+  "research": {
+    "status": "partial",
+    "origin": "mock",
+    "data": {
+      "summary": "Trend analizi eksik; diğer üç uzman çıktısı hazır.",
+      "riskReward": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "risks": [
+            {
+              "id": "risk-1",
+              "title": "Ödeme isteği",
+              "description": "Öğrenciler abonelik için ödeme yapmayabilir.",
+              "severity": "high",
+              "mitigation": "Küçük bir pilotla ödeme isteğini ölç.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "rewards": [
+            {
+              "id": "reward-1",
+              "description": "Bütçeye göre liste oluşturma zaman kazandırabilir.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": []
+        },
+        "error": null
+      },
+      "marketing": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "targetSegments": [
+            "Üniversite öğrencileri"
+          ],
+          "channels": [
+            {
+              "name": "Kampüs toplulukları",
+              "rationale": "Pilot katılımcı bulmak için örnek kanal."
+            }
+          ],
+          "findings": [
+            {
+              "id": "marketing-1",
+              "description": "Bütçe odaklı konumlandırma test edilebilir.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": []
+        },
+        "error": null
+      },
+      "rivals": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "competitors": [
+            {
+              "id": "rival-1",
+              "name": "Kurgu Rakip 1",
+              "website": "https://example.com/rival-1",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-1"
+              ],
+              "evidenceType": "mock"
+            },
+            {
+              "id": "rival-2",
+              "name": "Kurgu Rakip 2",
+              "website": "https://example.com/rival-2",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-2"
+              ],
+              "evidenceType": "mock"
+            },
+            {
+              "id": "rival-3",
+              "name": "Kurgu Rakip 3",
+              "website": "https://example.com/rival-3",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-3"
+              ],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": [
+            {
+              "id": "rivals-source-1",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-1",
+              "accessedAt": null
+            },
+            {
+              "id": "rivals-source-2",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-2",
+              "accessedAt": null
+            },
+            {
+              "id": "rivals-source-3",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-3",
+              "accessedAt": null
+            }
+          ]
+        },
+        "error": null
+      },
+      "trends": {
+        "status": "failed",
+        "origin": "none",
+        "data": null,
+        "error": {
+          "code": "TIMEOUT",
+          "message": "Trend agent süre sınırını aştı.",
+          "retryable": true
+        }
+      }
+    },
+    "error": {
+      "code": "TOOL_UNAVAILABLE",
+      "message": "Trend agent erişilemedi; diğer araştırmalar korunuyor.",
+      "retryable": true
+    }
+  },
+  "buildSuggestion": {
+    "status": "completed",
+    "origin": "mock",
+    "data": {
+      "summary": "Öğrencinin haftalık bütçesine göre yemek ve alışveriş listesi oluşturan MVP.",
+      "mvpFeatures": [
+        {
+          "id": "feature-1",
+          "title": "Bütçe girişi",
+          "description": "Haftalık yemek bütçesi alınır.",
+          "priority": "must"
+        },
+        {
+          "id": "feature-2",
+          "title": "Yemek planı",
+          "description": "Bütçeye uygun örnek yemek listesi gösterilir.",
+          "priority": "must"
+        }
+      ],
+      "implementationSteps": [
+        "React formunu oluştur.",
+        "Plan üretimini Node.js orchestrator üzerinden çağır.",
+        "Önerilen listeyi göster ve geri bildirim al."
+      ],
+      "testPlan": {
+        "kind": "simulation",
+        "currency": "TRY",
+        "assumptionNotice": "Tüm sayılar demo varsayımıdır; gerçek kullanıcı testi veya pazar tahmini değildir.",
+        "criteria": [
+          {
+            "id": "criterion-profit",
+            "description": "Varsayımsal aylık gelir maliyeti karşılıyor.",
+            "metric": "monthlyProfit",
+            "operator": "gte",
+            "threshold": 0
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "scenario-optimistic",
+            "label": "optimistic",
+            "assumptions": {
+              "monthlyVisitors": 1000,
+              "conversionRate": 0.05,
+              "monthlyPrice": 200,
+              "monthlyCosts": 8000,
+              "initialCash": 60000
+            }
+          },
+          {
+            "id": "scenario-pessimistic",
+            "label": "pessimistic",
+            "assumptions": {
+              "monthlyVisitors": 1000,
+              "conversionRate": 0.01,
+              "monthlyPrice": 200,
+              "monthlyCosts": 8000,
+              "initialCash": 60000
+            }
+          }
+        ]
+      }
+    },
+    "error": null
+  },
+  "testResults": {
+    "status": "completed",
+    "origin": "derived",
+    "data": {
+      "kind": "simulation",
+      "disclaimer": "Gerçek ürün testi yapılmadı; sonuçlar varsayımsal senaryolardan hesaplandı.",
+      "scenarios": [
+        {
+          "scenarioId": "scenario-optimistic",
+          "metrics": {
+            "payingCustomers": 50,
+            "monthlyRevenue": 10000,
+            "monthlyProfit": 2000,
+            "runwayMonths": null
+          },
+          "checks": [
+            {
+              "criterionId": "criterion-profit",
+              "observedValue": 2000,
+              "passed": true
+            }
+          ],
+          "outcome": "success"
+        },
+        {
+          "scenarioId": "scenario-pessimistic",
+          "metrics": {
+            "payingCustomers": 10,
+            "monthlyRevenue": 2000,
+            "monthlyProfit": -6000,
+            "runwayMonths": 10
+          },
+          "checks": [
+            {
+              "criterionId": "criterion-profit",
+              "observedValue": -6000,
+              "passed": false
+            }
+          ],
+          "outcome": "failure"
+        }
+      ]
+    },
+    "error": null
+  },
+  "evaluation": {
+    "status": "completed",
+    "origin": "mock",
+    "data": {
+      "overallOutcome": "inconclusive",
+      "summary": "İyimser koşullarda maliyet karşılanıyor; düşük dönüşümde zarar oluşuyor. Bu, gerçek startup başarısının kanıtı değildir.",
+      "scenarioAssessments": [
+        {
+          "scenarioId": "scenario-optimistic",
+          "outcome": "success",
+          "reasons": [
+            {
+              "explanation": "%5 dönüşüm 50 ödeme yapan kullanıcı ve 2000 TRY aylık kâr üretiyor.",
+              "criterionIds": [
+                "criterion-profit"
+              ]
+            }
+          ],
+          "nextActions": [
+            "Dönüşüm varsayımını küçük pilotla ölç."
+          ]
+        },
+        {
+          "scenarioId": "scenario-pessimistic",
+          "outcome": "failure",
+          "reasons": [
+            {
+              "explanation": "%1 dönüşümde gelir 2000 TRY, maliyet 8000 TRY; aylık zarar 6000 TRY.",
+              "criterionIds": [
+                "criterion-profit"
+              ]
+            }
+          ],
+          "nextActions": [
+            "Sabit maliyeti düşür veya ödeme isteğini doğrula."
+          ]
+        }
+      ],
+      "successConditions": [
+        "Belirlenen kârlılık eşiğinin karşılanması."
+      ],
+      "failureConditions": [
+        "Düşük dönüşüm nedeniyle gelirin maliyetin altında kalması."
+      ],
+      "limitations": [
+        "Bu değerlendirme yalnız simülasyon varsayımlarına dayanır.",
+        "Gerçek kullanıcı davranışı ölçülmedi."
+      ]
+    },
+    "error": null
+  },
+  "warnings": [
+    "DEMO_DATA: Araştırma kurgusaldır.",
+    "SIMULATION_ONLY: Gerçek ürün testi yapılmadı.",
+    "Trend analizi eksik; build suggestion sınırlı araştırmaya dayanıyor.",
+    "Hafıza güncellenemedi."
+  ],
+  "memoryUpdate": {
+    "status": "failed",
+    "origin": "none",
+    "data": null,
+    "error": {
+      "code": "STORAGE_FAILED",
+      "message": "JSON hafızası yazılamadı; sonuç UI için korunuyor.",
+      "retryable": true
+    }
+  }
+}

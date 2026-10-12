@@ -1,0 +1,3279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:slushd:analysis:3.0.0",
+  "$ref": "#/$defs/Response",
+  "$defs": {
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "BUSY",
+            "NOT_FOUND",
+            "IDEMPOTENCY_CONFLICT",
+            "INVALID_CURSOR",
+            "TIMEOUT",
+            "TOOL_UNAVAILABLE",
+            "INVALID_OUTPUT",
+            "STORAGE_FAILED",
+            "RUN_INTERRUPTED",
+            "DEPENDENCY_FAILED",
+            "INTAKE_NOT_READY",
+            "REVISION_CONFLICT"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ],
+      "additionalProperties": false
+    },
+    "Request": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "clientRequestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "intakeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "intakeRevision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientRequestId",
+        "intakeId",
+        "intakeRevision"
+      ],
+      "additionalProperties": false
+    },
+    "Links": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "events",
+        "snapshot"
+      ],
+      "additionalProperties": false
+    },
+    "Accepted": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "completed",
+            "partial",
+            "failed"
+          ]
+        },
+        "links": {
+          "$ref": "#/$defs/Links"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "status",
+        "links"
+      ],
+      "additionalProperties": false
+    },
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "$ref": "#/$defs/Error"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "Source": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https?://"
+        },
+        "accessedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "url",
+        "accessedAt"
+      ],
+      "additionalProperties": false
+    },
+    "Finding": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "evidenceType": {
+          "type": "string",
+          "enum": [
+            "sourced",
+            "hypothesis",
+            "mock"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "sourceIds",
+        "evidenceType"
+      ],
+      "additionalProperties": false
+    },
+    "RiskReward": {
+      "type": "object",
+      "properties": {
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
+              },
+              "mitigation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              },
+              "evidenceType": {
+                "type": "string",
+                "enum": [
+                  "sourced",
+                  "hypothesis",
+                  "mock"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "description",
+              "severity",
+              "mitigation",
+              "sourceIds",
+              "evidenceType"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "rewards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "risks",
+        "rewards",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "Marketing": {
+      "type": "object",
+      "properties": {
+        "targetSegments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "name",
+              "rationale"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          },
+          "minItems": 0,
+          "maxItems": 3
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "targetSegments",
+        "channels",
+        "findings",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "Rivals": {
+      "type": "object",
+      "properties": {
+        "competitors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "website": {
+                "type": "string",
+                "pattern": "^https?://"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "differentiation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              },
+              "evidenceType": {
+                "type": "string",
+                "enum": [
+                  "sourced",
+                  "mock"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "website",
+              "description",
+              "differentiation",
+              "sourceIds",
+              "evidenceType"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 3
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "competitors",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "Trends": {
+      "type": "object",
+      "properties": {
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          },
+          "minItems": 0,
+          "maxItems": 3
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "findings",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "RiskRewardResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/RiskReward"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/RiskReward"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "MarketingResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Marketing"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Marketing"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "RivalsResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Rivals"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Rivals"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "TrendsResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Trends"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Trends"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Research": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "riskReward": {
+          "$ref": "#/$defs/RiskRewardResult"
+        },
+        "marketing": {
+          "$ref": "#/$defs/MarketingResult"
+        },
+        "rivals": {
+          "$ref": "#/$defs/RivalsResult"
+        },
+        "trends": {
+          "$ref": "#/$defs/TrendsResult"
+        }
+      },
+      "required": [
+        "summary",
+        "riskReward",
+        "marketing",
+        "rivals",
+        "trends"
+      ],
+      "additionalProperties": false
+    },
+    "MemoryContext": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "similarIdeas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "idea": {
+                "type": "string",
+                "minLength": 1
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "success",
+                  "failure",
+                  "inconclusive"
+                ]
+              },
+              "lessons": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "runId",
+              "idea",
+              "summary",
+              "outcome",
+              "lessons"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 3
+        },
+        "matchMethod": {
+          "type": "string",
+          "enum": [
+            "keyword",
+            "none"
+          ]
+        }
+      },
+      "required": [
+        "namespace",
+        "similarIdeas",
+        "matchMethod"
+      ],
+      "additionalProperties": false
+    },
+    "Assumptions": {
+      "type": "object",
+      "properties": {
+        "monthlyVisitors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "conversionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "monthlyPrice": {
+          "type": "number",
+          "minimum": 0
+        },
+        "monthlyCosts": {
+          "type": "number",
+          "minimum": 0
+        },
+        "initialCash": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "monthlyVisitors",
+        "conversionRate",
+        "monthlyPrice",
+        "monthlyCosts",
+        "initialCash"
+      ],
+      "additionalProperties": false
+    },
+    "Scenario": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "enum": [
+            "optimistic",
+            "pessimistic"
+          ]
+        },
+        "assumptions": {
+          "$ref": "#/$defs/Assumptions"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "assumptions"
+      ],
+      "additionalProperties": false
+    },
+    "Criterion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metric": {
+          "type": "string",
+          "enum": [
+            "monthlyProfit",
+            "monthlyRevenue",
+            "payingCustomers"
+          ]
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "gte",
+            "lte"
+          ]
+        },
+        "threshold": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "metric",
+        "operator",
+        "threshold"
+      ],
+      "additionalProperties": false
+    },
+    "BuildSuggestion": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mvpFeatures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "must",
+                  "should"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "description",
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 5
+        },
+        "implementationSteps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "maxItems": 5
+        },
+        "testPlan": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "simulation"
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "assumptionNotice": {
+              "type": "string",
+              "minLength": 1
+            },
+            "criteria": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Criterion"
+              },
+              "minItems": 1,
+              "maxItems": 5
+            },
+            "scenarios": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Scenario"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "required": [
+            "kind",
+            "currency",
+            "assumptionNotice",
+            "criteria",
+            "scenarios"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "summary",
+        "mvpFeatures",
+        "implementationSteps",
+        "testPlan"
+      ],
+      "additionalProperties": false
+    },
+    "ScenarioResult": {
+      "type": "object",
+      "properties": {
+        "scenarioId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "payingCustomers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "monthlyRevenue": {
+              "type": "number",
+              "minimum": 0
+            },
+            "monthlyProfit": {
+              "type": "number"
+            },
+            "runwayMonths": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "payingCustomers",
+            "monthlyRevenue",
+            "monthlyProfit",
+            "runwayMonths"
+          ],
+          "additionalProperties": false
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "criterionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observedValue": {
+                "type": "number"
+              },
+              "passed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "criterionId",
+              "observedValue",
+              "passed"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 5
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "success",
+            "failure"
+          ]
+        }
+      },
+      "required": [
+        "scenarioId",
+        "metrics",
+        "checks",
+        "outcome"
+      ],
+      "additionalProperties": false
+    },
+    "TestResults": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "simulation"
+        },
+        "disclaimer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ScenarioResult"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "kind",
+        "disclaimer",
+        "scenarios"
+      ],
+      "additionalProperties": false
+    },
+    "Reason": {
+      "type": "object",
+      "properties": {
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "criterionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "explanation",
+        "criterionIds"
+      ],
+      "additionalProperties": false
+    },
+    "Evaluation": {
+      "type": "object",
+      "properties": {
+        "overallOutcome": {
+          "type": "string",
+          "enum": [
+            "success",
+            "failure",
+            "inconclusive"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenarioAssessments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenarioId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "success",
+                  "failure"
+                ]
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Reason"
+                },
+                "minItems": 1
+              },
+              "nextActions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "scenarioId",
+              "outcome",
+              "reasons",
+              "nextActions"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "successConditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "failureConditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "overallOutcome",
+        "summary",
+        "scenarioAssessments",
+        "successConditions",
+        "failureConditions",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "MemoryReceipt": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "recordId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "namespace",
+        "recordId",
+        "revision",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "ResearchResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Research"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Research"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "MemoryContextResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/MemoryContext"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/MemoryContext"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "BuildSuggestionResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/BuildSuggestion"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/BuildSuggestion"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "TestResultsResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/TestResults"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/TestResults"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "EvaluationResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Evaluation"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/Evaluation"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "MemoryReceiptResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "completed"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/MemoryReceipt"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "partial"
+            },
+            "origin": {
+              "type": "string",
+              "enum": [
+                "live",
+                "mock",
+                "derived"
+              ]
+            },
+            "data": {
+              "$ref": "#/$defs/MemoryReceipt"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "$ref": "#/$defs/Error"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "skipped"
+            },
+            "origin": {
+              "const": "none"
+            },
+            "data": {
+              "type": "null"
+            },
+            "error": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "origin",
+            "data",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AnalysisContent": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/AnalysisInput"
+        },
+        "memoryContext": {
+          "$ref": "#/$defs/MemoryContextResult"
+        },
+        "research": {
+          "$ref": "#/$defs/ResearchResult"
+        },
+        "buildSuggestion": {
+          "$ref": "#/$defs/BuildSuggestionResult"
+        },
+        "testResults": {
+          "$ref": "#/$defs/TestResultsResult"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/EvaluationResult"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "input",
+        "memoryContext",
+        "research",
+        "buildSuggestion",
+        "testResults",
+        "evaluation",
+        "warnings"
+      ],
+      "additionalProperties": false
+    },
+    "Response": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "partial",
+            "failed"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "input": {
+          "$ref": "#/$defs/AnalysisInput"
+        },
+        "memoryContext": {
+          "$ref": "#/$defs/MemoryContextResult"
+        },
+        "research": {
+          "$ref": "#/$defs/ResearchResult"
+        },
+        "buildSuggestion": {
+          "$ref": "#/$defs/BuildSuggestionResult"
+        },
+        "testResults": {
+          "$ref": "#/$defs/TestResultsResult"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/EvaluationResult"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "memoryUpdate": {
+          "$ref": "#/$defs/MemoryReceiptResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "status",
+        "createdAt",
+        "finishedAt",
+        "durationMs",
+        "input",
+        "memoryContext",
+        "research",
+        "buildSuggestion",
+        "testResults",
+        "evaluation",
+        "warnings",
+        "memoryUpdate"
+      ],
+      "additionalProperties": false
+    },
+    "ResearchInput": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "input": {
+          "$ref": "#/$defs/AnalysisInput"
+        }
+      },
+      "required": [
+        "runId",
+        "input"
+      ],
+      "additionalProperties": false
+    },
+    "SpecialistInput": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "input": {
+          "$ref": "#/$defs/AnalysisInput"
+        },
+        "task": {
+          "type": "string",
+          "enum": [
+            "risk_reward",
+            "marketing",
+            "rivals",
+            "trends"
+          ]
+        }
+      },
+      "required": [
+        "runId",
+        "input",
+        "task"
+      ],
+      "additionalProperties": false
+    },
+    "MemoryReadInput": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "namespace": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "idea": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        }
+      },
+      "required": [
+        "runId",
+        "namespace",
+        "idea",
+        "limit"
+      ],
+      "additionalProperties": false
+    },
+    "BuildInput": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "input": {
+          "$ref": "#/$defs/AnalysisInput"
+        },
+        "memoryContext": {
+          "$ref": "#/$defs/MemoryContextResult"
+        },
+        "research": {
+          "$ref": "#/$defs/ResearchResult"
+        }
+      },
+      "required": [
+        "runId",
+        "input",
+        "memoryContext",
+        "research"
+      ],
+      "additionalProperties": false
+    },
+    "SimulationInput": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "buildSuggestion": {
+          "$ref": "#/$defs/BuildSuggestion"
+        }
+      },
+      "required": [
+        "runId",
+        "buildSuggestion"
+      ],
+      "additionalProperties": false
+    },
+    "EvaluateInput": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "input": {
+          "$ref": "#/$defs/AnalysisInput"
+        },
+        "research": {
+          "$ref": "#/$defs/ResearchResult"
+        },
+        "buildSuggestion": {
+          "$ref": "#/$defs/BuildSuggestion"
+        },
+        "testResults": {
+          "$ref": "#/$defs/TestResults"
+        }
+      },
+      "required": [
+        "runId",
+        "input",
+        "research",
+        "buildSuggestion",
+        "testResults"
+      ],
+      "additionalProperties": false
+    },
+    "MemoryRecord": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "recordId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "namespace": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "analysisStatus": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "partial",
+            "failed"
+          ]
+        },
+        "analysis": {
+          "$ref": "#/$defs/AnalysisContent"
+        },
+        "lessons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "recordId",
+        "namespace",
+        "revision",
+        "createdAt",
+        "updatedAt",
+        "analysisStatus",
+        "analysis",
+        "lessons"
+      ],
+      "additionalProperties": false
+    },
+    "MemoryUpdateInput": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "namespace": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "analysisStatus": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "partial",
+            "failed"
+          ]
+        },
+        "analysis": {
+          "$ref": "#/$defs/AnalysisContent"
+        },
+        "lessons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "runId",
+        "namespace",
+        "analysisStatus",
+        "analysis",
+        "lessons"
+      ],
+      "additionalProperties": false
+    },
+    "Step": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "memory.read"
+            },
+            "parentStepId": {
+              "const": null
+            },
+            "agentId": {
+              "const": "memory"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/MemoryContextResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "research"
+            },
+            "parentStepId": {
+              "const": null
+            },
+            "agentId": {
+              "const": "research"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ResearchResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "research.risk_reward"
+            },
+            "parentStepId": {
+              "const": "research"
+            },
+            "agentId": {
+              "const": "risk_reward"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/RiskRewardResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "research.marketing"
+            },
+            "parentStepId": {
+              "const": "research"
+            },
+            "agentId": {
+              "const": "marketing"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/MarketingResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "research.rivals"
+            },
+            "parentStepId": {
+              "const": "research"
+            },
+            "agentId": {
+              "const": "rivals"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/RivalsResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "research.trends"
+            },
+            "parentStepId": {
+              "const": "research"
+            },
+            "agentId": {
+              "const": "trends"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/TrendsResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "strategy.build"
+            },
+            "parentStepId": {
+              "const": null
+            },
+            "agentId": {
+              "const": "strategy"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/BuildSuggestionResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "tests.run"
+            },
+            "parentStepId": {
+              "const": null
+            },
+            "agentId": {
+              "const": "simulation"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/TestResultsResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "strategy.evaluate"
+            },
+            "parentStepId": {
+              "const": null
+            },
+            "agentId": {
+              "const": "strategy"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvaluationResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stepId": {
+              "const": "memory.update"
+            },
+            "parentStepId": {
+              "const": null
+            },
+            "agentId": {
+              "const": "memory"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "running",
+                "completed",
+                "partial",
+                "failed",
+                "skipped"
+              ]
+            },
+            "startedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finishedAt": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/MemoryReceiptResult"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "stepId",
+            "parentStepId",
+            "agentId",
+            "status",
+            "startedAt",
+            "finishedAt",
+            "output"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Snapshot": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "completed",
+            "partial",
+            "failed"
+          ]
+        },
+        "lastSequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "minItems": 10,
+          "maxItems": 10
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Response"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "status",
+        "lastSequence",
+        "steps",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "AnalysisInput": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "clientRequestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "intakeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "intakeRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "testMode": {
+          "const": "simulation"
+        },
+        "product": {
+          "$ref": "urn:slushd:intake:3.0.0#/$defs/ProductProfile"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "allowIncomplete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientRequestId",
+        "intakeId",
+        "intakeRevision",
+        "language",
+        "mode",
+        "testMode",
+        "product",
+        "limitations",
+        "allowIncomplete"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

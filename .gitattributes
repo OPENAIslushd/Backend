@@ -1,0 +1,2 @@
+# SSE frames require a terminating blank line, including the final frame.
+contracts/examples/*.sse whitespace=-blank-at-eof
