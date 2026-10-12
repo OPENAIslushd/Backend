@@ -82,6 +82,15 @@ Akış:
 
 Gerçek veri modu henüz yok (`dataMode:"real"` 400 döner); planı [docs/real-data-mode.tr.md](docs/real-data-mode.tr.md). Servisleri ayrı çalıştırıyorsanız (ör. docker compose) Orchestrator'a `SIM_SERVICE_TOKEN` (veya `SIM_SERVICES=external`) ve `SIM_MEMORY_URL`, `SIM_STRATEGY_URL`, `SIM_SIMULATION_URL`, `SIM_OUTCOME_URL` verin.
 
+## İnternete açma (ngrok)
+
+```sh
+npm start          # bir terminalde
+npm run tunnel     # ikinci terminalde
+```
+
+`npm run tunnel` sunucuyu ngrok ile HTTPS adresinden açar ve **şifre ister** (ngrok basic auth). Kullanıcı/şifre ilk çalıştırmada rastgele üretilir, `.ngrok/policy.yml` dosyasında saklanır (Git'e girmez); yenisi için dosyayı silin. Bir kez `ngrok config add-authtoken <token>` gerekir. Uyarılar: sohbet ve kampanya akışı sizin oturum açılmış Codex/ChatGPT hesabınızı kullanır; şifreyi yalnız güvendiğiniz kişilerle paylaşın. Codex çağrılarında kabuk, tarayıcı ve uygulama araçları kapalıdır (`CODEX_ALLOW_TOOLS=1` açar), böylece istemle dosya okunamaz veya komut çalıştırılamaz.
+
 ## CLI ve MCP
 
 API anahtarı gerekmez; oturum açılmış Codex CLI kullanılır. Runner seçimi: CODEX_BIN → masaüstünün CODEX_CLI_PATH değeri → PATH'teki codex. CLI rol/prompt/JSON girdisini stdin'den alır; shell açılmaz. Ayrı geçici dizin, read-only sandbox, timeout, süreç grubu iptali, JSON parse ve şema kontrolü vardır. Intake için kullanıcı MCP yapılandırması yüklenmez; ekip adaptörleri kendi MCP bağlantılarını yönetir.

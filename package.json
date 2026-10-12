@@ -13,7 +13,8 @@
     "smoke": "node scripts/smoke.cjs",
     "smoke:cli": "node --env-file-if-exists=.env scripts/cli-smoke.cjs",
     "format": "prettier --write \"src/**/*.cjs\" \"test/**/*.cjs\" \"scripts/**/*.cjs\" contracts/validate.cjs \"public/*\"",
-    "format:check": "prettier --check \"src/**/*.cjs\" \"test/**/*.cjs\" \"scripts/**/*.cjs\" contracts/validate.cjs \"public/*\""
+    "format:check": "prettier --check \"src/**/*.cjs\" \"test/**/*.cjs\" \"scripts/**/*.cjs\" contracts/validate.cjs \"public/*\"",
+    "tunnel": "node scripts/tunnel.cjs"
   },
   "dependencies": {
     "ajv": "8.20.0",
