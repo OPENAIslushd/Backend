@@ -15,6 +15,8 @@ npm start
 
 Varsayılan adres `http://127.0.0.1:3001`. İsteğe bağlı `.env.example` dosyasını `.env` olarak kopyalayın; start/dev komutları bu dosyayı yükler. CORS varsayılan olarak localhost:5173 ve localhost:3000'e izin verir. Demo verileri `data/` altında kalır; Git'e girmez.
 
+Bu adres backend API'sidir; React ekranı ayrı frontend sunucusunda açılır. Tarayıcıda `/` servis bilgisi ve endpoint listesini, `/health` sağlık durumunu JSON olarak gösterir. Analiz akışı için POST istekleri veya aşağıdaki smoke komutu kullanılır. Kod değişikliklerinden sonra `npm start` sürecini yeniden başlatın; geliştirme sırasında `npm run dev` otomatik yeniden yükler.
+
 Başka terminalde uçtan uca demo:
 
 ```sh

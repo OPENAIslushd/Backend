@@ -147,6 +147,23 @@ async function createApp(options = {}) {
         !UUID.test(parts[1])
       )
         throw new AppError("NOT_FOUND", "Kayıt bulunamadı.", 404);
+      if (req.method === "GET" && url.pathname === "/")
+        return json(200, {
+          service: "Slushd Orchestrator API",
+          schemaVersion: VERSION,
+          message:
+            "Backend API çalışıyor. React arayüzü ayrı frontend sunucusunda açılır.",
+          health: "/health",
+          endpoints: [
+            "POST /intakes",
+            "GET /intakes/:id",
+            "POST /intakes/:id/messages",
+            "POST /analyze",
+            "GET /analyses/:runId",
+            "GET /analyses/:runId/events",
+            "POST /analyses/:runId/approval",
+          ],
+        });
       if (req.method === "GET" && url.pathname === "/health")
         return json(200, {
           status: "ok",
