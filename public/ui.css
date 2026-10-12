@@ -511,3 +511,7 @@ footer {
     padding: 18px 20px;
   }
 }
+.workspace.cli-only {
+  grid-template-columns: minmax(0, 780px);
+  justify-content: center;
+}

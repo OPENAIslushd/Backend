@@ -79,4 +79,10 @@ Kabul testleri: eksik bilgi, açıklama engeli, veri uydurmama, tekrar mesaj/ana
 
 Kapsam: tek Node süreci/tek DATA_DIR yazıcısı; yerel hackathon demosu. Kimlik doğrulama ve çok sunuculu dağıtım eklenmedi. Sunucu yeniden başlarsa onay bekleyen run korunur; çalışan yarım run otomatik model tekrarı olmadan sonuçlandırılır. Adapte edilen JS modülleri AbortSignal'a uymalıdır.
 
-Son doğrulama: demo smoke `completed`, memory `completed`, 23 SSE olayı üretti. Sözleşme kontrolleri ve 32 runtime/HTTP/subprocess kabul testi geçti. Canlı CLI çıkarımı **başarılı doğrulanamadı**: güncel masaüstü binary'si ve şema dönüşümüyle son çağrı `429 Too Many Requests` döndürdü. Limit uygun olduğunda `CODEX_MODEL=gpt-6-astra npm run smoke:cli` yeniden çalıştırılmalı; bu başarısızlık demo akışını etkilemez.
+İlk demo doğrulaması: demo smoke `completed`, memory `completed`, 23 SSE olayı üretti. Sözleşme kontrolleri ve 35 runtime/HTTP/subprocess kabul testi geçti. İlk canlı CLI çıkarımı denemesi **başarılı doğrulanamadı**: güncel masaüstü binary'si ve şema dönüşümüyle son çağrı `429 Too Many Requests` döndürdü. Limit uygun olduğunda `CODEX_MODEL=gpt-6-astra npm run smoke:cli` yeniden çalıştırılmalı; bu başarısızlık demo akışını etkilemez.
+
+## Canlı prompt denemesi
+
+`http://127.0.0.1:3001/cli` ekranı, serbest prompt’u doğrudan oturum açılmış Codex CLI’ye gönderir. `POST /cli/messages` gövdesi `{schemaVersion:"4.0.0",clientRequestId:"<uuid>",message:"<prompt>"}`; başarılı yanıt `origin:"live"` ve `reply` taşır. Her prompt bağımsızdır; önceki sohbet mesajları modele gönderilmez. API anahtarı kullanılmaz. Bu endpoint yalnız loopback bağlantılarda çalışır, aynı anda tek CLI çağrısı yapar ve 60 saniye sınırı vardır. Aynı anahtar/gövde tekrarı mevcut yanıtı döndürür; başarılı yanıtlar `data/cli-chat/` altında saklanır. CLI limit ve bağlantı hataları ekranda gösterilir; demo yanıtına dönüşmez.
+
+Güncel canlı bağlantı kontrolü: `/cli/messages` gerçek Codex CLI çağrısıyla HTTP 200, `origin:live` ve “Merhaba, bağlantı çalışıyor.” yanıtını döndürdü. Canlı sohbet ve mevcut backend için toplam 35 kabul testi geçti. Önceki 429 engeli bu son denemede görülmedi.

@@ -7,6 +7,7 @@ const { IntakeService } = require("./intake/service.cjs");
 const { Orchestrator, final } = require("./orchestrator/service.cjs");
 const { demoAdapters } = require("./adapters/demo.cjs");
 const { VERSION, AppError, publicError } = require("./runtime/core.cjs");
+const { CliChat } = require("./runtime/chat.cjs");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function milliseconds(name, fallback) {
   const value = Number(process.env[name] || fallback);
@@ -65,6 +66,7 @@ async function createApp(options = {}) {
     );
   await store.init();
   const intakes = new IntakeService(store, intakeConfig);
+  const cliChat = new CliChat(store, options.cliChat);
   let adapters = options.adapters || demoAdapters(store);
   if (!options.adapters && process.env.AGENT_ADAPTER_MODULE) {
     try {
@@ -151,6 +153,8 @@ async function createApp(options = {}) {
         throw new AppError("NOT_FOUND", "Kayıt bulunamadı.", 404);
       const assets = {
         "/": ["index.html", "text/html; charset=utf-8"],
+        "/cli": ["cli.html", "text/html; charset=utf-8"],
+        "/cli.js": ["cli.js", "text/javascript; charset=utf-8"],
         "/ui.js": ["ui.js", "text/javascript; charset=utf-8"],
         "/ui.css": ["ui.css", "text/css; charset=utf-8"],
       };
@@ -175,6 +179,7 @@ async function createApp(options = {}) {
           message: "Backend API çalışıyor. Yerel deneme ekranı / adresindedir.",
           health: "/health",
           endpoints: [
+            "POST /cli/messages",
             "POST /intakes",
             "GET /intakes/:id",
             "POST /intakes/:id/messages",
@@ -193,6 +198,19 @@ async function createApp(options = {}) {
         });
       if (req.method === "POST" && url.pathname === "/intakes")
         return json(201, await intakes.create(await body(req, maxBodyBytes)));
+      if (req.method === "POST" && url.pathname === "/cli/messages") {
+        if (
+          !["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(
+            req.socket.remoteAddress,
+          )
+        )
+          throw new AppError(
+            "INVALID_REQUEST",
+            "CLI denemesi yalnız yerel bilgisayarda kullanılabilir.",
+            403,
+          );
+        return json(200, await cliChat.send(await body(req, maxBodyBytes)));
+      }
       if (req.method === "GET" && parts[0] === "intakes" && parts.length === 2)
         return json(200, (await intakes.get(parts[1])).snapshot);
       if (
@@ -328,6 +346,7 @@ async function createApp(options = {}) {
         server.listening ? server.close(resolve) : resolve(),
       );
       await orchestrator.idle();
+      await cliChat.idle();
       await store.close();
     },
   };
