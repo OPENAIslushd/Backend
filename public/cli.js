@@ -44,11 +44,6 @@ const PROFILE_LABEL = {
   balanced: "Dengeli",
   high_risk_high_reward: "Yüksek risk / getiri",
 };
-const CHANNEL = {
-  paid_social: "Sosyal medya",
-  paid_search: "Arama reklamı",
-  influencer: "Influencer",
-};
 const ICON = { pending: "○", running: "◐", completed: "●", failed: "✕" };
 const emptyProfile = () => Object.fromEntries(FIELDS.map(([k]) => [k, null]));
 let profile = emptyProfile(),
@@ -127,24 +122,6 @@ function renderProfile() {
   $("profile-status").className = "cp-status" + (gaps.length ? "" : " ready");
   $("generate").disabled = busy || gaps.length > 0;
 }
-function allocation(a) {
-  return el(
-    "div",
-    { class: "cp-alloc" },
-    Object.entries(CHANNEL).map(([k, label]) => {
-      const bar = el("span", { class: "cp-bar " + k });
-      bar.style.width = `${a[k] * 100}%`;
-      return el(
-        "div",
-        { class: "cp-alloc-row" },
-        el("span", {}, label),
-        el("span", { class: "cp-track" }, bar),
-        el("span", { class: "cp-num" }, pct(a[k])),
-      );
-    }),
-  );
-}
-// Competitor cards from research (Gemini summary or catalog facts).
 function researchBlock(r, cls) {
   if (!r) return null;
   if (r.error)
@@ -232,43 +209,9 @@ function elapsed(s) {
   );
   return ` · ${sec} sn`;
 }
-// Computed reasoning trail (src/campaign/explain.cjs), built from the run's own numbers.
 function explanationFor(c, r) {
   return c.explanation?.recommendations.find(
     (x) => x.strategyId === r.strategy.strategy_id,
-  );
-}
-function whyBlock(c, r, cls) {
-  const x = explanationFor(c, r);
-  if (!x) return null;
-  return el(
-    "details",
-    { class: cls },
-    el("summary", {}, "Neden bu strateji?"),
-    el(
-      "ol",
-      {},
-      x.steps.map((step) => el("li", {}, step)),
-    ),
-  );
-}
-function processBlock(c, cls) {
-  if (!c.explanation) return null;
-  return el(
-    "details",
-    { class: cls },
-    el("summary", {}, "Stratejiler nasıl üretildi? (adım adım)"),
-    el(
-      "ol",
-      {},
-      c.explanation.process.map((p) => el("li", {}, p)),
-    ),
-    el("p", {}, el("b", {}, "Kanal varsayımları")),
-    el(
-      "ul",
-      {},
-      c.explanation.channels.map((p) => el("li", {}, p)),
-    ),
   );
 }
 function campaignView(c) {
@@ -299,7 +242,6 @@ function campaignView(c) {
       ),
     ),
     research,
-    processBlock(c, "cp-why cp-process"),
     c.input &&
       el(
         "details",
@@ -311,60 +253,10 @@ function campaignView(c) {
           c.input.assumptions.map((a) => el("li", {}, a)),
         ),
       ),
-    c.recommendations &&
-      el(
-        "div",
-        { class: "cp-recs" },
-        c.recommendations.recommendations.map((r) => {
-          const m = r.metrics;
-          const isSelected =
-            selected?.strategy_id === r.strategy.strategy_id &&
-            selected?.revision === r.strategy.revision;
-          return el(
-            "article",
-            { class: "cp-rec" + (isSelected ? " selected" : "") },
-            el(
-              "p",
-              { class: "eyebrow" },
-              PROFILE_LABEL[r.profile] || r.profile,
-            ),
-            el("h3", {}, explanationFor(c, r)?.title || r.strategy.name),
-            el("p", { class: "cp-note" }, r.strategy.name),
-            allocation(r.strategy.initial_allocation),
-            el(
-              "dl",
-              {},
-              el("dt", {}, "Beklenen satış"),
-              el("dd", {}, fmt(m.expected_purchases)),
-              el("dt", {}, "Beklenen kâr"),
-              el("dd", {}, `${fmt(m.expected_contribution_profit)} ${cur}`),
-              el("dt", {}, "P10–P90"),
-              el("dd", {}, `${fmt(m.profit_p10)} – ${fmt(m.profit_p90)}`),
-              el("dt", {}, "ROI"),
-              el("dd", {}, pct(m.roi)),
-              el("dt", {}, "Zarar olasılığı"),
-              el("dd", {}, pct(m.probability_of_loss)),
-            ),
-            whyBlock(c, r, "cp-why"),
-            c.status === "awaiting_selection"
-              ? el(
-                  "button",
-                  {
-                    class: "primary",
-                    type: "button",
-                    onclick: () => select(c.campaignId, r.strategy),
-                  },
-                  "Bu stratejiyi seç",
-                )
-              : isSelected &&
-                  el(
-                    "p",
-                    { class: "cp-badge" },
-                    "Seçildi · hafızaya kaydedildi",
-                  ),
-          );
-        }),
-      ),
+    window.renderPlans(c, {
+      onSelect: (id, plan) =>
+        select(id, { strategy_id: plan.strategyId, revision: 1 }),
+    }),
     c.error && el("p", { class: "cp-error" }, c.error.message),
   );
 }
@@ -405,10 +297,13 @@ function summarize(c) {
   const names = c.recommendations.recommendations
     .map((r) => `${PROFILE_LABEL[r.profile]}: ${r.strategy.name}`)
     .join("; ");
+  const purposes = (c.plans || [])
+    .map((p) => `${p.name} (amaç: ${p.purpose})`)
+    .join("; ");
   const chosen = c.selection
     ? ` Kullanıcı seçti: ${c.selection.record.strategy.name}.`
     : "";
-  return `3 strateji önerildi (${names}).${chosen}`;
+  return `Planlar: ${purposes}. Önerilenler: ${names}.${chosen}`;
 }
 async function poll(id) {
   try {

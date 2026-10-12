@@ -60,63 +60,89 @@ test("research reaches the strategy only as labelled context", () => {
   assert.match(input.context, /Gemini özetidir; doğrulanmamıştır/);
   assert.match(input.context, /Çentik: QR damga kartı\./);
 });
-test("explanation is built from the run's numbers and names strategies by their mix", () => {
-  const { explainCampaign } = require("../src/campaign/explain.cjs");
+test("plans: shares keep the 10% floor and sum to 1; template plans cover all 30 days", () => {
+  const {
+    normalizeAllocation,
+    templatePlanner,
+    toStrategy,
+  } = require("../src/campaign/planner.cjs");
+  const a = normalizeAllocation({
+    paid_social: 95,
+    paid_search: 5,
+    influencer: 0,
+  });
+  assert.ok(Object.values(a).every((x) => x >= 0.1));
+  assert.ok(Math.abs(Object.values(a).reduce((x, y) => x + y, 0) - 1) < 1e-9);
   const input = mockCampaignInput({
     business: { name: "X", description: "d", audience: "a", region: "Türkiye" },
   });
-  const metrics = (p10, mean, p90) => ({
-    expected_purchases: 80,
-    expected_contribution_profit: mean,
-    profit_p10: p10,
-    profit_p90: p90,
-    profit_stddev: 10,
-    probability_of_loss: 0.1,
-  });
-  const strategy = (id, social, search, influencer, creative) => ({
-    strategy_id: id,
-    creative,
-    initial_allocation: {
-      paid_social: social,
-      paid_search: search,
-      influencer,
+  return templatePlanner()
+    .plan({
+      business: {
+        name: "X",
+        description: "d",
+        audience: "a",
+        region: "Türkiye",
+      },
+      input,
+    })
+    .then(({ plans }) => {
+      for (const p of plans) {
+        assert.equal(p.timeline[0].start_day, 1);
+        assert.equal(p.timeline.at(-1).end_day, 30);
+        const s = toStrategy(p, input, "campaign-abc");
+        assert.equal(s.generator, "orchestrator_supplied");
+        assert.match(s.strategy_id, /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/);
+      }
+    });
+});
+test("evidence checks each plan's own targets against its simulated metrics", () => {
+  const { buildEvidence } = require("../src/campaign/explain.cjs");
+  const plan = {
+    id: "plan-1",
+    strategyId: "s1",
+    success_criteria: {
+      max_cost_per_purchase: 600,
+      max_loss_probability: 0.1,
+      min_purchases: 90,
     },
-    adaptation: { max_reallocation_fraction: 0.2 },
-  });
-  const results = [
-    {
-      strategy: strategy("a", 0.1, 0.1, 0.8, "discovery"),
-      adaptive: metrics(-500, 100, 900),
-    },
-    {
-      strategy: strategy("b", 0.2, 0.6, 0.2, "proof"),
-      adaptive: metrics(200, 150, 400),
-    },
-  ];
-  const rec = (r, profile) => ({
-    profile,
-    strategy: r.strategy,
-    metrics: r.adaptive,
-    paired_profit_delta: { mean: 50 },
-  });
-  const x = explainCampaign({
-    input,
-    evaluation: { scenario_count: 40, results },
-    ui: {
-      recommendations: [
-        rec(results[1], "conservative"),
-        rec(results[0], "high_risk_high_reward"),
+  };
+  const m = {
+    acquisition_cost: 633,
+    probability_of_loss: 0.05,
+    expected_purchases: 79,
+    expected_contribution_profit: 80000,
+    profit_p10: 40000,
+    profit_p90: 120000,
+  };
+  const [ev] = buildEvidence({
+    plans: [plan],
+    planEvaluation: {
+      results: [
+        {
+          strategy: { strategy_id: "s1" },
+          adaptive: m,
+          paired_profit_delta: { mean: 3700 },
+        },
       ],
     },
-    research: null,
-    audit: { approved: 2, rejected: [] },
+    baselineEvaluation: {
+      results: [70000, 90000].map((p) => ({
+        adaptive: { expected_contribution_profit: p, profit_p10: 30000 },
+      })),
+    },
+    ui: {
+      recommendations: [
+        { profile: "conservative", strategy: { strategy_id: "s1" } },
+      ],
+    },
+    input: { currency: "TRY" },
   });
-  assert.equal(
-    x.recommendations[0].title,
-    "Arama reklamı ağırlıklı · Kanıt/yorum",
+  assert.deepEqual(
+    ev.checks.map((c) => c.met),
+    [false, true, false, true],
   );
-  assert.equal(x.recommendations[1].title, "Influencer ağırlıklı · Keşif");
-  assert.match(x.recommendations[0].steps[0], /2 aday içinde 1\. sırada/);
-  assert.match(x.process[2], /deterministik örneklemedir/);
-  assert.equal(x.channels.length, 3);
+  assert.equal(ev.verdict, "partial");
+  assert.equal(ev.baseline.beatsProfit, 1);
+  assert.equal(ev.recommendedAs.label, "Temkinli");
 });

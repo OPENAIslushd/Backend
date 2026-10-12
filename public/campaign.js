@@ -1,20 +1,5 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
-const PROFILE = {
-  conservative: "Temkinli",
-  balanced: "Dengeli",
-  high_risk_high_reward: "Yüksek risk / yüksek getiri",
-};
-const CHANNEL = {
-  paid_social: "Sosyal medya",
-  paid_search: "Arama reklamı",
-  influencer: "Influencer",
-};
-const CREATIVE = {
-  proof: "Kanıt / yorum",
-  discovery: "Keşif",
-  offer: "Teklif",
-};
 const ICON = { pending: "○", running: "◐", completed: "●", failed: "✕" };
 let campaignId = null,
   pollTimer = null;
@@ -68,43 +53,9 @@ function elapsed(s) {
   );
   return ` · ${sec} sn`;
 }
-// Computed reasoning trail (src/campaign/explain.cjs), built from the run's own numbers.
 function explanationFor(c, r) {
   return c.explanation?.recommendations.find(
     (x) => x.strategyId === r.strategy.strategy_id,
-  );
-}
-function whyBlock(c, r, cls) {
-  const x = explanationFor(c, r);
-  if (!x) return null;
-  return el(
-    "details",
-    { class: cls },
-    el("summary", {}, "Neden bu strateji?"),
-    el(
-      "ol",
-      {},
-      x.steps.map((step) => el("li", {}, step)),
-    ),
-  );
-}
-function processBlock(c, cls) {
-  if (!c.explanation) return null;
-  return el(
-    "details",
-    { class: cls },
-    el("summary", {}, "Stratejiler nasıl üretildi? (adım adım)"),
-    el(
-      "ol",
-      {},
-      c.explanation.process.map((p) => el("li", {}, p)),
-    ),
-    el("p", {}, el("b", {}, "Kanal varsayımları")),
-    el(
-      "ul",
-      {},
-      c.explanation.channels.map((p) => el("li", {}, p)),
-    ),
   );
 }
 function renderSteps(c) {
@@ -213,94 +164,25 @@ function renderResearch(r) {
     }),
   );
 }
-function allocation(a) {
-  return el(
-    "div",
-    { class: "alloc" },
-    Object.entries(CHANNEL).map(([k, label]) => {
-      const bar = el("span", { class: "bar " + k });
-      bar.style.width = `${a[k] * 100}%`;
-      return el(
-        "div",
-        { class: "alloc-row" },
-        el("span", { class: "alloc-label" }, label),
-        el("span", { class: "track" }, bar),
-        el("span", { class: "alloc-val" }, pct(a[k])),
-      );
-    }),
-  );
-}
 function renderRecs(c) {
-  const ui = c.recommendations;
-  if (!ui) return;
-  $("assumptions-card").hidden = false;
-  $("assumptions").replaceChildren(
-    ...[...c.input.assumptions, ...(ui.warnings || [])].map((a) =>
-      el("li", {}, a),
-    ),
-  );
+  if (!c.plans?.length) return;
+  if (c.input) {
+    $("assumptions-card").hidden = false;
+    $("assumptions").replaceChildren(
+      ...[...c.input.assumptions, ...(c.recommendations?.warnings || [])].map(
+        (a) => el("li", {}, a),
+      ),
+    );
+  }
   $("recs-card").hidden = false;
   $("recs-note").textContent =
-    `${c.audit.approved} strateji simüle edildi. Rakamlar mock varsayımlara dayanır; gerçek kampanya sonucu değildir.`;
-  const selected = c.selection?.record.strategy;
-  $("process").replaceChildren(processBlock(c, "why process") || "");
+    "Rakamlar mock varsayımlara dayanır; gerçek kampanya sonucu değildir.";
+  $("process").replaceChildren();
   $("recs").replaceChildren(
-    ...ui.recommendations.map((r) => {
-      const m = r.metrics,
-        cur = ui.currency;
-      const isSelected =
-        selected &&
-        selected.strategy_id === r.strategy.strategy_id &&
-        selected.revision === r.strategy.revision;
-      return el(
-        "article",
-        { class: "rec" + (isSelected ? " selected" : "") },
-        el("p", { class: "eyebrow" }, PROFILE[r.profile] || r.profile),
-        el("h3", {}, explanationFor(c, r)?.title || r.strategy.name),
-        el(
-          "p",
-          { class: "muted small" },
-          `Kreatif: ${CREATIVE[r.strategy.creative] || r.strategy.creative}`,
-        ),
-        allocation(r.strategy.initial_allocation),
-        el(
-          "dl",
-          { class: "metrics" },
-          el("dt", {}, "Beklenen satış"),
-          el("dd", {}, fmt(m.expected_purchases)),
-          el("dt", {}, "Beklenen kâr"),
-          el("dd", {}, money(m.expected_contribution_profit, cur)),
-          el("dt", {}, "Kâr aralığı (P10–P90)"),
-          el("dd", {}, `${fmt(m.profit_p10)} – ${fmt(m.profit_p90)}`),
-          el("dt", {}, "ROI"),
-          el("dd", {}, pct(m.roi)),
-          el("dt", {}, "Müşteri edinme maliyeti"),
-          el(
-            "dd",
-            {},
-            m.acquisition_cost == null ? "—" : money(m.acquisition_cost, cur),
-          ),
-          el("dt", {}, "Zarar olasılığı"),
-          el("dd", {}, pct(m.probability_of_loss)),
-          el("dt", {}, "Uyarlamalı vs sabit"),
-          el(
-            "dd",
-            {},
-            `${r.paired_profit_delta?.mean >= 0 ? "+" : ""}${fmt(r.paired_profit_delta?.mean)} ${cur}`,
-          ),
-        ),
-        whyBlock(c, r, "why"),
-        c.status === "awaiting_selection"
-          ? el(
-              "button",
-              { onclick: () => select(r.strategy) },
-              "Bu stratejiyi seç",
-            )
-          : isSelected
-            ? el("p", { class: "badge" }, "Seçildi")
-            : null,
-      );
-    }),
+    window.renderPlans(c, {
+      onSelect: (_, plan) =>
+        select({ strategy_id: plan.strategyId, revision: 1 }),
+    }) || "",
   );
 }
 function renderSelection(c) {

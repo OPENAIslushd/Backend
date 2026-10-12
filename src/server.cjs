@@ -15,6 +15,7 @@ const {
   researchChain,
 } = require("./campaign/clients.cjs");
 const { geminiClient } = require("./campaign/gemini.cjs");
+const { codexPlanner } = require("./campaign/planner.cjs");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function milliseconds(name, fallback) {
   const value = Number(process.env[name] || fallback);
@@ -118,6 +119,8 @@ async function createApp(options = {}) {
   const campaigns = new CampaignService(store, {
     simulation: simulationClient(),
     // RESEARCH_PROVIDER=catalog skips the browser; default tries Gemini, then the catalog.
+    // PLANNER=template skips the Codex call; templates are also the automatic fallback.
+    ...(process.env.PLANNER !== "template" && { planner: codexPlanner() }),
     research:
       process.env.RESEARCH_PROVIDER === "catalog"
         ? researchClient()
@@ -183,6 +186,8 @@ async function createApp(options = {}) {
         "/campaign": ["campaign.html", "text/html; charset=utf-8"],
         "/campaign.js": ["campaign.js", "text/javascript; charset=utf-8"],
         "/campaign.css": ["campaign.css", "text/css; charset=utf-8"],
+        "/plans.js": ["plans.js", "text/javascript; charset=utf-8"],
+        "/plans.css": ["plans.css", "text/css; charset=utf-8"],
       };
       if (req.method === "GET" && Object.hasOwn(assets, url.pathname)) {
         const [file, contentType] = assets[url.pathname];
