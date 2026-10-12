@@ -269,6 +269,12 @@ async function poll() {
     if (c.status === "running" || c.status === "selecting")
       pollTimer = setTimeout(poll, 800);
   } catch (e) {
+    // A stale #id (another data folder or deleted run) just resets the page.
+    if (location.hash) {
+      history.replaceState(null, "", "/campaign");
+      campaignId = null;
+      return;
+    }
     showError(e.message);
   }
 }
@@ -346,7 +352,7 @@ $("actual-form").addEventListener("submit", async (event) => {
     showError(e.message);
   }
 });
-$("example").addEventListener("click", () => {
+function fillExample() {
   const form = $("campaign-form");
   const values = {
     name: "TakımPlan",
@@ -357,7 +363,12 @@ $("example").addEventListener("click", () => {
     topic: "Görev yönetimi",
   };
   for (const [k, val] of Object.entries(values)) form.elements[k].value = val;
-});
+}
+$("example").addEventListener("click", fillExample);
+// Clicking "Mock veri" fills the form with the example business for quick tests.
+document
+  .querySelector('input[name="dataMode"][value="mock"]')
+  .addEventListener("click", fillExample);
 health();
 setInterval(health, 10000);
 if (location.hash.length > 1) {
