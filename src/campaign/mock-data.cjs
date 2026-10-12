@@ -44,7 +44,25 @@ function slug(text, fallback) {
     .slice(0, 60);
   return s || fallback;
 }
-function mockCampaignInput(request) {
+// Research findings reach the strategy service only as labelled free-text context.
+function researchContext(research) {
+  if (!research?.competitors?.length) return "";
+  const label =
+    research.provider === "gemini"
+      ? "Rakip bilgileri Gemini özetidir; doğrulanmamıştır."
+      : "Rakip bilgileri kayıtlı katalog özetidir.";
+  const lines = research.competitors.map((c) => `- ${c.name}: ${c.summary}`);
+  return [
+    "",
+    label,
+    research.summary && `Pazar özeti: ${research.summary}`,
+    "Rakipler:",
+    ...lines,
+  ]
+    .filter((x) => x !== null && x !== undefined)
+    .join("\n");
+}
+function mockCampaignInput(request, research = null) {
   const b = request.business;
   const assumptions = [
     "Mock veri modu: kanal maliyet ve dönüşüm rakamları sentetik varsayımdır, ölçülmüş kampanya verisi değildir.",
@@ -93,7 +111,10 @@ function mockCampaignInput(request) {
     unit_contribution: unit,
     data_provenance: "synthetic",
     assumptions,
-    context: `Ürün: ${b.description}`.slice(0, 10000),
+    context: (`Ürün: ${b.description}` + researchContext(research)).slice(
+      0,
+      10000,
+    ),
     channels,
   };
 }

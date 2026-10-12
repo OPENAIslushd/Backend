@@ -144,13 +144,96 @@ function allocation(a) {
     }),
   );
 }
+// Competitor cards from research (Gemini summary or catalog facts).
+function researchBlock(r, cls) {
+  if (!r) return null;
+  if (r.error)
+    return el(
+      "p",
+      { class: cls.note },
+      `Araştırma yapılamadı: ${r.error.message}`,
+    );
+  if (!r.competitors.length)
+    return el(
+      "p",
+      { class: cls.note },
+      "Eşleşen rakip bulunamadı. Bu, rakip olmadığı anlamına gelmez.",
+    );
+  const host = (u) => {
+    try {
+      return new URL(u).hostname.replace(/^www\./, "");
+    } catch {
+      return u;
+    }
+  };
+  return el(
+    "div",
+    { class: cls.wrap },
+    el(
+      "p",
+      { class: cls.note },
+      r.provider === "gemini"
+        ? "Kaynak: Gemini (gemini.google.com) — yapay zekâ özeti, doğrulanmamıştır."
+        : "Kaynak: kayıtlı rakip kataloğu.",
+      r.fallbackFrom ? " Gemini başarısız olduğu için katalog kullanıldı." : "",
+    ),
+    r.summary && el("p", { class: cls.summary }, r.summary),
+    el(
+      "div",
+      { class: cls.grid },
+      r.competitors.map((c) =>
+        el(
+          "article",
+          { class: cls.card },
+          el(
+            "h3",
+            {},
+            c.url
+              ? el(
+                  "a",
+                  { href: c.url, target: "_blank", rel: "noopener" },
+                  c.name,
+                )
+              : c.name,
+          ),
+          el("p", {}, c.summary),
+          c.strengths?.length &&
+            el(
+              "ul",
+              {},
+              c.strengths.map((s) => el("li", {}, s)),
+            ),
+          c.pricing && el("p", { class: cls.note }, `Fiyat: ${c.pricing}`),
+          c.sources?.length &&
+            el(
+              "p",
+              { class: cls.note },
+              "Kaynaklar: ",
+              c.sources.map((u, i) => [
+                i ? ", " : "",
+                el(
+                  "a",
+                  { href: u, target: "_blank", rel: "noopener" },
+                  host(u),
+                ),
+              ]),
+            ),
+        ),
+      ),
+    ),
+  );
+}
 function campaignView(c) {
   if (!c) return el("p", {}, "Strateji hazırlanıyor…");
   const cur = c.recommendations?.currency || c.input?.currency || "";
   const selected = c.selection?.record.strategy;
-  const research = c.research?.competitors?.length
-    ? `Rakipler: ${c.research.competitors.map((x) => x.name).join(", ")}`
-    : null;
+  const research = researchBlock(c.research, {
+    note: "cp-note",
+    summary: "cp-market",
+    wrap: "cp-research",
+    grid: "cp-competitors",
+    card: "cp-competitor",
+  });
   return el(
     "div",
     { class: "cp-campaign" },
@@ -167,7 +250,7 @@ function campaignView(c) {
         ),
       ),
     ),
-    research && el("p", { class: "cp-note" }, research),
+    research,
     c.input &&
       el(
         "details",

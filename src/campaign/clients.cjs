@@ -110,6 +110,7 @@ function researchClient({
   timeoutMs = 30000,
 } = {}) {
   return {
+    name: "catalog",
     research(profile, signal) {
       return new Promise((resolve, reject) => {
         const child = spawn(python, ["orchestrator_bridge.py"], {
@@ -144,11 +145,54 @@ function researchClient({
           }
           if (code !== 0)
             return fail(`Araştırma modülü: ${value.error || "hata"}`);
-          resolve(value);
+          // Catalog facts become the same competitor shape the Gemini provider returns.
+          resolve({
+            provider: "catalog",
+            summary: null,
+            competitors: value.competitors.map((c) => ({
+              name: c.name,
+              url: c.url || null,
+              summary: c.facts.map((f) => f.statement).join(" "),
+              strengths: [],
+              pricing: null,
+              sources: c.sources.map((s) => s.url).filter(Boolean),
+            })),
+            warnings: value.warnings || [],
+          });
         });
         child.stdin.end(JSON.stringify(profile));
       });
     },
   };
 }
-module.exports = { simulationClient, researchClient, serviceConfig, SERVICES };
+// Tries providers in order; a later one runs only when the earlier one failed.
+function researchChain(providers) {
+  return {
+    async research(profile, signal) {
+      const failures = [];
+      for (const p of providers) {
+        try {
+          const result = await p.research(profile, signal);
+          return failures.length
+            ? { ...result, fallbackFrom: failures }
+            : result;
+        } catch (e) {
+          failures.push(`${p.name}: ${e.message}`);
+        }
+      }
+      throw new AppError(
+        "TOOL_UNAVAILABLE",
+        `Araştırma yapılamadı. ${failures.join(" · ")}`,
+        502,
+        true,
+      );
+    },
+  };
+}
+module.exports = {
+  simulationClient,
+  researchClient,
+  researchChain,
+  serviceConfig,
+  SERVICES,
+};

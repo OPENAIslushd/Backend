@@ -739,3 +739,38 @@ footer {
     position: static;
   }
 }
+.cp-research {
+  display: grid;
+  gap: 8px;
+}
+.cp-market {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.cp-competitors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+}
+.cp-competitor {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.cp-competitor h3 {
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+.cp-competitor p {
+  margin: 0 0 6px;
+}
+.cp-competitor ul {
+  margin: 0 0 6px;
+  padding-left: 16px;
+}
+.cp-competitor a {
+  color: var(--green);
+}

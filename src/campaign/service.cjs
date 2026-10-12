@@ -266,17 +266,11 @@ class CampaignService {
     const b = request.business;
     await this.step(id, "research", async () => {
       try {
-        const r = await this.research.research({
-          name: b.name,
-          description: b.description,
-          url: b.url,
-          topic: b.topic,
-          market: b.region,
-          audience: b.audience,
-        });
+        const r = await this.research.research({ ...b, market: b.region });
+        const source = r.provider === "gemini" ? "Gemini" : "Katalog";
         return {
           summary: r.competitors.length
-            ? `${r.competitors.length} rakip: ${r.competitors.map((x) => x.name).join(", ")}`
+            ? `${source}: ${r.competitors.length} rakip (${r.competitors.map((x) => x.name).join(", ")})${r.fallbackFrom ? " · Gemini başarısız, katalog kullanıldı" : ""}`
             : "Katalogda eşleşen rakip yok (bu, rakip olmadığı anlamına gelmez).",
           patch: (c) => (c.research = r),
         };
@@ -290,7 +284,7 @@ class CampaignService {
       }
     });
     const input = await this.step(id, "input", async () => {
-      const input = mockCampaignInput(request);
+      const input = mockCampaignInput(request, (await this.get(id)).research);
       return {
         result: input,
         summary: `${input.budget} ${input.currency} bütçe, ${input.assumptions.length} varsayım`,

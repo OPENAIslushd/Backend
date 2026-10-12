@@ -9,7 +9,12 @@ const { demoAdapters } = require("./adapters/demo.cjs");
 const { VERSION, AppError, publicError } = require("./runtime/core.cjs");
 const { CliChat } = require("./runtime/chat.cjs");
 const { CampaignService } = require("./campaign/service.cjs");
-const { simulationClient, researchClient } = require("./campaign/clients.cjs");
+const {
+  simulationClient,
+  researchClient,
+  researchChain,
+} = require("./campaign/clients.cjs");
+const { geminiClient } = require("./campaign/gemini.cjs");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function milliseconds(name, fallback) {
   const value = Number(process.env[name] || fallback);
@@ -112,7 +117,11 @@ async function createApp(options = {}) {
   }
   const campaigns = new CampaignService(store, {
     simulation: simulationClient(),
-    research: researchClient(),
+    // RESEARCH_PROVIDER=catalog skips the browser; default tries Gemini, then the catalog.
+    research:
+      process.env.RESEARCH_PROVIDER === "catalog"
+        ? researchClient()
+        : researchChain([geminiClient(), researchClient()]),
     ...options.campaign,
   });
   try {

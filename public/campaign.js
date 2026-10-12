@@ -73,57 +73,96 @@ function renderSteps(c) {
     ),
   );
 }
-function renderResearch(r) {
-  if (!r) return;
-  $("research-card").hidden = false;
-  if (r.error) {
-    $("research").replaceChildren(
-      el("p", { class: "muted" }, `Araştırma yapılamadı: ${r.error.message}`),
+// Competitor cards from research (Gemini summary or catalog facts).
+function researchBlock(r, cls) {
+  if (!r) return null;
+  if (r.error)
+    return el(
+      "p",
+      { class: cls.note },
+      `Araştırma yapılamadı: ${r.error.message}`,
     );
-    return;
-  }
-  if (!r.competitors.length) {
-    $("research").replaceChildren(
-      el(
-        "p",
-        { class: "muted" },
-        "Katalogda eşleşen rakip bulunamadı. Bu, rakip olmadığı anlamına gelmez; katalog şimdilik web analitiği, e-ticaret ve görev yönetimini kapsıyor.",
-      ),
+  if (!r.competitors.length)
+    return el(
+      "p",
+      { class: cls.note },
+      "Eşleşen rakip bulunamadı. Bu, rakip olmadığı anlamına gelmez.",
     );
-    return;
-  }
-  $("research").replaceChildren(
+  const host = (u) => {
+    try {
+      return new URL(u).hostname.replace(/^www\./, "");
+    } catch {
+      return u;
+    }
+  };
+  return el(
+    "div",
+    { class: cls.wrap },
+    el(
+      "p",
+      { class: cls.note },
+      r.provider === "gemini"
+        ? "Kaynak: Gemini (gemini.google.com) — yapay zekâ özeti, doğrulanmamıştır."
+        : "Kaynak: kayıtlı rakip kataloğu.",
+      r.fallbackFrom ? " Gemini başarısız olduğu için katalog kullanıldı." : "",
+    ),
+    r.summary && el("p", { class: cls.summary }, r.summary),
     el(
       "div",
-      { class: "competitors" },
+      { class: cls.grid },
       r.competitors.map((c) =>
         el(
           "article",
-          { class: "competitor" },
-          el("h3", {}, c.name),
+          { class: cls.card },
           el(
-            "ul",
+            "h3",
             {},
-            c.facts.map((f) =>
-              el("li", {}, el("b", {}, f.dimension + ": "), f.statement),
+            c.url
+              ? el(
+                  "a",
+                  { href: c.url, target: "_blank", rel: "noopener" },
+                  c.name,
+                )
+              : c.name,
+          ),
+          el("p", {}, c.summary),
+          c.strengths?.length &&
+            el(
+              "ul",
+              {},
+              c.strengths.map((s) => el("li", {}, s)),
             ),
-          ),
-          el(
-            "p",
-            { class: "muted small" },
-            "Kaynak: ",
-            c.sources.map((s, i) => [
-              i ? ", " : "",
-              el(
-                "a",
-                { href: s.url, target: "_blank", rel: "noopener" },
-                s.title,
-              ),
-            ]),
-          ),
+          c.pricing && el("p", { class: cls.note }, `Fiyat: ${c.pricing}`),
+          c.sources?.length &&
+            el(
+              "p",
+              { class: cls.note },
+              "Kaynaklar: ",
+              c.sources.map((u, i) => [
+                i ? ", " : "",
+                el(
+                  "a",
+                  { href: u, target: "_blank", rel: "noopener" },
+                  host(u),
+                ),
+              ]),
+            ),
         ),
       ),
     ),
+  );
+}
+function renderResearch(r) {
+  if (!r) return;
+  $("research-card").hidden = false;
+  $("research").replaceChildren(
+    researchBlock(r, {
+      note: "muted small",
+      summary: "",
+      wrap: "",
+      grid: "competitors",
+      card: "competitor",
+    }),
   );
 }
 function allocation(a) {

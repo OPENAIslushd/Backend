@@ -62,7 +62,7 @@ npm start
 
 Akış:
 
-1. **research**: Python köprüsü (`modules/research/orchestrator_bridge.py`) şirket profilini oluşturur, katalogdan rakip adaylarını getirir. Başarısız olursa simülasyon yine çalışır.
+1. **research**: Playwright (`playwright-core`, kurulu Google Chrome, görünmez pencere) gemini.google.com'a oturum açmadan rakip sorusunu sorar ve yanıttaki JSON'u okur: pazar özeti, 3–5 rakip için özet, öne çıkan özellikler, fiyat ve kaynaklar (~10–30 sn). Çerez onayında “Tümünü reddet” seçilir. Doğrulama/CAPTCHA sayfası aşılmaya çalışılmaz; Gemini başarısız olursa Python kataloğu (`modules/research/orchestrator_bridge.py`) kullanılır. Gemini çıktısı doğrulanmamış yapay zekâ özetidir ve stratejiye yalnız etiketli `context` metni olarak gider. `RESEARCH_PROVIDER=catalog` tarayıcıyı atlar; `GEMINI_HEADED=1` pencereyi gösterir; `GEMINI_BROWSER_CHANNEL` başka Chrome kanalı seçer. Araştırma başarısız olsa da simülasyon çalışır.
 2. **input**: mock veri modu; verilmeyen bütçe, para birimi ve satış başı katkı payı tahmin edilir, kanal varsayımları sentetiktir. Her doldurulan değer `assumptions` listesinde yazılır.
 3. **memory.retrieve** → **strategy.generate** (100 aday) → **audit** (Orchestrator: run_id, kapsam, bütçe, kanal payları, keşif tabanı, tekrar) → **simulation.evaluate** → **outcome.prepare** (3 öneri).
 4. Kullanıcı bir öneri seçer: **outcome.select** → **memory.save_selection**.
