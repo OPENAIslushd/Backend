@@ -50,6 +50,34 @@ Frontend v4.0.0 ve 9 adım kullanmalı. `awaiting_approval` sırasında Review g
 
 Kişi 3/4 modülleri hazır olduğunda `AGENT_ADAPTER_MODULE` ile `createAdapters({store,runCli})` modülü yüklenir. Arayüz: supports, research, memoryRead, strategy, simulate, memoryUpdate. [Girdi/çıktı ve callback ayrıntıları](contracts/README.md#agent-adaptörleri). Çalışan backend'de agent iş sırası veya şema model tarafından değiştirilmez.
 
+## Kampanya simülasyonu (uçtan uca)
+
+Orchestrator, `simulation_agents/` altındaki dört servisi (memory, strategy, simulation, outcome) ve `modules/research/` Python araştırma modülünü birbirine bağlar. Servisler birbirini çağırmaz; tüm yönlendirme, denetim ve hafıza yazımı Orchestrator'dadır.
+
+```sh
+npm run start:all
+```
+
+Bu komut dört servisi 8081–8084 portlarında, Orchestrator'ı `PORT` (varsayılan 3001) üzerinde başlatır ve her açılışta ortak rastgele bir servis token'ı üretir. Geçici mock arayüz: `http://127.0.0.1:3001/campaign`. Gereksinimler: Node.js 24+ (`node:sqlite`), Python 3.10+ ve `modules/research/requirements.txt`. Simülasyon hafızası `DATA_DIR/simulation/memory.sqlite` dosyasındadır.
+
+Akış:
+
+1. **research**: Python köprüsü (`modules/research/orchestrator_bridge.py`) şirket profilini oluşturur, katalogdan rakip adaylarını getirir. Başarısız olursa simülasyon yine çalışır.
+2. **input**: mock veri modu; verilmeyen bütçe, para birimi ve satış başı katkı payı tahmin edilir, kanal varsayımları sentetiktir. Her doldurulan değer `assumptions` listesinde yazılır.
+3. **memory.retrieve** → **strategy.generate** (100 aday) → **audit** (Orchestrator: run_id, kapsam, bütçe, kanal payları, keşif tabanı, tekrar) → **simulation.evaluate** → **outcome.prepare** (3 öneri).
+4. Kullanıcı bir öneri seçer: **outcome.select** → **memory.save_selection**.
+5. Kampanya bittiğinde gerçek sonuç girilir: **outcome.observe** → **memory.update_actual**; tahmin ile gerçek karşılaştırılır.
+
+| Endpoint | Açıklama |
+|---|---|
+| `GET /campaigns/health` | Dört servisin durumu |
+| `POST /campaigns` | `{clientRequestId, dataMode:"mock", business:{name, description, audience, region, productName?, topic?, url?}, budget?, currency?, unitContribution?}` → 202 |
+| `GET /campaigns`, `GET /campaigns/:id` | Liste ve anlık durum (UI 0,8 sn'de bir sorgular) |
+| `POST /campaigns/:id/selection` | `{strategyId, strategyRevision}` → 202 |
+| `POST /campaigns/:id/actuals` | `{spend, purchases, source, unitContribution?, status?, attributionEndDay?}` |
+
+Gerçek veri modu henüz yok (`dataMode:"real"` 400 döner); planı [docs/real-data-mode.tr.md](docs/real-data-mode.tr.md). Servisleri ayrı çalıştırıyorsanız Orchestrator'a `SIM_SERVICE_TOKEN` ve gerekirse `SIM_MEMORY_URL`, `SIM_STRATEGY_URL`, `SIM_SIMULATION_URL`, `SIM_OUTCOME_URL` verin.
+
 ## CLI ve MCP
 
 API anahtarı gerekmez; oturum açılmış Codex CLI kullanılır. Runner seçimi: CODEX_BIN → masaüstünün CODEX_CLI_PATH değeri → PATH'teki codex. CLI rol/prompt/JSON girdisini stdin'den alır; shell açılmaz. Ayrı geçici dizin, read-only sandbox, timeout, süreç grubu iptali, JSON parse ve şema kontrolü vardır. Intake için kullanıcı MCP yapılandırması yüklenmez; ekip adaptörleri kendi MCP bağlantılarını yönetir.

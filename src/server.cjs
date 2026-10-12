@@ -8,6 +8,8 @@ const { Orchestrator, final } = require("./orchestrator/service.cjs");
 const { demoAdapters } = require("./adapters/demo.cjs");
 const { VERSION, AppError, publicError } = require("./runtime/core.cjs");
 const { CliChat } = require("./runtime/chat.cjs");
+const { CampaignService } = require("./campaign/service.cjs");
+const { simulationClient, researchClient } = require("./campaign/clients.cjs");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function milliseconds(name, fallback) {
   const value = Number(process.env[name] || fallback);
@@ -108,6 +110,17 @@ async function createApp(options = {}) {
     await store.close();
     throw e;
   }
+  const campaigns = new CampaignService(store, {
+    simulation: simulationClient(),
+    research: researchClient(),
+    ...options.campaign,
+  });
+  try {
+    await campaigns.init();
+  } catch (e) {
+    await store.close();
+    throw e;
+  }
   const allowed = new Set(
     options.origins ||
       (
@@ -146,7 +159,8 @@ async function createApp(options = {}) {
       const url = new URL(req.url, "http://localhost"),
         parts = url.pathname.split("/").filter(Boolean);
       if (
-        (parts[0] === "intakes" || parts[0] === "analyses") &&
+        ["intakes", "analyses", "campaigns"].includes(parts[0]) &&
+        parts[1] !== "health" &&
         parts[1] &&
         !UUID.test(parts[1])
       )
@@ -157,6 +171,9 @@ async function createApp(options = {}) {
         "/cli.js": ["cli.js", "text/javascript; charset=utf-8"],
         "/ui.js": ["ui.js", "text/javascript; charset=utf-8"],
         "/ui.css": ["ui.css", "text/css; charset=utf-8"],
+        "/campaign": ["campaign.html", "text/html; charset=utf-8"],
+        "/campaign.js": ["campaign.js", "text/javascript; charset=utf-8"],
+        "/campaign.css": ["campaign.css", "text/css; charset=utf-8"],
       };
       if (req.method === "GET" && Object.hasOwn(assets, url.pathname)) {
         const [file, contentType] = assets[url.pathname];
@@ -187,6 +204,12 @@ async function createApp(options = {}) {
             "GET /analyses/:runId",
             "GET /analyses/:runId/events",
             "POST /analyses/:runId/approval",
+            "GET /campaigns/health",
+            "GET /campaigns",
+            "POST /campaigns",
+            "GET /campaigns/:id",
+            "POST /campaigns/:id/selection",
+            "POST /campaigns/:id/actuals",
           ],
         });
       if (req.method === "GET" && url.pathname === "/health")
@@ -223,6 +246,37 @@ async function createApp(options = {}) {
           200,
           await intakes.message(parts[1], await body(req, maxBodyBytes)),
         );
+      if (parts[0] === "campaigns") {
+        if (req.method === "GET" && parts.length === 1)
+          return json(200, { campaigns: await campaigns.list() });
+        if (req.method === "POST" && parts.length === 1)
+          return json(
+            202,
+            await campaigns.start(await body(req, maxBodyBytes)),
+          );
+        if (req.method === "GET" && parts[1] === "health" && parts.length === 2)
+          return json(200, { services: await campaigns.health() });
+        if (req.method === "GET" && parts.length === 2)
+          return json(200, await campaigns.get(parts[1]));
+        if (
+          req.method === "POST" &&
+          parts[2] === "selection" &&
+          parts.length === 3
+        )
+          return json(
+            202,
+            await campaigns.select(parts[1], await body(req, maxBodyBytes)),
+          );
+        if (
+          req.method === "POST" &&
+          parts[2] === "actuals" &&
+          parts.length === 3
+        )
+          return json(
+            200,
+            await campaigns.observe(parts[1], await body(req, maxBodyBytes)),
+          );
+      }
       if (req.method === "POST" && url.pathname === "/analyze")
         return json(
           202,
@@ -333,6 +387,7 @@ async function createApp(options = {}) {
     store,
     intakes,
     orchestrator,
+    campaigns,
     async listen(port = 0, host = "127.0.0.1") {
       await new Promise((resolve, reject) => {
         server.once("error", reject);
@@ -347,6 +402,7 @@ async function createApp(options = {}) {
       );
       await orchestrator.idle();
       await cliChat.idle();
+      await campaigns.idle();
       await store.close();
     },
   };
