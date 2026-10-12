@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:slushd:events:3.0.0",
+  "$id": "urn:slushd:events:4.0.0",
   "oneOf": [
     {
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "type": "string",
@@ -30,10 +30,10 @@
             "settledSteps": {
               "type": "integer",
               "minimum": 0,
-              "maximum": 10
+              "maximum": 9
             },
             "totalSteps": {
-              "const": 10
+              "const": 9
             }
           },
           "required": [
@@ -46,7 +46,7 @@
           "const": "run.accepted"
         },
         "payload": {
-          "$ref": "urn:slushd:analysis:3.0.0#/$defs/Accepted"
+          "$ref": "urn:slushd:analysis:4.0.0#/$defs/Accepted"
         }
       },
       "required": [
@@ -65,7 +65,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "type": "string",
@@ -89,10 +89,10 @@
             "settledSteps": {
               "type": "integer",
               "minimum": 0,
-              "maximum": 10
+              "maximum": 9
             },
             "totalSteps": {
-              "const": 10
+              "const": 9
             }
           },
           "required": [
@@ -133,7 +133,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "type": "string",
@@ -157,10 +157,10 @@
             "settledSteps": {
               "type": "integer",
               "minimum": 0,
-              "maximum": 10
+              "maximum": 9
             },
             "totalSteps": {
-              "const": 10
+              "const": 9
             }
           },
           "required": [
@@ -176,7 +176,7 @@
           "type": "object",
           "properties": {
             "step": {
-              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Step"
+              "$ref": "urn:slushd:analysis:4.0.0#/$defs/Step"
             }
           },
           "required": [
@@ -201,7 +201,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "type": "string",
@@ -225,10 +225,10 @@
             "settledSteps": {
               "type": "integer",
               "minimum": 0,
-              "maximum": 10
+              "maximum": 9
             },
             "totalSteps": {
-              "const": 10
+              "const": 9
             }
           },
           "required": [
@@ -244,7 +244,7 @@
           "type": "object",
           "properties": {
             "step": {
-              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Step"
+              "$ref": "urn:slushd:analysis:4.0.0#/$defs/Step"
             }
           },
           "required": [
@@ -269,7 +269,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "type": "string",
@@ -293,10 +293,10 @@
             "settledSteps": {
               "type": "integer",
               "minimum": 0,
-              "maximum": 10
+              "maximum": 9
             },
             "totalSteps": {
-              "const": 10
+              "const": 9
             }
           },
           "required": [
@@ -312,11 +312,203 @@
           "type": "object",
           "properties": {
             "result": {
-              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Response"
+              "$ref": "urn:slushd:analysis:4.0.0#/$defs/Response"
             }
           },
           "required": [
             "result"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "sequence",
+        "timestamp",
+        "message",
+        "progress",
+        "type",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "4.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "settledSteps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9
+            },
+            "totalSteps": {
+              "const": 9
+            }
+          },
+          "required": [
+            "settledSteps",
+            "totalSteps"
+          ],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "run.awaiting_approval"
+        },
+        "payload": {
+          "$ref": "urn:slushd:analysis:4.0.0#/$defs/Review"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "sequence",
+        "timestamp",
+        "message",
+        "progress",
+        "type",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "4.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "settledSteps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9
+            },
+            "totalSteps": {
+              "const": 9
+            }
+          },
+          "required": [
+            "settledSteps",
+            "totalSteps"
+          ],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "run.approved"
+        },
+        "payload": {
+          "$ref": "urn:slushd:analysis:4.0.0#/$defs/Approval"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "sequence",
+        "timestamp",
+        "message",
+        "progress",
+        "type",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "4.0.0"
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "settledSteps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9
+            },
+            "totalSteps": {
+              "const": 9
+            }
+          },
+          "required": [
+            "settledSteps",
+            "totalSteps"
+          ],
+          "additionalProperties": false
+        },
+        "type": {
+          "const": "run.cancelled"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "intakeId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "intakeRevision": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "intakeId",
+            "intakeRevision"
           ],
           "additionalProperties": false
         }

@@ -1,7 +1,7 @@
 {
   "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
   "input": {
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "4.0.0",
     "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
     "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
     "intakeRevision": 2,

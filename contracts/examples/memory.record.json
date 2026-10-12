@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.0.0",
+  "schemaVersion": "4.0.0",
   "recordId": "dc722ed7-196b-4911-9820-66fd641d190b",
   "namespace": "demo",
   "revision": 1,
@@ -8,7 +8,7 @@
   "analysisStatus": "completed",
   "analysis": {
     "input": {
-      "schemaVersion": "3.0.0",
+      "schemaVersion": "4.0.0",
       "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
       "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
       "intakeRevision": 2,
@@ -339,65 +339,302 @@
             ],
             "outcome": "failure"
           }
-        ]
-      },
-      "error": null
-    },
-    "evaluation": {
-      "status": "completed",
-      "origin": "mock",
-      "data": {
-        "overallOutcome": "inconclusive",
-        "summary": "İyimser koşullarda maliyet karşılanıyor; düşük dönüşümde zarar oluşuyor. Bu, gerçek startup başarısının kanıtı değildir.",
-        "scenarioAssessments": [
-          {
-            "scenarioId": "scenario-optimistic",
-            "outcome": "success",
-            "reasons": [
-              {
-                "explanation": "%5 dönüşüm 50 ödeme yapan kullanıcı ve 2000 TRY aylık kâr üretiyor.",
-                "criterionIds": [
-                  "criterion-profit"
-                ]
-              }
-            ],
-            "nextActions": [
-              "Dönüşüm varsayımını küçük pilotla ölç."
-            ]
-          },
-          {
-            "scenarioId": "scenario-pessimistic",
-            "outcome": "failure",
-            "reasons": [
-              {
-                "explanation": "%1 dönüşümde gelir 2000 TRY, maliyet 8000 TRY; aylık zarar 6000 TRY.",
-                "criterionIds": [
-                  "criterion-profit"
-                ]
-              }
-            ],
-            "nextActions": [
-              "Sabit maliyeti düşür veya ödeme isteğini doğrula."
-            ]
-          }
         ],
-        "successConditions": [
-          "Belirlenen kârlılık eşiğinin karşılanması."
-        ],
-        "failureConditions": [
-          "Düşük dönüşüm nedeniyle gelirin maliyetin altında kalması."
-        ],
-        "limitations": [
-          "Bu değerlendirme yalnız simülasyon varsayımlarına dayanır.",
-          "Gerçek kullanıcı davranışı ölçülmedi."
-        ]
+        "evaluation": {
+          "overallOutcome": "inconclusive",
+          "summary": "İyimser koşullarda maliyet karşılanıyor; düşük dönüşümde zarar oluşuyor. Bu, gerçek startup başarısının kanıtı değildir.",
+          "scenarioAssessments": [
+            {
+              "scenarioId": "scenario-optimistic",
+              "outcome": "success",
+              "reasons": [
+                {
+                  "explanation": "%5 dönüşüm 50 ödeme yapan kullanıcı ve 2000 TRY aylık kâr üretiyor.",
+                  "criterionIds": [
+                    "criterion-profit"
+                  ]
+                }
+              ],
+              "nextActions": [
+                "Dönüşüm varsayımını küçük pilotla ölç."
+              ]
+            },
+            {
+              "scenarioId": "scenario-pessimistic",
+              "outcome": "failure",
+              "reasons": [
+                {
+                  "explanation": "%1 dönüşümde gelir 2000 TRY, maliyet 8000 TRY; aylık zarar 6000 TRY.",
+                  "criterionIds": [
+                    "criterion-profit"
+                  ]
+                }
+              ],
+              "nextActions": [
+                "Sabit maliyeti düşür veya ödeme isteğini doğrula."
+              ]
+            }
+          ],
+          "successConditions": [
+            "Belirlenen kârlılık eşiğinin karşılanması."
+          ],
+          "failureConditions": [
+            "Düşük dönüşüm nedeniyle gelirin maliyetin altında kalması."
+          ],
+          "limitations": [
+            "Bu değerlendirme yalnız simülasyon varsayımlarına dayanır.",
+            "Gerçek kullanıcı davranışı ölçülmedi."
+          ]
+        }
       },
       "error": null
     },
     "warnings": [
       "DEMO_DATA: Araştırma kurgusaldır.",
       "SIMULATION_ONLY: Gerçek ürün testi yapılmadı."
-    ]
+    ],
+    "review": {
+      "revision": 1,
+      "input": {
+        "schemaVersion": "4.0.0",
+        "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
+        "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+        "intakeRevision": 2,
+        "language": "tr",
+        "mode": "demo",
+        "testMode": "simulation",
+        "product": {
+          "productDescription": {
+            "status": "provided",
+            "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+            "sourceMessageIds": [
+              "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+            ]
+          },
+          "website": {
+            "status": "not_applicable",
+            "value": null,
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "targetCustomer": {
+            "status": "provided",
+            "value": "Üniversite öğrencileri",
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "targetMarket": {
+            "status": "provided",
+            "value": "Türkiye",
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "currentFeatures": {
+            "status": "provided",
+            "value": [
+              "Bütçe girişi",
+              "Haftalık yemek planı",
+              "Alışveriş listesi"
+            ],
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "pricing": {
+            "status": "provided",
+            "value": {
+              "model": "subscription",
+              "amount": 200,
+              "currency": "TRY",
+              "billingPeriod": "monthly"
+            },
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "userGoal": {
+            "status": "provided",
+            "value": "Deneme kullanıcılarını ücretli aboneye dönüştürmek.",
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "knownCompetitors": {
+            "status": "not_applicable",
+            "value": null,
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          }
+        },
+        "limitations": [],
+        "allowIncomplete": false
+      },
+      "research": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "summary": "Dört uzman agent çıktısının kurgusal demo özeti.",
+          "riskReward": {
+            "status": "completed",
+            "origin": "mock",
+            "data": {
+              "risks": [
+                {
+                  "id": "risk-1",
+                  "title": "Ödeme isteği",
+                  "description": "Öğrenciler abonelik için ödeme yapmayabilir.",
+                  "severity": "high",
+                  "mitigation": "Küçük bir pilotla ödeme isteğini ölç.",
+                  "sourceIds": [],
+                  "evidenceType": "mock"
+                }
+              ],
+              "rewards": [
+                {
+                  "id": "reward-1",
+                  "description": "Bütçeye göre liste oluşturma zaman kazandırabilir.",
+                  "sourceIds": [],
+                  "evidenceType": "mock"
+                }
+              ],
+              "sources": []
+            },
+            "error": null
+          },
+          "marketing": {
+            "status": "completed",
+            "origin": "mock",
+            "data": {
+              "targetSegments": [
+                "Üniversite öğrencileri"
+              ],
+              "channels": [
+                {
+                  "name": "Kampüs toplulukları",
+                  "rationale": "Pilot katılımcı bulmak için örnek kanal."
+                }
+              ],
+              "findings": [
+                {
+                  "id": "marketing-1",
+                  "description": "Bütçe odaklı konumlandırma test edilebilir.",
+                  "sourceIds": [],
+                  "evidenceType": "mock"
+                }
+              ],
+              "sources": []
+            },
+            "error": null
+          },
+          "rivals": {
+            "status": "completed",
+            "origin": "mock",
+            "data": {
+              "competitors": [
+                {
+                  "id": "rival-1",
+                  "name": "Kurgu Rakip 1",
+                  "website": "https://example.com/rival-1",
+                  "description": "Sabit demo rakibidir.",
+                  "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                  "sourceIds": [
+                    "rivals-source-1"
+                  ],
+                  "evidenceType": "mock"
+                },
+                {
+                  "id": "rival-2",
+                  "name": "Kurgu Rakip 2",
+                  "website": "https://example.com/rival-2",
+                  "description": "Sabit demo rakibidir.",
+                  "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                  "sourceIds": [
+                    "rivals-source-2"
+                  ],
+                  "evidenceType": "mock"
+                },
+                {
+                  "id": "rival-3",
+                  "name": "Kurgu Rakip 3",
+                  "website": "https://example.com/rival-3",
+                  "description": "Sabit demo rakibidir.",
+                  "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                  "sourceIds": [
+                    "rivals-source-3"
+                  ],
+                  "evidenceType": "mock"
+                }
+              ],
+              "sources": [
+                {
+                  "id": "rivals-source-1",
+                  "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                  "url": "https://example.com/rival-1",
+                  "accessedAt": null
+                },
+                {
+                  "id": "rivals-source-2",
+                  "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                  "url": "https://example.com/rival-2",
+                  "accessedAt": null
+                },
+                {
+                  "id": "rivals-source-3",
+                  "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                  "url": "https://example.com/rival-3",
+                  "accessedAt": null
+                }
+              ]
+            },
+            "error": null
+          },
+          "trends": {
+            "status": "completed",
+            "origin": "mock",
+            "data": {
+              "findings": [
+                {
+                  "id": "trend-1",
+                  "description": "Örnek hipotez: haftalık bütçe planlamasına ilgi.",
+                  "sourceIds": [],
+                  "evidenceType": "mock"
+                }
+              ],
+              "sources": []
+            },
+            "error": null
+          }
+        },
+        "error": null
+      },
+      "memoryContext": {
+        "status": "completed",
+        "origin": "derived",
+        "data": {
+          "namespace": "demo",
+          "similarIdeas": [],
+          "matchMethod": "none"
+        },
+        "error": null
+      },
+      "limitations": [
+        "DEMO_DATA: Araştırma kurgusaldır.",
+        "SIMULATION_ONLY: Gerçek ürün testi yapılmadı."
+      ]
+    },
+    "approval": {
+      "request": {
+        "schemaVersion": "4.0.0",
+        "clientRequestId": "590f2f58-d1c8-47ef-bba6-409778f244aa",
+        "reviewRevision": 1,
+        "decision": "approve"
+      },
+      "decidedAt": "2026-10-12T09:00:13Z"
+    }
   },
   "lessons": [
     "Düşük dönüşüm varsayımında aylık maliyet karşılanmıyor."

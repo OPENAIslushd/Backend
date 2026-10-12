@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Slushd · Canlı Codex</title>
+    <link rel="stylesheet" href="/ui.css" />
+    <script src="/cli.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/cli">slushd<span> / canlı codex</span></a
+      ><a href="/" class="text-button">Analiz demosuna dön ↗</a>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">OTURUM AÇILMIŞ CODEX CLI</p>
+        <h1>Bir prompt gönder.</h1>
+        <p>
+          Mesajın backend üzerinden Codex CLI’ye gider. Gerçek yanıt burada
+          görünür.
+        </p>
+      </section>
+      <div class="workspace cli-only">
+        <section class="conversation panel" aria-labelledby="chat-title">
+          <div class="panel-heading">
+            <h2 id="chat-title">Canlı deneme</h2>
+            <button id="clear-chat" class="text-button" type="button">
+              Yeni sohbet ↗
+            </button>
+          </div>
+          <div id="messages" class="messages" aria-live="polite">
+            <div class="welcome">
+              <span class="spark">✳</span>
+              <h3>Ne sormak istersin?</h3>
+              <p>
+                Örneğin: Bir yemek planlama uygulaması için üç MVP özelliği
+                öner.
+              </p>
+            </div>
+          </div>
+          <div id="notice" class="notice" role="status">
+            Her prompt bağımsız çalışır. Çağrılar sunucudaki ChatGPT oturumunun
+            kullanım limitlerine tabidir.
+          </div>
+          <div id="error" class="error" role="alert" hidden></div>
+          <form id="prompt-form">
+            <label class="sr-only" for="prompt"
+              >Codex’e göndermek istediğin prompt</label
+            ><textarea
+              id="prompt"
+              rows="4"
+              maxlength="4000"
+              placeholder="Merhaba! Bana basit bir startup fikri öner."
+              required
+            ></textarea>
+            <div class="composer-footer">
+              <span>Enter ile gönder · Shift+Enter ile yeni satır</span
+              ><button id="send" class="primary" type="submit">
+                Codex’e gönder ↑
+              </button>
+            </div>
+          </form>
+          <div class="examples">
+            <button id="example" type="button">＋ Basit prompt kullan</button>
+          </div>
+        </section>
+      </div>
+      <footer>
+        Slushd / Canlı CLI denemesi
+        <span
+          >API anahtarı kullanılmaz. Yanıtın gelmesi birkaç saniye
+          sürebilir.</span
+        >
+      </footer>
+    </main>
+  </body>
+</html>

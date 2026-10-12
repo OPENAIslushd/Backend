@@ -1,6 +1,6 @@
 {
   "snapshot": {
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "4.0.0",
     "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
     "revision": 2,
     "status": "ready",
@@ -108,7 +108,7 @@
     "limitations": []
   },
   "createRequest": {
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "4.0.0",
     "clientRequestId": "a32d8e23-5a4c-4c0d-adb9-5430ac5e4b7e",
     "message": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
     "language": "tr",
@@ -116,7 +116,7 @@
     "testMode": "simulation"
   },
   "createResponse": {
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "4.0.0",
     "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
     "revision": 1,
     "status": "needs_input",
@@ -252,14 +252,14 @@
   "processedMessages": [
     {
       "request": {
-        "schemaVersion": "3.0.0",
+        "schemaVersion": "4.0.0",
         "clientMessageId": "f8aa69af-1c90-4368-8077-b20229c33351",
         "expectedRevision": 1,
         "action": "reply",
         "message": "Türkiye’deki üniversite öğrencilerini hedefliyorum. Web sitem henüz yok. Mevcut özellikler bütçe girişi, haftalık yemek planı ve alışveriş listesi. Fiyat aylık 200 TRY abonelik. Amacım deneme kullanıcılarını ücretli aboneye dönüştürmek. Bildiğim rakip yok."
       },
       "response": {
-        "schemaVersion": "3.0.0",
+        "schemaVersion": "4.0.0",
         "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
         "revision": 2,
         "status": "ready",

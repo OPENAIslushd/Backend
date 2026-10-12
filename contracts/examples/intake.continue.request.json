@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "3.0.0",
+  "schemaVersion": "4.0.0",
   "clientMessageId": "49e6396e-46c2-49d8-87a2-a712e8141ed0",
   "expectedRevision": 1,
   "action": "continue_with_unknowns",
