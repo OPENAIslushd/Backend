@@ -3,7 +3,7 @@
 ## Decisions
 
 - Node.js 24, ES modules, the built-in HTTP server, Ajv JSON Schema validation, and built-in `node:sqlite` for memory. No Python or external AI provider dependency.
-- Four independent container processes. Astra alone routes messages and approves writes.
+- Four independent container processes. The Orchestrator alone routes messages and approves writes.
 - Deterministic generation of 100–200 candidates; repeated numerical scenarios with delayed observations and paired fixed controls.
 - Versioned JSON contracts and immutable evaluation hashes; SQLite transactions, scoped idempotency keys, optimistic record revisions, and retained snapshots.
 
@@ -21,4 +21,4 @@
 - [ ] Execute hosted checks and review their results after the user opens a pull request.
 - [ ] Review and commit the dependency lock emitted by the first hosted run; switch installs to `npm ci` once committed.
 
-The checked boxes mean files were implemented, not that runtime checks passed. No application code, tests, installs, builds or containers were executed locally. Research, real/demo business data, calibration, deployment, UI implementation, and Astra's orchestration/audit/retry logic remain outside this repository's MVP scope.
+The checked boxes mean files were implemented, not that runtime checks passed. No application code, tests, installs, builds or containers were executed locally. Research, real/demo business data, calibration, deployment, UI implementation, and the Orchestrator's orchestration/audit/retry logic remain outside this repository's MVP scope.

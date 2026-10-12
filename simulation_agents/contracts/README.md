@@ -1,8 +1,8 @@
 # Contract integration reference
 
-Share these **two files together** with Astra and UI developers:
+Share these **two files together** with the Orchestrator and UI developers:
 
-1. `astra-request.schema.json`: every accepted service action plus reusable input, strategy, evaluation, record, actual and comparison definitions.
+1. `orchestrator-request.schema.json`: every accepted service action plus reusable input, strategy, evaluation, record, actual and comparison definitions.
 2. `ui-response.schema.json`: the `data` field returned by `outcome.prepare`. It references definitions in the first schema.
 
 Both use JSON Schema draft-07, contract version `1.0`, and stable logical `$id` values. The `simulation-agents.local` URLs are schema identifiers, not network endpoints. Load/register both documents in the validator; do not fetch those URLs. Ajv in `shared/contracts.js` is the reference integration. Unknown properties are rejected. Optional means omitted; `null` is allowed only where explicitly declared. Defaults are applied in service code, not by mutating incoming requests.
@@ -35,9 +35,9 @@ Every `input` field is required except `context`. A complete valid request is [t
 | `context` | Optional curated text, at most 10,000 characters; deterministic generator does not interpret prose as executable instructions |
 | `channels` | Required `paid_social`, `paid_search`, `influencer` assumption objects |
 
-Each channel requires cost per click in currency/click, a baseline conversion probability per click (0–1, greater than zero), a positive daily saturation spend in currency/day, nonnegative fatigue per elapsed day, an integer conversion delay of 0–7 days, and nonnegative relative standard deviations for scenario-level cost and conversion rates. Unknown inputs cannot be represented as null; Astra must supply explicit assumptions instead of implying missing numbers are known facts.
+Each channel requires cost per click in currency/click, a baseline conversion probability per click (0–1, greater than zero), a positive daily saturation spend in currency/day, nonnegative fatigue per elapsed day, an integer conversion delay of 0–7 days, and nonnegative relative standard deviations for scenario-level cost and conversion rates. Unknown inputs cannot be represented as null; the Orchestrator must supply explicit assumptions instead of implying missing numbers are known facts.
 
-Generated strategy objects carry scope, run, stable strategy ID, revision, name, generator label, budget/currency/objective, audience/region, days 1–30, initial channel fractions summing to one, creative approach, assumption list and an adaptation object. Adaptation requires `enabled`, checkpoint period exactly 3 days, a maximum transfer fraction from 0 to 0.2, minimum clicks and matured purchases per channel, and a per-channel exploration floor from 0.05 to 0.2. Initial allocations must meet that floor. Default generated thresholds are 30 or 60 clicks and 3 matured purchases, with floor 0.1. `astra_supplied` candidates are accepted by simulation under the same invariants.
+Generated strategy objects carry scope, run, stable strategy ID, revision, name, generator label, budget/currency/objective, audience/region, days 1–30, initial channel fractions summing to one, creative approach, assumption list and an adaptation object. Adaptation requires `enabled`, checkpoint period exactly 3 days, a maximum transfer fraction from 0 to 0.2, minimum clicks and matured purchases per channel, and a per-channel exploration floor from 0.05 to 0.2. Initial allocations must meet that floor. Default generated thresholds are 30 or 60 clicks and 3 matured purchases, with floor 0.1. `orchestrator_supplied` candidates are accepted by simulation under the same invariants.
 
 `strategy.generate` optional fields: `candidate_count` defaults to 150 (100–200), `seed` to 42, `revision` to 1. Seeds are integers from 0 to 2,147,483,647. The same task/seed/revision/run yields the same candidates. Candidate IDs remain stable across requested revisions of the same task/seed/run; changed input gets new IDs.
 
@@ -53,16 +53,16 @@ Each recommendation includes `metrics` for the submitted adaptive policy, `fixed
 
 ## Selection and observation writes
 
-`memory.retrieve` returns the last ten selected records for the required business/product scope. Its optional `selection_id` requests one exact current record instead, so Astra can prepare observation updates for older campaigns. A scoped miss returns an empty `records` array; a supplied ID never bypasses business/product filtering.
+`memory.retrieve` returns the last ten selected records for the required business/product scope. Its optional `selection_id` requests one exact current record instead, so the Orchestrator can prepare observation updates for older campaigns. A scoped miss returns an empty `records` array; a supplied ID never bypasses business/product filtering.
 
-Selection requires the complete immutable evaluation and exact strategy ID/revision **from its recommendation set**, plus caller-assigned `selection_id` and `selected_at`. The returned proposed record starts at `record_revision: 1`, `selection_kind: user_selected`, `actual: null` and `comparison: null`. Only Astra's subsequent `memory.save_selection` writes it.
+Selection requires the complete immutable evaluation and exact strategy ID/revision **from its recommendation set**, plus caller-assigned `selection_id` and `selected_at`. The returned proposed record starts at `record_revision: 1`, `selection_kind: user_selected`, `actual: null` and `comparison: null`. Only the Orchestrator's subsequent `memory.save_selection` writes it.
 
 An actual snapshot requires all of: unique `observation_id`, `observed_at`, textual source, status (`partial` or `final`), attribution end day (integer day relative to campaign start), cumulative spend, cumulative integer purchases, observed contribution per purchase and currency. Observations can exceed planned budget; they describe what happened. Currency must match the saved input. An observation cannot precede selection or move an existing observation's timestamp/horizon backwards. Final cannot be downgraded to partial. Corrections use a new observation ID; historical snapshots are retained.
 
-Outcome returns a proposed `memory.update_actual` payload with business/product/selection identity, an idempotency key, the supplied record's `expected_revision`, actuals and computed comparison. Astra passes it through after audit. Memory checks current revision, recalculates the comparison and commits atomically. HTTP 409 requires Astra to resolve a conflict; these services do not implement retry policy.
+Outcome returns a proposed `memory.update_actual` payload with business/product/selection identity, an idempotency key, the supplied record's `expected_revision`, actuals and computed comparison. The Orchestrator passes it through after audit. Memory checks current revision, recalculates the comparison and commits atomically. HTTP 409 requires the Orchestrator to resolve a conflict; these services do not implement retry policy.
 
 Comparisons include `comparable`, a reason, actual contribution profit/ROI/acquisition cost, observed-minus-predicted purchases/profit/ROI, and purchases/profit relative errors. Differences are null unless results are final and attribution horizons match. Relative error is `(actual − prediction) / abs(prediction)` and is null when prediction is zero. Actual metrics remain available even when forecast comparison is inappropriate.
 
 ## Concrete end-to-end examples
 
-[The container client test](../test/container/handoffs.test.js) shows every complete payload assembled from real prior service responses. [Contract tests](../test/contracts.test.js) construct and validate all eight action envelopes; [helpers](../test/helpers.js) provide full synthetic selection and observation examples. These are client examples only; neither service-to-service routing nor Astra's audits are implemented.
+[The container client test](../test/container/handoffs.test.js) shows every complete payload assembled from real prior service responses. [Contract tests](../test/contracts.test.js) construct and validate all eight action envelopes; [helpers](../test/helpers.js) provide full synthetic selection and observation examples. These are client examples only; neither service-to-service routing nor the Orchestrator's audits are implemented.

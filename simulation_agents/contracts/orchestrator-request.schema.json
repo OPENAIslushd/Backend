@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://simulation-agents.local/contracts/astra-request-1.0.json",
-  "title": "Astra to advertising simulation services v1.0",
+  "$id": "https://simulation-agents.local/contracts/orchestrator-request-1.0.json",
+  "title": "Orchestrator to advertising simulation services v1.0",
   "type": "object",
   "additionalProperties": false,
   "required": ["contract_version", "request_id", "run_id", "action", "payload"],
@@ -58,7 +58,7 @@
         "unit_contribution": { "type": "number", "minimum": 0, "maximum": 1000000 },
         "data_provenance": { "enum": ["synthetic", "user_supplied", "measured"] },
         "assumptions": { "type": "array", "minItems": 1, "maxItems": 30, "items": { "$ref": "#/definitions/text" } },
-        "context": { "type": "string", "maxLength": 10000, "description": "Optional Astra-curated instruction; no raw history or held-out outcomes." },
+        "context": { "type": "string", "maxLength": 10000, "description": "Optional Orchestrator-curated instruction; no raw history or held-out outcomes." },
         "channels": {
           "type": "object", "additionalProperties": false, "required": ["paid_social", "paid_search", "influencer"],
           "properties": { "paid_social": { "$ref": "#/definitions/channelAssumption" }, "paid_search": { "$ref": "#/definitions/channelAssumption" }, "influencer": { "$ref": "#/definitions/channelAssumption" } }
@@ -82,7 +82,7 @@
       "properties": {
         "strategy_id": { "$ref": "#/definitions/id" }, "revision": { "type": "integer", "minimum": 1 }, "run_id": { "$ref": "#/definitions/id" },
         "business_id": { "$ref": "#/definitions/id" }, "product_id": { "$ref": "#/definitions/id" }, "name": { "$ref": "#/definitions/text" },
-        "generator": { "enum": ["deterministic-diversity-v1", "astra_supplied"] },
+        "generator": { "enum": ["deterministic-diversity-v1", "orchestrator_supplied"] },
         "budget": { "type": "number", "minimum": 1, "maximum": 1000000000 }, "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
         "objective": { "const": "purchases" }, "audience": { "$ref": "#/definitions/text" }, "region": { "$ref": "#/definitions/text" },
         "start_day": { "const": 1 }, "end_day": { "const": 30 }, "initial_allocation": { "$ref": "#/definitions/allocation" },
