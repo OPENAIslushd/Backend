@@ -3,6 +3,7 @@ const Ajv = require("ajv/dist/2020");
 const addFormats = require("ajv-formats");
 const { AppError, publicError, now, same } = require("../runtime/core.cjs");
 const { mockCampaignInput } = require("./mock-data.cjs");
+const { explainCampaign } = require("./explain.cjs");
 const CHANNELS = ["paid_social", "paid_search", "influencer"];
 const text = (max) => ({ type: "string", minLength: 1, maxLength: max });
 const ajv = new Ajv({ strict: true, allErrors: true });
@@ -217,6 +218,7 @@ class CampaignService {
         history: null,
         audit: null,
         recommendations: null,
+        explanation: null,
         selection: null,
         observation: null,
         error: null,
@@ -266,7 +268,21 @@ class CampaignService {
     const b = request.business;
     await this.step(id, "research", async () => {
       try {
-        const r = await this.research.research({ ...b, market: b.region });
+        // Live sub-progress for the slow research step; writes are serialized and only on change.
+        let shown = null;
+        const progress = (text) => {
+          if (text === shown) return;
+          shown = text;
+          this.update(id, (c) => {
+            const s = c.steps.find((s) => s.stepId === "research");
+            if (s.status === "running") s.summary = text;
+          }).catch(() => {});
+        };
+        const r = await this.research.research(
+          { ...b, market: b.region },
+          undefined,
+          progress,
+        );
         const source = r.provider === "gemini" ? "Gemini" : "Katalog";
         return {
           summary: r.competitors.length
@@ -358,6 +374,18 @@ class CampaignService {
         summary: `${ui.recommendations.length} öneri (${ui.status})`,
         patch: (c) => {
           c.recommendations = ui;
+          // The explanation is a display aid; it must never fail the run.
+          try {
+            c.explanation = explainCampaign({
+              input,
+              evaluation,
+              ui,
+              research: c.research,
+              audit: c.audit,
+            });
+          } catch {
+            c.explanation = null;
+          }
           c.status = "awaiting_selection";
         },
       };

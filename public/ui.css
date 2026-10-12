@@ -774,3 +774,28 @@ footer {
 .cp-competitor a {
   color: var(--green);
 }
+.cp-why {
+  font-size: 12px;
+  line-height: 1.55;
+  color: #4d5a50;
+}
+.cp-why summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--green);
+}
+.cp-why ol,
+.cp-why ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+.cp-why p {
+  margin: 8px 0 0;
+}
+.cp-process {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+}

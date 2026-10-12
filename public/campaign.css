@@ -298,3 +298,27 @@ button:disabled {
     grid-column: 2;
   }
 }
+.why {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #4d5a50;
+  margin: 8px 0;
+}
+.why summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--green);
+}
+.why ol,
+.why ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+.why.process {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 0 0 14px;
+}

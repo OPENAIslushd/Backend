@@ -72,7 +72,7 @@ function geminiClient({
 } = {}) {
   return {
     name: "gemini",
-    async research(profile, signal) {
+    async research(profile, signal, progress = () => {}) {
       let chromium;
       try {
         ({ chromium } = require("playwright-core"));
@@ -89,8 +89,10 @@ function geminiClient({
       signal?.addEventListener("abort", abort, { once: true });
       const deadline = Date.now() + timeoutMs;
       try {
+        progress("Chrome açılıyor…");
         browser = await chromium.launch({ channel, headless });
         const page = await browser.newPage({ locale: "tr-TR" });
+        progress("gemini.google.com açılıyor…");
         await page.goto(GEMINI_URL, { waitUntil: "domcontentloaded" });
         if (page.url().includes("consent.")) {
           await page
@@ -108,6 +110,7 @@ function geminiClient({
           );
         const box = page.getByRole("textbox").first();
         await box.waitFor({ timeout: 20000 });
+        progress("Soru Gemini'ye gönderiliyor…");
         await box.fill(prompt(profile));
         await page.keyboard.press("Enter");
         // The answer streams in; it is done when the last response text stops changing.
@@ -120,6 +123,11 @@ function geminiClient({
             .allInnerTexts()
             .catch(() => []);
           const current = texts.at(-1) || "";
+          progress(
+            current
+              ? `Gemini yanıt yazıyor… (${current.length.toLocaleString("tr-TR")} karakter)`
+              : "Gemini araştırıyor…",
+          );
           if (current && current === last) {
             if (++stable >= 3) break;
           } else stable = 0;
@@ -128,6 +136,7 @@ function geminiClient({
         if (!last)
           throw new AppError("TIMEOUT", "Gemini yanıt vermedi.", 504, true);
         try {
+          progress("Gemini yanıtı okunuyor…");
           return { provider: "gemini", ...parseAnswer(last) };
         } catch (e) {
           throw new AppError(

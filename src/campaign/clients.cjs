@@ -111,7 +111,8 @@ function researchClient({
 } = {}) {
   return {
     name: "catalog",
-    research(profile, signal) {
+    research(profile, signal, progress = () => {}) {
+      progress("Rakip kataloğu taranıyor…");
       return new Promise((resolve, reject) => {
         const child = spawn(python, ["orchestrator_bridge.py"], {
           cwd: dir,
@@ -168,11 +169,13 @@ function researchClient({
 // Tries providers in order; a later one runs only when the earlier one failed.
 function researchChain(providers) {
   return {
-    async research(profile, signal) {
+    async research(profile, signal, progress = () => {}) {
       const failures = [];
       for (const p of providers) {
         try {
-          const result = await p.research(profile, signal);
+          if (failures.length)
+            progress(`${failures.at(-1)} — yedek kaynağa geçiliyor…`);
+          const result = await p.research(profile, signal, progress);
           return failures.length
             ? { ...result, fallbackFrom: failures }
             : result;

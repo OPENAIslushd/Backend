@@ -59,6 +59,54 @@ async function health() {
     $("health").replaceChildren(el("li", { class: "down" }, "orchestrator"));
   }
 }
+// Running steps show elapsed time so slow research never looks frozen.
+function elapsed(s) {
+  if (s.status !== "running" || !s.startedAt) return "";
+  const sec = Math.max(
+    0,
+    Math.round((Date.now() - Date.parse(s.startedAt)) / 1000),
+  );
+  return ` · ${sec} sn`;
+}
+// Computed reasoning trail (src/campaign/explain.cjs), built from the run's own numbers.
+function explanationFor(c, r) {
+  return c.explanation?.recommendations.find(
+    (x) => x.strategyId === r.strategy.strategy_id,
+  );
+}
+function whyBlock(c, r, cls) {
+  const x = explanationFor(c, r);
+  if (!x) return null;
+  return el(
+    "details",
+    { class: cls },
+    el("summary", {}, "Neden bu strateji?"),
+    el(
+      "ol",
+      {},
+      x.steps.map((step) => el("li", {}, step)),
+    ),
+  );
+}
+function processBlock(c, cls) {
+  if (!c.explanation) return null;
+  return el(
+    "details",
+    { class: cls },
+    el("summary", {}, "Stratejiler nasıl üretildi? (adım adım)"),
+    el(
+      "ol",
+      {},
+      c.explanation.process.map((p) => el("li", {}, p)),
+    ),
+    el("p", {}, el("b", {}, "Kanal varsayımları")),
+    el(
+      "ul",
+      {},
+      c.explanation.channels.map((p) => el("li", {}, p)),
+    ),
+  );
+}
 function renderSteps(c) {
   $("progress-card").hidden = false;
   $("steps").replaceChildren(
@@ -68,7 +116,7 @@ function renderSteps(c) {
         { class: s.status },
         el("span", { class: "icon" }, ICON[s.status] || "○"),
         el("span", { class: "label" }, s.label),
-        el("span", { class: "summary" }, s.summary || ""),
+        el("span", { class: "summary" }, (s.summary || "") + elapsed(s)),
       ),
     ),
   );
@@ -195,6 +243,7 @@ function renderRecs(c) {
   $("recs-note").textContent =
     `${c.audit.approved} strateji simüle edildi. Rakamlar mock varsayımlara dayanır; gerçek kampanya sonucu değildir.`;
   const selected = c.selection?.record.strategy;
+  $("process").replaceChildren(processBlock(c, "why process") || "");
   $("recs").replaceChildren(
     ...ui.recommendations.map((r) => {
       const m = r.metrics,
@@ -207,7 +256,7 @@ function renderRecs(c) {
         "article",
         { class: "rec" + (isSelected ? " selected" : "") },
         el("p", { class: "eyebrow" }, PROFILE[r.profile] || r.profile),
-        el("h3", {}, r.strategy.name),
+        el("h3", {}, explanationFor(c, r)?.title || r.strategy.name),
         el(
           "p",
           { class: "muted small" },
@@ -240,8 +289,7 @@ function renderRecs(c) {
             `${r.paired_profit_delta?.mean >= 0 ? "+" : ""}${fmt(r.paired_profit_delta?.mean)} ${cur}`,
           ),
         ),
-        el("p", { class: "small" }, r.reasons.join(" ")),
-        el("p", { class: "muted small" }, r.tradeoffs[0]),
+        whyBlock(c, r, "why"),
         c.status === "awaiting_selection"
           ? el(
               "button",

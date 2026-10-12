@@ -223,6 +223,54 @@ function researchBlock(r, cls) {
     ),
   );
 }
+// Running steps show elapsed time so slow research never looks frozen.
+function elapsed(s) {
+  if (s.status !== "running" || !s.startedAt) return "";
+  const sec = Math.max(
+    0,
+    Math.round((Date.now() - Date.parse(s.startedAt)) / 1000),
+  );
+  return ` · ${sec} sn`;
+}
+// Computed reasoning trail (src/campaign/explain.cjs), built from the run's own numbers.
+function explanationFor(c, r) {
+  return c.explanation?.recommendations.find(
+    (x) => x.strategyId === r.strategy.strategy_id,
+  );
+}
+function whyBlock(c, r, cls) {
+  const x = explanationFor(c, r);
+  if (!x) return null;
+  return el(
+    "details",
+    { class: cls },
+    el("summary", {}, "Neden bu strateji?"),
+    el(
+      "ol",
+      {},
+      x.steps.map((step) => el("li", {}, step)),
+    ),
+  );
+}
+function processBlock(c, cls) {
+  if (!c.explanation) return null;
+  return el(
+    "details",
+    { class: cls },
+    el("summary", {}, "Stratejiler nasıl üretildi? (adım adım)"),
+    el(
+      "ol",
+      {},
+      c.explanation.process.map((p) => el("li", {}, p)),
+    ),
+    el("p", {}, el("b", {}, "Kanal varsayımları")),
+    el(
+      "ul",
+      {},
+      c.explanation.channels.map((p) => el("li", {}, p)),
+    ),
+  );
+}
 function campaignView(c) {
   if (!c) return el("p", {}, "Strateji hazırlanıyor…");
   const cur = c.recommendations?.currency || c.input?.currency || "";
@@ -246,11 +294,12 @@ function campaignView(c) {
           { class: s.status },
           el("span", { class: "cp-icon" }, ICON[s.status]),
           el("span", {}, s.label),
-          el("span", { class: "cp-summary" }, s.summary || ""),
+          el("span", { class: "cp-summary" }, (s.summary || "") + elapsed(s)),
         ),
       ),
     ),
     research,
+    processBlock(c, "cp-why cp-process"),
     c.input &&
       el(
         "details",
@@ -279,7 +328,8 @@ function campaignView(c) {
               { class: "eyebrow" },
               PROFILE_LABEL[r.profile] || r.profile,
             ),
-            el("h3", {}, r.strategy.name),
+            el("h3", {}, explanationFor(c, r)?.title || r.strategy.name),
+            el("p", { class: "cp-note" }, r.strategy.name),
             allocation(r.strategy.initial_allocation),
             el(
               "dl",
@@ -295,6 +345,7 @@ function campaignView(c) {
               el("dt", {}, "Zarar olasılığı"),
               el("dd", {}, pct(m.probability_of_loss)),
             ),
+            whyBlock(c, r, "cp-why"),
             c.status === "awaiting_selection"
               ? el(
                   "button",
