@@ -2,3 +2,6 @@
 /data/
 # Contract validation dependencies
 /contracts/node_modules/
+
+/node_modules/
+.env

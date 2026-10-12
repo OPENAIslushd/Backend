@@ -1,0 +1,596 @@
+{
+  "schemaVersion": "4.0.0",
+  "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
+  "status": "awaiting_approval",
+  "lastSequence": 15,
+  "steps": [
+    {
+      "stepId": "memory.read",
+      "parentStepId": null,
+      "agentId": "memory",
+      "status": "completed",
+      "startedAt": "2026-10-12T09:00:02Z",
+      "finishedAt": "2026-10-12T09:00:08Z",
+      "output": {
+        "status": "completed",
+        "origin": "derived",
+        "data": {
+          "namespace": "demo",
+          "similarIdeas": [],
+          "matchMethod": "none"
+        },
+        "error": null
+      }
+    },
+    {
+      "stepId": "research",
+      "parentStepId": null,
+      "agentId": "research",
+      "status": "completed",
+      "startedAt": "2026-10-12T09:00:03Z",
+      "finishedAt": "2026-10-12T09:00:13Z",
+      "output": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "summary": "Dört uzman agent çıktısının kurgusal demo özeti.",
+          "riskReward": {
+            "status": "completed",
+            "origin": "mock",
+            "data": {
+              "risks": [
+                {
+                  "id": "risk-1",
+                  "title": "Ödeme isteği",
+                  "description": "Öğrenciler abonelik için ödeme yapmayabilir.",
+                  "severity": "high",
+                  "mitigation": "Küçük bir pilotla ödeme isteğini ölç.",
+                  "sourceIds": [],
+                  "evidenceType": "mock"
+                }
+              ],
+              "rewards": [
+                {
+                  "id": "reward-1",
+                  "description": "Bütçeye göre liste oluşturma zaman kazandırabilir.",
+                  "sourceIds": [],
+                  "evidenceType": "mock"
+                }
+              ],
+              "sources": []
+            },
+            "error": null
+          },
+          "marketing": {
+            "status": "completed",
+            "origin": "mock",
+            "data": {
+              "targetSegments": [
+                "Üniversite öğrencileri"
+              ],
+              "channels": [
+                {
+                  "name": "Kampüs toplulukları",
+                  "rationale": "Pilot katılımcı bulmak için örnek kanal."
+                }
+              ],
+              "findings": [
+                {
+                  "id": "marketing-1",
+                  "description": "Bütçe odaklı konumlandırma test edilebilir.",
+                  "sourceIds": [],
+                  "evidenceType": "mock"
+                }
+              ],
+              "sources": []
+            },
+            "error": null
+          },
+          "rivals": {
+            "status": "completed",
+            "origin": "mock",
+            "data": {
+              "competitors": [
+                {
+                  "id": "rival-1",
+                  "name": "Kurgu Rakip 1",
+                  "website": "https://example.com/rival-1",
+                  "description": "Sabit demo rakibidir.",
+                  "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                  "sourceIds": [
+                    "rivals-source-1"
+                  ],
+                  "evidenceType": "mock"
+                },
+                {
+                  "id": "rival-2",
+                  "name": "Kurgu Rakip 2",
+                  "website": "https://example.com/rival-2",
+                  "description": "Sabit demo rakibidir.",
+                  "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                  "sourceIds": [
+                    "rivals-source-2"
+                  ],
+                  "evidenceType": "mock"
+                },
+                {
+                  "id": "rival-3",
+                  "name": "Kurgu Rakip 3",
+                  "website": "https://example.com/rival-3",
+                  "description": "Sabit demo rakibidir.",
+                  "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                  "sourceIds": [
+                    "rivals-source-3"
+                  ],
+                  "evidenceType": "mock"
+                }
+              ],
+              "sources": [
+                {
+                  "id": "rivals-source-1",
+                  "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                  "url": "https://example.com/rival-1",
+                  "accessedAt": null
+                },
+                {
+                  "id": "rivals-source-2",
+                  "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                  "url": "https://example.com/rival-2",
+                  "accessedAt": null
+                },
+                {
+                  "id": "rivals-source-3",
+                  "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                  "url": "https://example.com/rival-3",
+                  "accessedAt": null
+                }
+              ]
+            },
+            "error": null
+          },
+          "trends": {
+            "status": "completed",
+            "origin": "mock",
+            "data": {
+              "findings": [
+                {
+                  "id": "trend-1",
+                  "description": "Örnek hipotez: haftalık bütçe planlamasına ilgi.",
+                  "sourceIds": [],
+                  "evidenceType": "mock"
+                }
+              ],
+              "sources": []
+            },
+            "error": null
+          }
+        },
+        "error": null
+      }
+    },
+    {
+      "stepId": "research.risk_reward",
+      "parentStepId": "research",
+      "agentId": "risk_reward",
+      "status": "completed",
+      "startedAt": "2026-10-12T09:00:04Z",
+      "finishedAt": "2026-10-12T09:00:09Z",
+      "output": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "risks": [
+            {
+              "id": "risk-1",
+              "title": "Ödeme isteği",
+              "description": "Öğrenciler abonelik için ödeme yapmayabilir.",
+              "severity": "high",
+              "mitigation": "Küçük bir pilotla ödeme isteğini ölç.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "rewards": [
+            {
+              "id": "reward-1",
+              "description": "Bütçeye göre liste oluşturma zaman kazandırabilir.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": []
+        },
+        "error": null
+      }
+    },
+    {
+      "stepId": "research.marketing",
+      "parentStepId": "research",
+      "agentId": "marketing",
+      "status": "completed",
+      "startedAt": "2026-10-12T09:00:05Z",
+      "finishedAt": "2026-10-12T09:00:10Z",
+      "output": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "targetSegments": [
+            "Üniversite öğrencileri"
+          ],
+          "channels": [
+            {
+              "name": "Kampüs toplulukları",
+              "rationale": "Pilot katılımcı bulmak için örnek kanal."
+            }
+          ],
+          "findings": [
+            {
+              "id": "marketing-1",
+              "description": "Bütçe odaklı konumlandırma test edilebilir.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": []
+        },
+        "error": null
+      }
+    },
+    {
+      "stepId": "research.rivals",
+      "parentStepId": "research",
+      "agentId": "rivals",
+      "status": "completed",
+      "startedAt": "2026-10-12T09:00:06Z",
+      "finishedAt": "2026-10-12T09:00:11Z",
+      "output": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "competitors": [
+            {
+              "id": "rival-1",
+              "name": "Kurgu Rakip 1",
+              "website": "https://example.com/rival-1",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-1"
+              ],
+              "evidenceType": "mock"
+            },
+            {
+              "id": "rival-2",
+              "name": "Kurgu Rakip 2",
+              "website": "https://example.com/rival-2",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-2"
+              ],
+              "evidenceType": "mock"
+            },
+            {
+              "id": "rival-3",
+              "name": "Kurgu Rakip 3",
+              "website": "https://example.com/rival-3",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-3"
+              ],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": [
+            {
+              "id": "rivals-source-1",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-1",
+              "accessedAt": null
+            },
+            {
+              "id": "rivals-source-2",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-2",
+              "accessedAt": null
+            },
+            {
+              "id": "rivals-source-3",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-3",
+              "accessedAt": null
+            }
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "stepId": "research.trends",
+      "parentStepId": "research",
+      "agentId": "trends",
+      "status": "completed",
+      "startedAt": "2026-10-12T09:00:07Z",
+      "finishedAt": "2026-10-12T09:00:12Z",
+      "output": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "findings": [
+            {
+              "id": "trend-1",
+              "description": "Örnek hipotez: haftalık bütçe planlamasına ilgi.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": []
+        },
+        "error": null
+      }
+    },
+    {
+      "stepId": "strategy.build",
+      "parentStepId": null,
+      "agentId": "strategy",
+      "status": "pending",
+      "startedAt": null,
+      "finishedAt": null,
+      "output": null
+    },
+    {
+      "stepId": "tests.run",
+      "parentStepId": null,
+      "agentId": "simulation",
+      "status": "pending",
+      "startedAt": null,
+      "finishedAt": null,
+      "output": null
+    },
+    {
+      "stepId": "memory.update",
+      "parentStepId": null,
+      "agentId": "memory",
+      "status": "pending",
+      "startedAt": null,
+      "finishedAt": null,
+      "output": null
+    }
+  ],
+  "result": null,
+  "review": {
+    "revision": 1,
+    "input": {
+      "schemaVersion": "4.0.0",
+      "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
+      "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+      "intakeRevision": 2,
+      "language": "tr",
+      "mode": "demo",
+      "testMode": "simulation",
+      "product": {
+        "productDescription": {
+          "status": "provided",
+          "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+          "sourceMessageIds": [
+            "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+          ]
+        },
+        "website": {
+          "status": "not_applicable",
+          "value": null,
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "targetCustomer": {
+          "status": "provided",
+          "value": "Üniversite öğrencileri",
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "targetMarket": {
+          "status": "provided",
+          "value": "Türkiye",
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "currentFeatures": {
+          "status": "provided",
+          "value": [
+            "Bütçe girişi",
+            "Haftalık yemek planı",
+            "Alışveriş listesi"
+          ],
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "pricing": {
+          "status": "provided",
+          "value": {
+            "model": "subscription",
+            "amount": 200,
+            "currency": "TRY",
+            "billingPeriod": "monthly"
+          },
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "userGoal": {
+          "status": "provided",
+          "value": "Deneme kullanıcılarını ücretli aboneye dönüştürmek.",
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "knownCompetitors": {
+          "status": "not_applicable",
+          "value": null,
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        }
+      },
+      "limitations": [],
+      "allowIncomplete": false
+    },
+    "research": {
+      "status": "completed",
+      "origin": "mock",
+      "data": {
+        "summary": "Dört uzman agent çıktısının kurgusal demo özeti.",
+        "riskReward": {
+          "status": "completed",
+          "origin": "mock",
+          "data": {
+            "risks": [
+              {
+                "id": "risk-1",
+                "title": "Ödeme isteği",
+                "description": "Öğrenciler abonelik için ödeme yapmayabilir.",
+                "severity": "high",
+                "mitigation": "Küçük bir pilotla ödeme isteğini ölç.",
+                "sourceIds": [],
+                "evidenceType": "mock"
+              }
+            ],
+            "rewards": [
+              {
+                "id": "reward-1",
+                "description": "Bütçeye göre liste oluşturma zaman kazandırabilir.",
+                "sourceIds": [],
+                "evidenceType": "mock"
+              }
+            ],
+            "sources": []
+          },
+          "error": null
+        },
+        "marketing": {
+          "status": "completed",
+          "origin": "mock",
+          "data": {
+            "targetSegments": [
+              "Üniversite öğrencileri"
+            ],
+            "channels": [
+              {
+                "name": "Kampüs toplulukları",
+                "rationale": "Pilot katılımcı bulmak için örnek kanal."
+              }
+            ],
+            "findings": [
+              {
+                "id": "marketing-1",
+                "description": "Bütçe odaklı konumlandırma test edilebilir.",
+                "sourceIds": [],
+                "evidenceType": "mock"
+              }
+            ],
+            "sources": []
+          },
+          "error": null
+        },
+        "rivals": {
+          "status": "completed",
+          "origin": "mock",
+          "data": {
+            "competitors": [
+              {
+                "id": "rival-1",
+                "name": "Kurgu Rakip 1",
+                "website": "https://example.com/rival-1",
+                "description": "Sabit demo rakibidir.",
+                "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                "sourceIds": [
+                  "rivals-source-1"
+                ],
+                "evidenceType": "mock"
+              },
+              {
+                "id": "rival-2",
+                "name": "Kurgu Rakip 2",
+                "website": "https://example.com/rival-2",
+                "description": "Sabit demo rakibidir.",
+                "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                "sourceIds": [
+                  "rivals-source-2"
+                ],
+                "evidenceType": "mock"
+              },
+              {
+                "id": "rival-3",
+                "name": "Kurgu Rakip 3",
+                "website": "https://example.com/rival-3",
+                "description": "Sabit demo rakibidir.",
+                "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+                "sourceIds": [
+                  "rivals-source-3"
+                ],
+                "evidenceType": "mock"
+              }
+            ],
+            "sources": [
+              {
+                "id": "rivals-source-1",
+                "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                "url": "https://example.com/rival-1",
+                "accessedAt": null
+              },
+              {
+                "id": "rivals-source-2",
+                "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                "url": "https://example.com/rival-2",
+                "accessedAt": null
+              },
+              {
+                "id": "rivals-source-3",
+                "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+                "url": "https://example.com/rival-3",
+                "accessedAt": null
+              }
+            ]
+          },
+          "error": null
+        },
+        "trends": {
+          "status": "completed",
+          "origin": "mock",
+          "data": {
+            "findings": [
+              {
+                "id": "trend-1",
+                "description": "Örnek hipotez: haftalık bütçe planlamasına ilgi.",
+                "sourceIds": [],
+                "evidenceType": "mock"
+              }
+            ],
+            "sources": []
+          },
+          "error": null
+        }
+      },
+      "error": null
+    },
+    "memoryContext": {
+      "status": "completed",
+      "origin": "derived",
+      "data": {
+        "namespace": "demo",
+        "similarIdeas": [],
+        "matchMethod": "none"
+      },
+      "error": null
+    },
+    "limitations": [
+      "DEMO_DATA: Araştırma kurgusaldır.",
+      "SIMULATION_ONLY: Gerçek ürün testi yapılmadı."
+    ]
+  },
+  "approval": null
+}

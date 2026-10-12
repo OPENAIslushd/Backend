@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:slushd:analysis:3.0.0",
+  "$id": "urn:slushd:analysis:4.0.0",
   "$ref": "#/$defs/Response",
   "$defs": {
     "Error": {
@@ -21,7 +21,8 @@
             "RUN_INTERRUPTED",
             "DEPENDENCY_FAILED",
             "INTAKE_NOT_READY",
-            "REVISION_CONFLICT"
+            "REVISION_CONFLICT",
+            "APPROVAL_REQUIRED"
           ]
         },
         "message": {
@@ -43,7 +44,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "clientRequestId": {
           "type": "string",
@@ -88,7 +89,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "type": "string",
@@ -101,7 +102,9 @@
             "running",
             "completed",
             "partial",
-            "failed"
+            "failed",
+            "awaiting_approval",
+            "cancelled"
           ]
         },
         "links": {
@@ -120,7 +123,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "anyOf": [
@@ -1296,12 +1299,16 @@
           },
           "minItems": 2,
           "maxItems": 2
+        },
+        "evaluation": {
+          "$ref": "#/$defs/Evaluation"
         }
       },
       "required": [
         "kind",
         "disclaimer",
-        "scenarios"
+        "scenarios",
+        "evaluation"
       ],
       "additionalProperties": false
     },
@@ -1894,116 +1901,6 @@
         }
       ]
     },
-    "EvaluationResult": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "status": {
-              "const": "completed"
-            },
-            "origin": {
-              "type": "string",
-              "enum": [
-                "live",
-                "mock",
-                "derived"
-              ]
-            },
-            "data": {
-              "$ref": "#/$defs/Evaluation"
-            },
-            "error": {
-              "type": "null"
-            }
-          },
-          "required": [
-            "status",
-            "origin",
-            "data",
-            "error"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "status": {
-              "const": "partial"
-            },
-            "origin": {
-              "type": "string",
-              "enum": [
-                "live",
-                "mock",
-                "derived"
-              ]
-            },
-            "data": {
-              "$ref": "#/$defs/Evaluation"
-            },
-            "error": {
-              "$ref": "#/$defs/Error"
-            }
-          },
-          "required": [
-            "status",
-            "origin",
-            "data",
-            "error"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "status": {
-              "const": "failed"
-            },
-            "origin": {
-              "const": "none"
-            },
-            "data": {
-              "type": "null"
-            },
-            "error": {
-              "$ref": "#/$defs/Error"
-            }
-          },
-          "required": [
-            "status",
-            "origin",
-            "data",
-            "error"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "status": {
-              "const": "skipped"
-            },
-            "origin": {
-              "const": "none"
-            },
-            "data": {
-              "type": "null"
-            },
-            "error": {
-              "type": "null"
-            }
-          },
-          "required": [
-            "status",
-            "origin",
-            "data",
-            "error"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
     "MemoryReceiptResult": {
       "oneOf": [
         {
@@ -2132,9 +2029,6 @@
         "testResults": {
           "$ref": "#/$defs/TestResultsResult"
         },
-        "evaluation": {
-          "$ref": "#/$defs/EvaluationResult"
-        },
         "warnings": {
           "type": "array",
           "items": {
@@ -2142,6 +2036,26 @@
             "minLength": 1
           },
           "minItems": 0
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Review"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Approval"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -2150,8 +2064,9 @@
         "research",
         "buildSuggestion",
         "testResults",
-        "evaluation",
-        "warnings"
+        "warnings",
+        "review",
+        "approval"
       ],
       "additionalProperties": false
     },
@@ -2159,7 +2074,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "type": "string",
@@ -2200,9 +2115,6 @@
         "testResults": {
           "$ref": "#/$defs/TestResultsResult"
         },
-        "evaluation": {
-          "$ref": "#/$defs/EvaluationResult"
-        },
         "warnings": {
           "type": "array",
           "items": {
@@ -2213,6 +2125,26 @@
         },
         "memoryUpdate": {
           "$ref": "#/$defs/MemoryReceiptResult"
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Review"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Approval"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -2227,9 +2159,10 @@
         "research",
         "buildSuggestion",
         "testResults",
-        "evaluation",
         "warnings",
-        "memoryUpdate"
+        "memoryUpdate",
+        "review",
+        "approval"
       ],
       "additionalProperties": false
     },
@@ -2324,13 +2257,21 @@
         },
         "research": {
           "$ref": "#/$defs/ResearchResult"
+        },
+        "review": {
+          "$ref": "#/$defs/Review"
+        },
+        "approval": {
+          "$ref": "#/$defs/Approval"
         }
       },
       "required": [
         "runId",
         "input",
         "memoryContext",
-        "research"
+        "research",
+        "review",
+        "approval"
       ],
       "additionalProperties": false
     },
@@ -2351,40 +2292,11 @@
       ],
       "additionalProperties": false
     },
-    "EvaluateInput": {
-      "type": "object",
-      "properties": {
-        "runId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "input": {
-          "$ref": "#/$defs/AnalysisInput"
-        },
-        "research": {
-          "$ref": "#/$defs/ResearchResult"
-        },
-        "buildSuggestion": {
-          "$ref": "#/$defs/BuildSuggestion"
-        },
-        "testResults": {
-          "$ref": "#/$defs/TestResults"
-        }
-      },
-      "required": [
-        "runId",
-        "input",
-        "research",
-        "buildSuggestion",
-        "testResults"
-      ],
-      "additionalProperties": false
-    },
     "MemoryRecord": {
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "recordId": {
           "type": "string",
@@ -3026,73 +2938,6 @@
           "type": "object",
           "properties": {
             "stepId": {
-              "const": "strategy.evaluate"
-            },
-            "parentStepId": {
-              "const": null
-            },
-            "agentId": {
-              "const": "strategy"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "running",
-                "completed",
-                "partial",
-                "failed",
-                "skipped"
-              ]
-            },
-            "startedAt": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "finishedAt": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "output": {
-              "anyOf": [
-                {
-                  "$ref": "#/$defs/EvaluationResult"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            }
-          },
-          "required": [
-            "stepId",
-            "parentStepId",
-            "agentId",
-            "status",
-            "startedAt",
-            "finishedAt",
-            "output"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "stepId": {
               "const": "memory.update"
             },
             "parentStepId": {
@@ -3162,7 +3007,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "runId": {
           "type": "string",
@@ -3175,7 +3020,9 @@
             "running",
             "completed",
             "partial",
-            "failed"
+            "failed",
+            "awaiting_approval",
+            "cancelled"
           ]
         },
         "lastSequence": {
@@ -3187,13 +3034,33 @@
           "items": {
             "$ref": "#/$defs/Step"
           },
-          "minItems": 10,
-          "maxItems": 10
+          "minItems": 9,
+          "maxItems": 9
         },
         "result": {
           "anyOf": [
             {
               "$ref": "#/$defs/Response"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Review"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Approval"
             },
             {
               "type": "null"
@@ -3207,7 +3074,9 @@
         "status",
         "lastSequence",
         "steps",
-        "result"
+        "result",
+        "review",
+        "approval"
       ],
       "additionalProperties": false
     },
@@ -3215,7 +3084,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "3.0.0"
+          "const": "4.0.0"
         },
         "clientRequestId": {
           "type": "string",
@@ -3247,7 +3116,7 @@
           "const": "simulation"
         },
         "product": {
-          "$ref": "urn:slushd:intake:3.0.0#/$defs/ProductProfile"
+          "$ref": "urn:slushd:intake:4.0.0#/$defs/ProductProfile"
         },
         "limitations": {
           "type": "array",
@@ -3272,6 +3141,85 @@
         "product",
         "limitations",
         "allowIncomplete"
+      ],
+      "additionalProperties": false
+    },
+    "Review": {
+      "type": "object",
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "input": {
+          "$ref": "#/$defs/AnalysisInput"
+        },
+        "research": {
+          "$ref": "#/$defs/ResearchResult"
+        },
+        "memoryContext": {
+          "$ref": "#/$defs/MemoryContextResult"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "revision",
+        "input",
+        "research",
+        "memoryContext",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "ApprovalRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "4.0.0"
+        },
+        "clientRequestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reviewRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "decision": {
+          "enum": [
+            "approve",
+            "request_changes"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientRequestId",
+        "reviewRevision",
+        "decision"
+      ],
+      "additionalProperties": false
+    },
+    "Approval": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "$ref": "#/$defs/ApprovalRequest"
+        },
+        "decidedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "request",
+        "decidedAt"
       ],
       "additionalProperties": false
     }

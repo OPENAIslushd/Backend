@@ -1,73 +1,50 @@
-# Kişi 2 — Orchestrator Agent uygulama planı
+# Orchestrator teslimi ve ekip entegrasyonu
 
-Sözleşmenin tek kaynağı [contracts/README.md](../contracts/README.md) ve dört JSON Schema dosyasıdır. Bu plan v3 mimarisini uygular. Test girdileri gerçek ürün testi değil demo simülasyonudur.
+Son akışın kaynağı [v4 sözleşmesi](../contracts/README.md). Backend `feat/orchestrator` üzerinde; React yalnız bu backend'e bağlanır. JSON dosyaları dışında depolama bağımlılığı yoktur.
 
-## İş akışı
+| Sahip | Kapsam |
+|---|---|
+| Kişi 1 | React chat, eksik bilgi soruları, araştırma sonrası onay, SSE, dashboard |
+| Kişi 2 | Node HTTP, intake, CLI runner, orkestrasyon, onay/kimlik kontrolleri, kalıcılık ve hata yönetimi |
+| Kişi 3 | Research parent ve dört uzman |
+| Kişi 4 | Strategy, Simulator, Memory ve bunların MCP/adaptör entegrasyonu |
 
-0. React chatbox, POST /intakes ile ürün açıklamasını gönderir. Orchestrator alanları çıkarır; needs_input durumunda questions döndürür. UI cevapları POST /intakes/:intakeId/messages ile iletir. Hazır profil veya açık eksik bilgi onayı olmadan Research başlamaz. Ayrıntı: [intake sözleşmesi](../contracts/intake.md).
-1. React, hazır intakeId/intakeRevision ile Orchestrator'a POST /analyze gönderir. Node.js intake durumunu/sürümünü doğrulayıp yapılandırılmış AnalysisInput kopyasını alır, idempotency kontrolü yapar ve runId/olay URL'siyle 202 döner.
-2. Orchestrator Agent, Memory Agent'tan JSON geçmişini okutur ve Research Agent'ı başlatır. İki dal paralel çalışabilir.
-3. Research Agent, risk/reward analytics, marketing research, rival research ve trend analytics agent'larına ayrılır. Uzman çıktıları ayrı şemalarda doğrulanır; Research bunları birleştirir.
-4. Orchestrator, araştırmayı ve hafızayı Strategy Agent'a vererek build suggestion ve test planı ister.
-5. Test planının iki senaryosu deterministik simülasyon aracında çalışır. Araç metric, criterion checks ve success/failure üretir.
-6. Orchestrator Strategy Agent'ı değerlendirme fazında çağırır. Strategy başarılı/başarısız senaryoları nedenleri, koşulları, sonraki adımları ve sınırlamalarıyla açıklar.
-7. Orchestrator, Memory Agent üzerinden analiz ve çıkarılan dersleri JSON hafızasına yazar.
-8. Memory yazma girişimi sonuçlandıktan sonra run.finished ile nihai sonuç UI'a gönderilir. Yazma başarısızsa sonuç kaybolmaz, durum partial olur.
+Strategy **bir kez**, araştırma + hafıza verileri kullanıcı tarafından onaylandıktan sonra çalışır. Simulator gerekçeleri kendi çıktısına ekler. Kullanıcı eksik bilgilerle araştırmayı başlatabilir; bu eylem Strategy'yi başlatmaz.
 
-Her başlangıç/bitişte Orchestrator olay üretir. Research kendi alt adımlarını onStep callback'iyle bildirir; global sıra numarasını yalnız Orchestrator verir. Önceki plandaki Supabase/ilişkisel depolama ve senkron tek-yanıt yaklaşımı kaldırılmıştır.
+## Uygulanan sıra
 
-## Sorumluluklar ve branch'ler
+1. Güncel origin/main üzerinden feat/orchestrator.
+2. v4 şemalar, 9 adım, onay olayları, Simulator evaluation ve örnekler.
+3. HTTP başlangıç, CORS, 16 KiB JSON limiti, ortak hatalar.
+4. JSON intake ve atomik/idempotent mesaj işleme.
+5. Açık bilinmeyenler, kaynak mesajları, sorular ve hazır olma kontrolü.
+6. Shell kullanmayan, şema kontrollü, iptal/timeout destekli CLI runner.
+7. Donmuş AnalysisInput, analyze, Snapshot ve SSE.
+8. Paralel Research/Memory ve uzman ilerlemesi.
+9. Review revizyonuna bağlı, idempotent kullanıcı onayı ve düzeltme yolu.
+10. Tek Strategy → Simulator zinciri; ID/hesap/sonuç doğrulaması.
+11. Memory yazma girişimi sonrası nihai olay.
+12. Kalıcı event sırası, replay, disconnect ve restart davranışı.
+13. Şema, runtime, subprocess ve HTTP/SSE kabul testleri.
 
-| Sahip | Branch | Dosyalar / teslim |
-|---|---|---|
-| Kişi 1 | feat/frontend-dashboard | Frontend repo; chatbox, eksik bilgi soruları, intake endpoint'leri, POST, EventSource, 10 adımlık agent görünümü, snapshot/reconnect |
-| Kişi 2 | feat/orchestrator | contracts/, src/orchestrator/, src/intake/, src/runtime/, src/strategy/, src/events/, Node HTTP |
-| Kişi 3 | feat/research | src/research/; parent + dört uzman, kaynak doğrulama, onStep bildirimleri |
-| Kişi 4 | feat/json-memory-simulation | src/memory/, src/simulation/, src/mcp/; JSON kayıt ve simülasyon |
+## Demo ve gerçek bağlantılar
 
-Sözleşme branch'i codex/contracts-orchestration-plan. PR'ı kullanıcı açacak. Sözleşme main'e alındıktan sonra herkes aynı commit'ten kendi branch'ini açar. Ortak şema ve kök bağımlılık/lockfile değişikliklerini Kişi 2 koordine eder. Frontend ayrı repodaysa contracts aynı sürümden kopyalanır. Ayrı clone/worktree kullanın; aynı dizinde eşzamanlı branch değiştirmeyin.
+`src/adapters/demo.cjs` yalnız geçici fixture adaptörüdür; Kişi 3/4 iş mantığının yerine geçmez. Research ve Strategy mevcut sabit JSON'ları, Simulator sabit test sonucunu döndürür. Memory.read boş bağlam; Memory.update JSON kayıt yazar. Demo sayıları açık varsayımlardır.
 
-İlk PR sözleşme; ikinci PR Orchestrator'ın fixture+SSE iskeleti. Research ve JSON Memory entegrasyonlarını küçük PR'larla ekleyin. Son saati ilk merge için beklemeyin.
+Intake varsayılan demo çıkarımında ilk serbest açıklamayı, belgelenmiş tam örnek yanıtı veya etiketli alanları işler. Genel doğal dil çıkarımı `INTAKE_EXTRACTOR=cli` ile ortak runner'a bağlanır. Unknown değerler null kalır; model revision/status/onay kontrol etmez.
 
-## Beş saatlik sıra
+Gerçek agent modülü için `AGENT_ADAPTER_MODULE` ayarlanır; [metot sözleşmeleri](../contracts/README.md#agent-adaptörleri) korunur. Adaptörler signal'a uymalı, şema zarfı döndürmeli, Research onStep callback'lerini beklemeli. Live hatası demo'ya dönüşmez.
 
-| Süre | Senin teslimin | Paralel ekip teslimi |
-|---|---|---|
-| 00:00–00:30 | v3 şema/olay adlarını dondur, bağlantıları doğrula | Herkes fixture'ı okuyabilir |
-| 00:30–01:15 | Chat intake fixture akışı, POST 202, snapshot ve fixture SSE oynatıcı | UI agent ağacını ve canlı adımları gösterir |
-| 01:15–02:15 | CLI runner + Strategy build/evaluate | Research uzman stub'ları; JSON memory ve simülasyon |
-| 02:15–03:15 | Gerçek adaptörleri bağla, tek olay yazıcısı | Dört araştırma sonucu + memory receipt |
-| 03:15–04:00 | Reconnect, hata, kaynak/ID, timeout, kayıt tekrar testleri | Uçtan uca ortak demo |
-| 04:00–05:00 | Özellik dondurma, 3 prova ve yedek video | Aynı commit ile sunum |
+CLI kurulumu/oturum/MCP bulguları ve çalışma komutları [README](../README.md) içindedir. CLI şema çıktısı yaklaşımı [resmî Codex örneği](https://developers.openai.com/cookbook/examples/codex/build_iterative_repair_loops_with_codex) ile yerel `codex exec --help` üzerinden doğrulandı. İlgili MCP'nin listede olması bir ekip agent'ının çalıştığını kanıtlamaz.
 
-## Runtime kararları
+Varsayılan agent çağrı sınırı 30 saniye; araştırma fazı ve onay sonrası faz ayrı ayrı 120 saniye. Intake 30 saniye. Kullanıcı bekleme süresi bütçeye dahil değildir. Geçici adaptörler model döngüsü/retry başlatmaz; bütün sıra Node.js tarafından belirlenir.
 
-Orchestrator ve Research'ün fan-out/fan-in davranışı Node.js runtime tarafından yürütülür; model çıktısı iş sırasını veya HTTP şemasını değiştiremez. CLI çalıştırmaları rol prompt'u + görev verisi + çıktı şeması alır. Research parent kendi dört uzman görevini koordine eder; sınırsız agent açma/döngü yok. Strategy build ve evaluate ayrı çağrılardır; test sonuçları ikinci çağrının açık girdisidir.
+## Entegrasyon kontrolü
 
-Ortak runner: child_process.spawn, shell=false, sabit prompt argümanı ve JSON veri stdin'den; her run/rol için ayrı çalışma/geçici çıktı alanı. Süreç exit code, JSON parse ve output schema kontrolü zorunlu. CLI olayları uygulamanın SSE olayları değildir; kullanıcıya yalnız doğrulanmış adım sonuçları gönderilir. Runner değişse de agent sözleşmesi değişmez.
-
-Codex kullanılıyorsa daha önce doğrulanan [non-interactive çıktı şeması](https://learn.chatgpt.com/docs/non-interactive-mode) desteği adaptörde kullanılabilir. HTTP Response yerine ilgili agent'ın data şemasını verin. [MCP bağlantısı](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) ve [hesap oturumu](https://learn.chatgpt.com/docs/auth) demo bilgisayarında gerçek child process ile test edilmelidir. Bu PR model/bağlantı kurulumu yapmaz.
-
-Intake çıkarımı mesaj başına en fazla 30 saniye; kullanıcı cevabını beklemek analiz bütçesine dahil değildir. Başlangıç analiz bütçesi: toplam 240 saniye; memory.read 5 s, araştırma dalı en fazla 120 s (dört uzman, varsayılan concurrency=2, her biri 50 s + birleştirme 20 s), strategy.build 45 s, simülasyon 5 s, strategy.evaluate 45 s, memory.update 5 s; kalan süre doğrulama ve süreç temizliği payıdır. Bunlar hedef sınırlar, gecikme garantisi değil. Gerçek oturum/limitlere göre smoke test sonrası ayarlayın. Memory read araştırmayla paraleldir.
-
-AbortSignal ve süreç ağacı temizliği sağlayın. Promise.race tek başına süreç durdurmaz. SSE client disconnect analiz iptali değildir; yeniden bağlanma desteklenir. Global timeout çalışan adımları failed/TIMEOUT, bağımlıları skipped yapar; kullanıcıya terminal olay ulaşır. Agent retry aynı step içinde sınırlıdır, yeni bir run yaratmaz.
-
-JSON kaydı tek yazıcı ile yapılır; DB servisi yoktur. Demo/live namespace'leri ayrıdır. Sunucudan gelen metni React metin olarak gösterir; HTML olarak işlemez. Anahtar/oturum bilgileri, yerel dosya yolları ve ham tool logları UI payload'una girmez.
-
-## Entegrasyon kabul koşulları
-
-- Chat mesajı sekiz ürün alanına dönüşüyor; bilinmeyen fiyat/pazar uydurulmuyor.
-- Eksik alanlar gerekçeli sorularla UI'a dönüyor; yanıt endpoint'i aynı intake'ı güncelliyor.
-- Ready olmadan Research başlayamıyor; kullanıcı açıkça eksik bilgilerle devam edebiliyor.
-- Eski revision ve tekrar gönderilen mesajlar çift analiz/yanlış profil üretmiyor.
-- UI yalnız Orchestrator'a bağlı; dört uzman Research altında ayrı görülebiliyor.
-- İki Strategy fazı ve aralarındaki simülasyon ayrı adımlar olarak görünüyor.
-- İyimser başarı ve kötümser başarısızlığın kriterlere dayalı nedenleri gösteriliyor.
-- Gerçek ürün testi yapılmadığı, tüm rakamların varsayımsal olduğu görünür.
-- Memory okuma/güncelleme JSON üzerinden çalışıyor; son UI sonucu yazma girişiminden sonra geliyor.
-- UI reconnect erken olayları kaybetmiyor, duplicate sequence sonucu iki kez işlemiyor.
-- Trend agent hatasında diğer üç araştırma sonucu korunuyor.
-- Strategy hatasında bağımlı adımlar atlanıyor; UI sonsuz spinner göstermiyor.
-- Hafıza yazma hatasında kullanıcı sonucu görebiliyor; kayıt başarılı diye gösterilmiyor.
-- Aynı clientRequestId ikinci model akışı başlatmıyor; aynı runId tekrar kaydı çoğaltmıyor.
-- npm test --prefix contracts başarılı; canlı runtime ayrıca uçtan uca test ediliyor.
+- Frontend schemaVersion=4.0.0, totalSteps=9 ve yeni approval endpoint'ini kullanmalı.
+- Review gösterildikten sonra reviewRevision ile açık approve/request_changes gönderilmeli.
+- Düzeltme eski run'ı değiştirmaz; intake revision artar, yeni analiz gerekir.
+- SSE sequence tekilleştirilmeli; yeniden bağlantıda Last-Event-ID/after kullanılmalı.
+- Simulator çıktısındaki evaluation gerekçeleri dashboard'a taşınmalı.
+- Kişi 3/4 modülleri gelince demo adaptörü değiştirilmeli ve aynı kabul testleri gerçek adaptörlere uygulanmalı.
+- `npm test` ve ayrı `npm run smoke:cli` farklı doğrulamalardır; fixture testleri gerçek model/MCP erişim kanıtı değildir.

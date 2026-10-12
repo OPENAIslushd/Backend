@@ -1,6 +1,6 @@
 # Chatbox -> yapılandırılmış ürün profili -> Research
 
-v3'te kullanıcı önce ürününü doğal dille anlatır. Orchestrator bu metni yapılandırır; eksik ayrıntıları UI'a soru olarak döndürür. UI yanıtı aynı intake oturumuna gönderir. Profil hazır olduğunda UI `/analyze` çağırır; Research yalnız bu profilin sunucuda dondurulmuş kopyasını alır. Bu bölüm endpoint sözleşmesidir; runtime henüz uygulanmadı.
+v4'te kullanıcı önce ürününü doğal dille anlatır. Orchestrator bu metni yapılandırır; eksik ayrıntıları UI'a soru olarak döndürür. UI yanıtı aynı intake oturumuna gönderir. Profil hazır olduğunda UI `/analyze` çağırır; Research yalnız bu profilin sunucuda dondurulmuş kopyasını alır. Runtime uygulanmıştır; demo ve CLI çıkarımı aşağıda ayrılır.
 
 ## Görselden alınan alanlar
 
@@ -43,7 +43,7 @@ Başlatma isteği (`CreateRequest`):
 
 ```json
 {
-  "schemaVersion": "3.0.0",
+  "schemaVersion": "4.0.0",
   "clientRequestId": "a32d8e23-5a4c-4c0d-adb9-5430ac5e4b7e",
   "message": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
   "language": "tr",
@@ -58,7 +58,7 @@ Yanıt gönderme isteği (`MessageRequest`):
 
 ```json
 {
-  "schemaVersion": "3.0.0",
+  "schemaVersion": "4.0.0",
   "clientMessageId": "f8aa69af-1c90-4368-8077-b20229c33351",
   "expectedRevision": 1,
   "action": "reply",
@@ -72,7 +72,7 @@ Kullanıcı bilmiyorsa ayrı UI eylemi:
 
 ```json
 {
-  "schemaVersion": "3.0.0",
+  "schemaVersion": "4.0.0",
   "clientMessageId": "49e6396e-46c2-49d8-87a2-a712e8141ed0",
   "expectedRevision": 1,
   "action": "continue_with_unknowns",
@@ -90,7 +90,7 @@ UI ready gördüğünde şu isteği gönderir:
 
 ```json
 {
-  "schemaVersion": "3.0.0",
+  "schemaVersion": "4.0.0",
   "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
   "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
   "intakeRevision": 2
@@ -122,10 +122,16 @@ Intake ApiError: 400/413 INVALID_REQUEST, 404 NOT_FOUND, 409 REVISION_CONFLICT v
 
 `data/intakes/<intakeId>.json` Intake.Record şemasını kullanır: snapshot, createRequest, createResponse, processedMessages[{request,response}]. Tek yazıcı ve atomic rename; ayrı DB yok. Idempotency indeksleri restart sonrası dosyalardan yeniden kurulabilir. Memory kayıtları AnalysisInput içindeki profil ve kaynak mesaj ID'lerini tutar; ilgili intake JSON'u run geçmişiyle beraber saklanır.
 
-Demo modunda chat çıkarımı da tanımlı intake fixture'larıyla oynatılabilir. `intake.incomplete-ready.response.json` eksik bilgiyle devam davranışının alternatif örneğidir. Mevcut tam analiz fixture'ı yalnız intake.ready.response.json ürün profiliyle eşleşir; farklı profile aynı sonucu yapıştırmayın. O profil için demo analiz fixture'ı yoksa POST /analyze 400 INVALID_REQUEST döner. Live mod gerçek çıkarım/araştırmayı kullanır; testler her zaman simülasyondur.
+Demo modunda chat çıkarımı da tanımlı intake fixture'larıyla oynatılabilir. `intake.incomplete-ready.response.json` eksik bilgiyle devam davranışının alternatif örneğidir. Mevcut tam analiz fixture'ı yalnız intake.ready.response.json ürün profiliyle eşleşir; farklı profile aynı sonucu yapıştırmayın. O profil için demo analiz fixture'ı yoksa POST /analyze 400 TOOL_UNAVAILABLE döner. Live mod gerçek çıkarım/araştırmayı kullanır; testler her zaman simülasyondur.
 
 ## Geliştirici sınırları
 
-Orchestrator `ExtractInput` (önceki profil + konuşma) ile çıkarım yapar; model `ExtractOutput` döndürür. Alan tipleri, user mesaj referansları, eksikler ve soru eşleşmesi doğrulanır. Model snapshot status, revision, idempotency veya allowIncomplete değerini belirlemez; backend iş kuralları belirler. UI yalnız metin ve açık devam eylemini gönderir.
+Orchestrator `ExtractInput` (önceki profil + konuşma) ile çıkarım yapar; model `ExtractOutput` döndürür. Alan tipleri ve user mesaj referansları doğrulanır; eksikler ve sorular backend tarafından hesaplanır. Model snapshot status, revision, idempotency veya allowIncomplete değerini belirlemez; backend iş kuralları belirler. UI yalnız metin ve açık devam eylemini gönderir.
 
-Bu adım mevcut 10 analiz adımından öncedir. Intake sırasında UI chat isteği bekleme/yanıt durumunu gösterir. Profil hazır olduktan sonraki Research/Memory/Strategy ilerlemesi mevcut SSE sözleşmesinde kalır. Kullanıcıdan cevap beklerken CLI süreci veya açık SSE bağlantısı tutmak gerekmez.
+Bu adım mevcut 9 analiz adımından öncedir. Intake sırasında UI chat isteği bekleme/yanıt durumunu gösterir. Profil hazır olduktan sonraki Research/Memory/Strategy ilerlemesi mevcut SSE sözleşmesinde kalır. Kullanıcıdan cevap beklerken CLI süreci veya açık SSE bağlantısı tutmak gerekmez.
+
+## Demo çıkarımı ve ayrı onay
+
+Varsayılan demo çıkarımı ilk serbest açıklamayı aynen korur. Diğer alanlar tam `examples/intake.message.request.json` cevabı veya noktalı virgül/yeni satırla ayrılmış etiketlerle verilir: `Hedef müşteri: Üniversite öğrencileri; Hedef pazar: Türkiye; Fiyatlandırma: aylık 200 TRY; Web sitesi: yok`. Etiketler Ürün, Web sitesi, Hedef müşteri, Hedef pazar, Özellikler (virgülle), Fiyatlandırma, Hedef, Rakipler (virgülle). `bilmiyorum` unknown, `paylaşmak istemiyorum` declined, `yok` not_applicable üretir. Fiyat için ücretsiz, aylık/yıllık/tek sefer + tutar + ISO para birimi desteklenir. Demo belirsiz serbest yanıtı tahmin etmez; eksik alanları tekrar sorar. Genel doğal dil için `INTAKE_EXTRACTOR=cli` kullanılır.
+
+Eksik bilgilerle devam yalnız araştırmayı başlatmaya izin verir. Araştırma sonrası UI Review verisini gösterir ve ayrı `/analyses/:runId/approval` çağrısı yapar. Strategy bu ikinci onay olmadan çalışmaz. Düzeltme isteği iptal edilen run'ın intake'ına döner; yeni mesaj yeni revision oluşturur.
