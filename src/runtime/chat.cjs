@@ -116,7 +116,13 @@ class CliChat {
     this.active = null;
   }
   async send(request) {
-    if (!validate(request) || !request.message.trim())
+    if (!validate(request))
+      throw new AppError(
+        "INVALID_REQUEST",
+        `Geçersiz sohbet isteği: ${ajv.errorsText(validate.errors)}`,
+        400,
+      );
+    if (!request.message.trim())
       throw new AppError(
         "INVALID_REQUEST",
         "Prompt 1–4000 karakter olmalı.",
