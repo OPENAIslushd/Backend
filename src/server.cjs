@@ -407,8 +407,28 @@ async function createApp(options = {}) {
     },
   };
 }
+// Without an explicit SIM_SERVICE_TOKEN the Orchestrator starts its own simulation services.
+// SIM_SERVICES=external skips this when the services run elsewhere (e.g. docker compose).
+async function startServices() {
+  if (process.env.SIM_SERVICE_TOKEN || process.env.SIM_SERVICES === "external")
+    return null;
+  const { launchServices } = require("./campaign/launcher.cjs");
+  const services = await launchServices({
+    dataDir: path.resolve(
+      process.env.DATA_DIR || path.join(__dirname, "../data"),
+    ),
+  });
+  process.env.SIM_SERVICE_TOKEN = services.token;
+  for (const [name, url] of Object.entries(services.urls))
+    process.env[`SIM_${name.toUpperCase()}_URL`] = url;
+  console.log("Simülasyon servisleri başlatıldı (otomatik token).");
+  return services;
+}
 if (require.main === module) {
-  createApp()
+  let services = null;
+  startServices()
+    .then((s) => (services = s))
+    .then(createApp)
     .then(async (app) => {
       const port = Number(process.env.PORT || 3001);
       if (!Number.isInteger(port) || port < 0 || port > 65535)
@@ -417,9 +437,15 @@ if (require.main === module) {
         `Orchestrator: ${await app.listen(port, process.env.HOST || "127.0.0.1")}`,
       );
       for (const sig of ["SIGINT", "SIGTERM"])
-        process.once(sig, () => app.close().then(() => process.exit(0)));
+        process.once(sig, () =>
+          app.close().then(() => {
+            services?.stop();
+            process.exit(0);
+          }),
+        );
     })
     .catch((error) => {
+      services?.stop();
       console.error(error.message);
       process.exitCode = 1;
     });

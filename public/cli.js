@@ -426,7 +426,10 @@ async function health() {
           "li",
           {
             class: state,
-            title: state === "ok" ? "çalışıyor" : "kapalı — npm run start:all",
+            title:
+              state === "ok"
+                ? "çalışıyor"
+                : "kapalı — sunucuyu yeniden başlatın",
           },
           name,
         ),

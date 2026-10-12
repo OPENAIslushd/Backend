@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server.cjs",
     "dev": "node --env-file-if-exists=.env --watch src/server.cjs",
-    "start:all": "node scripts/start-all.cjs",
+    "start:all": "npm start",
     "test": "npm test --prefix contracts && node --test test/*.test.cjs",
     "smoke": "node scripts/smoke.cjs",
     "smoke:cli": "node --env-file-if-exists=.env scripts/cli-smoke.cjs",

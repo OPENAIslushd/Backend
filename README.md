@@ -55,10 +55,10 @@ Kişi 3/4 modülleri hazır olduğunda `AGENT_ADAPTER_MODULE` ile `createAdapter
 Orchestrator, `simulation_agents/` altındaki dört servisi (memory, strategy, simulation, outcome) ve `modules/research/` Python araştırma modülünü birbirine bağlar. Servisler birbirini çağırmaz; tüm yönlendirme, denetim ve hafıza yazımı Orchestrator'dadır.
 
 ```sh
-npm run start:all
+npm start
 ```
 
-Bu komut dört servisi 8081–8084 portlarında, Orchestrator'ı `PORT` (varsayılan 3001) üzerinde başlatır ve her açılışta ortak rastgele bir servis token'ı üretir. Geçici mock arayüz: `http://127.0.0.1:3001/campaign`. Gereksinimler: Node.js 24+ (`node:sqlite`), Python 3.10+ ve `modules/research/requirements.txt`. Simülasyon hafızası `DATA_DIR/simulation/memory.sqlite` dosyasındadır.
+`npm start` (ve `npm run dev`) dört servisi Orchestrator'ın alt süreçleri olarak boş localhost portlarında başlatır ve her açılışta ortak rastgele bir servis token'ı üretir; ek ayar gerekmez. Orchestrator kapanınca servisler de kapanır. `npm run start:all` aynı komutun eski adıdır. Geçici mock arayüz: `http://127.0.0.1:3001/campaign`. Gereksinimler: Node.js 24+ (`node:sqlite`), Python 3.10+ ve `modules/research/requirements.txt`. Simülasyon hafızası `DATA_DIR/simulation/memory.sqlite` dosyasındadır.
 
 Akış:
 
@@ -76,7 +76,7 @@ Akış:
 | `POST /campaigns/:id/selection` | `{strategyId, strategyRevision}` → 202 |
 | `POST /campaigns/:id/actuals` | `{spend, purchases, source, unitContribution?, status?, attributionEndDay?}` |
 
-Gerçek veri modu henüz yok (`dataMode:"real"` 400 döner); planı [docs/real-data-mode.tr.md](docs/real-data-mode.tr.md). Servisleri ayrı çalıştırıyorsanız Orchestrator'a `SIM_SERVICE_TOKEN` ve gerekirse `SIM_MEMORY_URL`, `SIM_STRATEGY_URL`, `SIM_SIMULATION_URL`, `SIM_OUTCOME_URL` verin.
+Gerçek veri modu henüz yok (`dataMode:"real"` 400 döner); planı [docs/real-data-mode.tr.md](docs/real-data-mode.tr.md). Servisleri ayrı çalıştırıyorsanız (ör. docker compose) Orchestrator'a `SIM_SERVICE_TOKEN` (veya `SIM_SERVICES=external`) ve `SIM_MEMORY_URL`, `SIM_STRATEGY_URL`, `SIM_SIMULATION_URL`, `SIM_OUTCOME_URL` verin.
 
 ## CLI ve MCP
 
@@ -111,6 +111,6 @@ Kapsam: tek Node süreci/tek DATA_DIR yazıcısı; yerel hackathon demosu. Kimli
 
 ## Kampanya sohbeti (`/cli`)
 
-`http://127.0.0.1:3001/cli` ekranı oturum açılmış Codex CLI ile sohbet eder ve konuştukça sağdaki kampanya profilini (işletme adı, ürün, açıklama, hedef kitle, bölge, araştırma konusu, web sitesi, bütçe, para birimi, satış başı katkı payı) günceller. Zorunlu alanlar: işletme adı, açıklama, hedef kitle, bölge. Kullanıcı “strateji üret” dediğinde (veya düğmeye bastığında) profil `POST /campaigns` ile mock veri modunda kampanya akışına gider; adımlar ve 3 öneri sohbet içinde görünür, seçim hafızaya yazılır. “Mock veriyle doldur” düğmesi Codex'e gitmeden örnek profil doldurur. Simülasyon için `npm run start:all` gerekir.
+`http://127.0.0.1:3001/cli` ekranı oturum açılmış Codex CLI ile sohbet eder ve konuştukça sağdaki kampanya profilini (işletme adı, ürün, açıklama, hedef kitle, bölge, araştırma konusu, web sitesi, bütçe, para birimi, satış başı katkı payı) günceller. Zorunlu alanlar: işletme adı, açıklama, hedef kitle, bölge. Kullanıcı “strateji üret” dediğinde (veya düğmeye bastığında) profil `POST /campaigns` ile mock veri modunda kampanya akışına gider; adımlar ve 3 öneri sohbet içinde görünür, seçim hafızaya yazılır. “Mock veriyle doldur” düğmesi Codex'e gitmeden örnek profil doldurur. Simülasyon servisleri `npm start` ile otomatik başlar.
 
 `POST /cli/messages` gövdesi `{schemaVersion:"4.0.0",clientRequestId,message,history?,profile?}`; yanıt `{reply, profile, missing, ready, generate}`. Model çıktısı güvenilmez sayılır: alanlar uzunluk/biçim kontrolünden geçer, `generate` yalnız zorunlu alanlar doluysa `true` olur. Ekran son 20 mesajı `history` olarak gönderir. API anahtarı kullanılmaz; endpoint yalnız loopback bağlantılarda çalışır, aynı anda tek CLI çağrısı yapar ve 60 saniye sınırı vardır. Aynı anahtar/gövde tekrarı mevcut yanıtı döndürür; başarılı yanıtlar `data/cli-chat/` altında saklanır.
