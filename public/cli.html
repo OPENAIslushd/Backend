@@ -3,28 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Slushd · Canlı Codex</title>
+    <title>Slushd · Kampanya Sohbeti</title>
     <link rel="stylesheet" href="/ui.css" />
+    <link rel="stylesheet" href="/plans.css" />
+    <script src="/plans.js" defer></script>
     <script src="/cli.js" defer></script>
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="/cli">slushd<span> / canlı codex</span></a
-      ><a href="/" class="text-button">Analiz demosuna dön ↗</a>
+      <a class="brand" href="/cli">slushd<span> / kampanya sohbeti</span></a
+      ><a href="/campaign" class="text-button">Form ekranı ↗</a>
     </header>
     <main>
       <section class="intro">
-        <p class="eyebrow">OTURUM AÇILMIŞ CODEX CLI</p>
-        <h1>Bir prompt gönder.</h1>
+        <p class="eyebrow">ORCHESTRATOR · CANLI CODEX · MOCK VERİ</p>
+        <h1>İşletmeni anlat, stratejini üretelim.</h1>
         <p>
-          Mesajın backend üzerinden Codex CLI’ye gider. Gerçek yanıt burada
-          görünür.
+          Konuştukça sağdaki kampanya profili güncellenir. Zorunlu bilgiler
+          tamamlanınca “strateji üret” yaz ya da düğmeye bas.
         </p>
       </section>
-      <div class="workspace cli-only">
+      <div class="workspace">
         <section class="conversation panel" aria-labelledby="chat-title">
           <div class="panel-heading">
-            <h2 id="chat-title">Canlı deneme</h2>
+            <h2 id="chat-title">Sohbet</h2>
             <button id="clear-chat" class="text-button" type="button">
               Yeni sohbet ↗
             </button>
@@ -32,44 +34,66 @@
           <div id="messages" class="messages" aria-live="polite">
             <div class="welcome">
               <span class="spark">✳</span>
-              <h3>Ne sormak istersin?</h3>
+              <h3>İşletmeni anlatarak başla</h3>
               <p>
-                Örneğin: Bir yemek planlama uygulaması için üç MVP özelliği
-                öner.
+                Örneğin: Kafe ve restoranlara NFC ile sadakat programı sunan
+                Yakalıyo adında bir işletmem var.
               </p>
             </div>
           </div>
           <div id="notice" class="notice" role="status">
-            Her prompt bağımsız çalışır. Çağrılar sunucudaki ChatGPT oturumunun
-            kullanım limitlerine tabidir.
+            Mesajlar oturum açılmış Codex CLI’ye gider; kanal rakamları mock
+            veridir, gerçek kampanya sonucu değildir.
           </div>
           <div id="error" class="error" role="alert" hidden></div>
           <form id="prompt-form">
-            <label class="sr-only" for="prompt"
-              >Codex’e göndermek istediğin prompt</label
+            <label class="sr-only" for="prompt">Mesajın</label
             ><textarea
               id="prompt"
               rows="4"
               maxlength="4000"
-              placeholder="Merhaba! Bana basit bir startup fikri öner."
+              placeholder="İşletmeni, hedef kitleni ve pazarını anlat…"
               required
             ></textarea>
             <div class="composer-footer">
               <span>Enter ile gönder · Shift+Enter ile yeni satır</span
-              ><button id="send" class="primary" type="submit">
-                Codex’e gönder ↑
-              </button>
+              ><button id="send" class="primary" type="submit">Gönder ↑</button>
             </div>
           </form>
           <div class="examples">
-            <button id="example" type="button">＋ Basit prompt kullan</button>
+            <button id="example" type="button">＋ Örnek mesaj</button>
           </div>
         </section>
+        <aside class="panel cp-panel" aria-labelledby="profile-title">
+          <div class="panel-heading">
+            <h2 id="profile-title">Kampanya profili</h2>
+            <span id="profile-status" class="cp-status">Eksik</span>
+          </div>
+          <div class="cp-body">
+            <div class="cp-mode">
+              <span class="cp-chip active">Mock veri</span>
+              <span class="cp-chip" title="docs/real-data-mode.tr.md"
+                >Gerçek veri · yakında</span
+              >
+            </div>
+            <div id="profile-fields" class="cp-fields"></div>
+            <p id="missing" class="cp-missing"></p>
+            <div class="cp-actions">
+              <button id="mock-fill" class="secondary" type="button">
+                Mock veriyle doldur
+              </button>
+              <button id="generate" class="primary" type="button" disabled>
+                Strateji üret
+              </button>
+            </div>
+            <ul id="health" class="cp-health" aria-label="Servis durumu"></ul>
+          </div>
+        </aside>
       </div>
       <footer>
-        Slushd / Canlı CLI denemesi
+        Slushd / Orchestrator kampanya sohbeti
         <span
-          >API anahtarı kullanılmaz. Yanıtın gelmesi birkaç saniye
+          >API anahtarı kullanılmaz. Codex yanıtı ve simülasyon birkaç saniye
           sürebilir.</span
         >
       </footer>

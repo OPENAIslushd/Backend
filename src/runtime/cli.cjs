@@ -46,6 +46,7 @@ async function runCli({
   timeoutMs = 30000,
   command = process.env.CODEX_BIN || process.env.CODEX_CLI_PATH || "codex",
   model = process.env.CODEX_MODEL,
+  effort,
   args,
   maxOutputBytes = 1024 * 1024,
 }) {
@@ -60,6 +61,7 @@ async function runCli({
   const argv = args || [
     "exec",
     ...(model ? ["--model", model] : []),
+    ...(effort ? ["-c", `model_reasoning_effort="${effort}"`] : []),
     "--ignore-user-config",
     "--ephemeral",
     "--sandbox",

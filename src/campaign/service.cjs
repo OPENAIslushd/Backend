@@ -3,6 +3,8 @@ const Ajv = require("ajv/dist/2020");
 const addFormats = require("ajv-formats");
 const { AppError, publicError, now, same } = require("../runtime/core.cjs");
 const { mockCampaignInput } = require("./mock-data.cjs");
+const { buildEvidence } = require("./explain.cjs");
+const { templatePlanner, toStrategy } = require("./planner.cjs");
 const CHANNELS = ["paid_social", "paid_search", "influencer"];
 const text = (max) => ({ type: "string", minLength: 1, maxLength: max });
 const ajv = new Ajv({ strict: true, allErrors: true });
@@ -59,9 +61,10 @@ const STEPS = [
   ["research", "Rakip araştırması"],
   ["input", "Kampanya girdisi (mock veri)"],
   ["memory.retrieve", "Geçmiş seçimler"],
-  ["strategy.generate", "Strateji adayları"],
+  ["plan", "Strateji planları"],
+  ["strategy.generate", "Karşılaştırma için rastgele dağılımlar"],
   ["audit", "Orchestrator denetimi"],
-  ["simulation.evaluate", "Simülasyon"],
+  ["simulation.evaluate", "Planların testi (simülasyon)"],
   ["outcome.prepare", "Öneriler"],
 ];
 const invalid = (message, errors) =>
@@ -105,12 +108,21 @@ function auditStrategies(strategies, input, runId) {
 class CampaignService {
   constructor(
     store,
-    { simulation, research, candidateCount = 100, scenarioCount = 40 },
+    {
+      simulation,
+      research,
+      planner = templatePlanner(),
+      fallbackPlanner = templatePlanner(),
+      candidateCount = 100,
+      scenarioCount = 40,
+    },
   ) {
     Object.assign(this, {
       store,
       simulation,
       research,
+      planner,
+      fallbackPlanner,
       candidateCount,
       scenarioCount,
     });
@@ -217,6 +229,10 @@ class CampaignService {
         history: null,
         audit: null,
         recommendations: null,
+        situation: null,
+        plans: null,
+        planProvider: null,
+        evidence: null,
         selection: null,
         observation: null,
         error: null,
@@ -266,17 +282,25 @@ class CampaignService {
     const b = request.business;
     await this.step(id, "research", async () => {
       try {
-        const r = await this.research.research({
-          name: b.name,
-          description: b.description,
-          url: b.url,
-          topic: b.topic,
-          market: b.region,
-          audience: b.audience,
-        });
+        // Live sub-progress for the slow research step; writes are serialized and only on change.
+        let shown = null;
+        const progress = (text) => {
+          if (text === shown) return;
+          shown = text;
+          this.update(id, (c) => {
+            const s = c.steps.find((s) => s.stepId === "research");
+            if (s.status === "running") s.summary = text;
+          }).catch(() => {});
+        };
+        const r = await this.research.research(
+          { ...b, market: b.region },
+          undefined,
+          progress,
+        );
+        const source = r.provider === "gemini" ? "Gemini" : "Katalog";
         return {
           summary: r.competitors.length
-            ? `${r.competitors.length} rakip: ${r.competitors.map((x) => x.name).join(", ")}`
+            ? `${source}: ${r.competitors.length} rakip (${r.competitors.map((x) => x.name).join(", ")})${r.fallbackFrom ? " · Gemini başarısız, katalog kullanıldı" : ""}`
             : "Katalogda eşleşen rakip yok (bu, rakip olmadığı anlamına gelmez).",
           patch: (c) => (c.research = r),
         };
@@ -290,7 +314,7 @@ class CampaignService {
       }
     });
     const input = await this.step(id, "input", async () => {
-      const input = mockCampaignInput(request);
+      const input = mockCampaignInput(request, (await this.get(id)).research);
       return {
         result: input,
         summary: `${input.budget} ${input.currency} bütçe, ${input.assumptions.length} varsayım`,
@@ -312,58 +336,122 @@ class CampaignService {
         patch: (c) => (c.history = history),
       };
     });
+    // Plans come first: purpose, thesis, 30-day timeline, tactics and success criteria.
+    const planned = await this.step(id, "plan", async () => {
+      const ctx = {
+        business: b,
+        input,
+        research: (await this.get(id)).research,
+        history: (await this.get(id)).history,
+      };
+      let out,
+        note = "";
+      await this.update(id, (c) => {
+        c.steps.find((s) => s.stepId === "plan").summary =
+          this.planner.name === "codex"
+            ? "Codex 4–5 plan yazıyor: amaç, 30 günlük takvim, taktikler, hedefler (genelde 2–4 dk)…"
+            : "Planlar hazırlanıyor…";
+      });
+      try {
+        out = await this.planner.plan(ctx);
+      } catch (e) {
+        out = await this.fallbackPlanner.plan(ctx);
+        note = ` · ${this.planner.name || "planlayıcı"} başarısız (${e.message}); şablon planlar kullanıldı`;
+      }
+      const plans = out.plans.map((p) => ({
+        ...p,
+        strategyId: toStrategy(p, input, runId).strategy_id,
+      }));
+      return {
+        result: { ...out, plans },
+        summary: `${plans.length} plan (${out.provider === "codex" ? "Codex" : "şablon"})${note}`,
+        patch: (c) => {
+          c.situation = out.situation;
+          c.plans = plans;
+          c.planProvider = out.provider;
+        },
+      };
+    });
     const generated = await this.step(id, "strategy.generate", async () => {
       const g = await this.simulation.call(
         "strategy.generate",
         { input, candidate_count: this.candidateCount, seed: 42, revision: 1 },
         runId,
       );
-      return { result: g, summary: `${g.strategies.length} aday strateji` };
+      return { result: g, summary: `${g.strategies.length} rastgele dağılım` };
     });
-    const approved = await this.step(id, "audit", async () => {
-      const { approved, rejected } = auditStrategies(
-        generated.strategies,
-        input,
-        runId,
-      );
-      if (!approved.length)
-        throw new AppError("INVALID_OUTPUT", "Denetimden geçen strateji yok.");
-      return {
-        result: approved,
-        summary: `${approved.length} onaylandı, ${rejected.length} reddedildi`,
-        patch: (c) => (c.audit = { approved: approved.length, rejected }),
-      };
-    });
-    const evaluation = await this.step(id, "simulation.evaluate", async () => {
+    const { planStrategies, baseline } = await this.step(
+      id,
+      "audit",
+      async () => {
+        const plans = auditStrategies(
+          planned.plans.map((p) => toStrategy(p, input, runId)),
+          input,
+          runId,
+        );
+        const base = auditStrategies(generated.strategies, input, runId);
+        if (!plans.approved.length)
+          throw new AppError("INVALID_OUTPUT", "Denetimden geçen plan yok.");
+        const rejected = [...plans.rejected, ...base.rejected];
+        return {
+          result: { planStrategies: plans.approved, baseline: base.approved },
+          summary: `${plans.approved.length} plan + ${base.approved.length} rastgele dağılım onaylandı, ${rejected.length} reddedildi`,
+          patch: (c) =>
+            (c.audit = {
+              approved: plans.approved.length + base.approved.length,
+              plans: plans.approved.length,
+              rejected,
+            }),
+        };
+      },
+    );
+    const evaluate = async (strategies) => {
       const e = await this.simulation.call(
         "simulation.evaluate",
-        {
-          input,
-          strategies: approved,
-          scenario_count: this.scenarioCount,
-          seed: 42,
-        },
+        { input, strategies, scenario_count: this.scenarioCount, seed: 42 },
         runId,
       );
       if (e.run_id !== runId)
         throw new AppError("INVALID_OUTPUT", "Simülasyon run_id uyuşmuyor.");
-      return {
-        result: e,
-        summary: `${e.results.length} strateji × ${e.scenario_count} senaryo`,
-      };
-    });
-    // The full evaluation is kept server-side; outcome.select needs the exact object later.
-    await this.store.write(`campaign-evaluations/${id}.json`, evaluation);
+      return e;
+    };
+    // Plans and the random baseline run on the same seed, so they face the same scenarios.
+    const { planEvaluation, baselineEvaluation } = await this.step(
+      id,
+      "simulation.evaluate",
+      async () => {
+        const planEvaluation = await evaluate(planStrategies);
+        const baselineEvaluation = await evaluate(baseline);
+        return {
+          result: { planEvaluation, baselineEvaluation },
+          summary: `${planEvaluation.results.length} plan + ${baselineEvaluation.results.length} rastgele dağılım × ${planEvaluation.scenario_count} senaryo`,
+        };
+      },
+    );
+    // outcome.select later needs the exact plan evaluation object.
+    await this.store.write(`campaign-evaluations/${id}.json`, planEvaluation);
     await this.step(id, "outcome.prepare", async () => {
       const ui = await this.simulation.call(
         "outcome.prepare",
-        { evaluation },
+        { evaluation: planEvaluation },
         runId,
       );
       return {
-        summary: `${ui.recommendations.length} öneri (${ui.status})`,
+        summary: `${ui.recommendations.length} plan önerildi (${ui.status})`,
         patch: (c) => {
           c.recommendations = ui;
+          // Evidence is a display aid; it must never fail the run.
+          try {
+            c.evidence = buildEvidence({
+              plans: c.plans,
+              planEvaluation,
+              baselineEvaluation,
+              ui,
+              input,
+            });
+          } catch {
+            c.evidence = null;
+          }
           c.status = "awaiting_selection";
         },
       };

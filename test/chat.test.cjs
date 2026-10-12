@@ -53,3 +53,47 @@ test("different prompts cannot start concurrent CLI processes", async (t) => {
   release({ reply: "Tamam" });
   await first;
 });
+test("chat returns a cleaned campaign profile and gates generate on required fields", async (t) => {
+  const c = await setup(t);
+  const outputs = [
+    {
+      reply: "Bütçeniz nedir?",
+      profile: {
+        name: " Yakalıyo ",
+        productName: null,
+        description: "NFC sadakat programı",
+        audience: null,
+        region: "Türkiye",
+        topic: null,
+        url: "javascript:alert(1)",
+        budget: -5,
+        currency: "try",
+        unitContribution: null,
+      },
+      generate: true,
+    },
+    { reply: "Üretiyorum.", generate: true },
+  ];
+  let seen;
+  const chat = new CliChat(c.store, {
+    runner: async (args) => {
+      seen = args.text;
+      return outputs.shift();
+    },
+  });
+  const a = await chat.send(request());
+  assert.equal(a.profile.name, "Yakalıyo");
+  assert.equal(a.profile.url, null);
+  assert.equal(a.profile.budget, null);
+  assert.equal(a.profile.currency, "TRY");
+  assert.deepEqual(a.missing, ["audience"]);
+  assert.equal(a.generate, false);
+  // A runner without profile output keeps the client's current profile.
+  const b = await chat.send({
+    ...request(),
+    profile: { ...a.profile, audience: "Kafe sahipleri" },
+  });
+  assert.match(seen, /Kafe sahipleri/);
+  assert.equal(b.ready, true);
+  assert.equal(b.generate, true);
+});

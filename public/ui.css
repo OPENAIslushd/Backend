@@ -515,3 +515,183 @@ footer {
   grid-template-columns: minmax(0, 780px);
   justify-content: center;
 }
+/* Campaign chat profile panel (/cli) */
+.cp-panel {
+  position: sticky;
+  top: 16px;
+}
+.cp-body {
+  padding: 18px 20px 20px;
+  display: grid;
+  gap: 14px;
+}
+.cp-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fbf0e4;
+  color: #9a5b1f;
+}
+.cp-status.ready {
+  background: #e6f0ea;
+  color: var(--green);
+}
+.cp-mode {
+  display: flex;
+  gap: 6px;
+}
+.cp-chip {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.cp-chip.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+.cp-fields {
+  display: grid;
+  gap: 8px;
+}
+.cp-field {
+  display: grid;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6f776f;
+}
+.cp-field input {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: #26372c;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  background: #fbfcf9;
+}
+.cp-field.filled input {
+  border-color: #b9d3c2;
+  background: #f3f8f2;
+}
+.cp-missing {
+  margin: 0;
+  font-size: 12px;
+  color: #76816d;
+  line-height: 1.5;
+}
+.cp-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.cp-health {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cp-health li {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fbeaea;
+  color: #a23b3b;
+}
+.cp-health li.ok {
+  background: #e6f0ea;
+  color: var(--green);
+}
+.cp-campaign {
+  display: grid;
+  gap: 12px;
+  white-space: normal;
+}
+.cp-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+}
+.cp-steps li {
+  display: grid;
+  grid-template-columns: 16px minmax(120px, 190px) 1fr;
+  gap: 6px;
+}
+.cp-icon,
+.cp-summary {
+  color: #8a948a;
+}
+.cp-steps .completed .cp-icon {
+  color: var(--green);
+}
+.cp-steps .running .cp-icon {
+  color: #c27c3a;
+}
+.cp-steps .failed .cp-icon,
+.cp-steps .failed .cp-summary,
+.cp-error {
+  color: #a23b3b;
+}
+.cp-note,
+.cp-error {
+  margin: 0;
+  font-size: 12px;
+}
+.cp-assumptions {
+  font-size: 12px;
+  color: #6f776f;
+}
+.cp-assumptions ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+@media (max-width: 760px) {
+  .cp-panel {
+    position: static;
+  }
+}
+.cp-research {
+  display: grid;
+  gap: 8px;
+}
+.cp-market {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.cp-competitors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+}
+.cp-competitor {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.cp-competitor h3 {
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+.cp-competitor p {
+  margin: 0 0 6px;
+}
+.cp-competitor ul {
+  margin: 0 0 6px;
+  padding-left: 16px;
+}
+.cp-competitor a {
+  color: var(--green);
+}

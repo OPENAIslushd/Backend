@@ -62,17 +62,31 @@ function fakeSimulation({ bad = 0 } = {}) {
         return {
           run_id: runId,
           scenario_count: payload.scenario_count,
-          results: payload.strategies.map((strategy) => ({ strategy })),
+          results: payload.strategies.map((strategy, i) => ({
+            strategy,
+            adaptive: {
+              expected_purchases: 80 + i,
+              expected_contribution_profit: 1000 * (i + 1),
+              acquisition_cost: 500,
+              profit_p10: 100 * i,
+              profit_p90: 2000,
+              profit_stddev: 10,
+              probability_of_loss: 0.05,
+            },
+            paired_profit_delta: { mean: 10 },
+          })),
         };
       if (action === "outcome.prepare")
         return {
           status: "complete",
           currency: "TRY",
           warnings: [],
-          recommendations: payload.evaluation.results.map((r, i) => ({
-            profile: ["conservative", "balanced", "high_risk_high_reward"][i],
-            strategy: r.strategy,
-          })),
+          recommendations: payload.evaluation.results
+            .slice(0, 3)
+            .map((r, i) => ({
+              profile: ["conservative", "balanced", "high_risk_high_reward"][i],
+              strategy: r.strategy,
+            })),
         };
       if (action === "outcome.select") {
         const s = payload.evaluation.results.find(
@@ -113,24 +127,36 @@ test("campaign pipeline reaches awaiting_selection, then selection is saved to m
   assert.equal(done.recommendations.recommendations.length, 3);
   assert.equal(done.input.currency, "TRY");
   assert.equal(done.input.data_provenance, "synthetic");
+  // Plans (template fallback here) are what gets tested and recommended.
+  assert.equal(done.planProvider, "template");
+  assert.equal(done.plans.length, 4);
+  assert.ok(done.situation.summary.includes("TakımPlan"));
+  const [first, second] = done.recommendations.recommendations.map(
+    (r) => r.strategy.strategy_id,
+  );
+  assert.equal(first, done.plans[0].strategyId);
+  const ev = done.evidence.find((e) => e.planId === done.plans[0].id);
+  assert.equal(ev.recommendedAs.profile, "conservative");
+  assert.ok(ev.checks.length >= 1);
+  assert.equal(ev.baseline.count, 3);
   await campaigns.select(c.campaignId, {
-    strategyId: "str-2",
+    strategyId: first,
     strategyRevision: 1,
   });
   await campaigns.idle();
   done = await campaigns.get(c.campaignId);
   assert.equal(done.status, "completed");
-  assert.equal(done.selection.record.strategy.strategy_id, "str-2");
+  assert.equal(done.selection.record.strategy.strategy_id, first);
   assert.deepEqual(
     await campaigns.select(c.campaignId, {
-      strategyId: "str-2",
+      strategyId: first,
       strategyRevision: 1,
     }),
     done,
   );
   await assert.rejects(
     campaigns.select(c.campaignId, {
-      strategyId: "str-1",
+      strategyId: second,
       strategyRevision: 1,
     }),
     {
@@ -143,12 +169,14 @@ test("Orchestrator audit rejects inconsistent candidates before simulation", asy
   const c = await campaigns.start(start());
   await campaigns.idle();
   const done = await campaigns.get(c.campaignId);
-  assert.equal(done.audit.approved, 3);
+  assert.equal(done.audit.plans, 4);
+  assert.equal(done.audit.approved, 4 + 3);
   assert.equal(done.audit.rejected.length, 2);
-  const sim = campaigns.simulation.calls.find(
+  const [plans, baseline] = campaigns.simulation.calls.filter(
     (x) => x.action === "simulation.evaluate",
   );
-  assert.equal(sim.payload.strategies.length, 3);
+  assert.equal(plans.payload.strategies.length, 4);
+  assert.equal(baseline.payload.strategies.length, 3);
 });
 test("research failure does not block the simulation", async (t) => {
   const { campaigns } = await service(t, {

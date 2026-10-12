@@ -16,7 +16,8 @@ const { Orchestrator } = require("../src/orchestrator/service.cjs");
 const { IntakeService } = require("../src/intake/service.cjs");
 const fixture = require("../contracts/examples/analyze.demo.response.json");
 test("chat → research → explicit approval → strategy → simulator → JSON record → result", async (t) => {
-  const c = await setup(t);
+  // Happy path: the default 100 ms agent limit is for timeout tests; a disk fsync can exceed it under load.
+  const c = await setup(t, {}, { timeoutMs: 2000 });
   const r = await complete(c);
   assert.equal(r.snapshot.status, "completed");
   checks.checkEvents(r.events);

@@ -1,20 +1,5 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
-const PROFILE = {
-  conservative: "Temkinli",
-  balanced: "Dengeli",
-  high_risk_high_reward: "Yüksek risk / yüksek getiri",
-};
-const CHANNEL = {
-  paid_social: "Sosyal medya",
-  paid_search: "Arama reklamı",
-  influencer: "Influencer",
-};
-const CREATIVE = {
-  proof: "Kanıt / yorum",
-  discovery: "Keşif",
-  offer: "Teklif",
-};
 const ICON = { pending: "○", running: "◐", completed: "●", failed: "✕" };
 let campaignId = null,
   pollTimer = null;
@@ -59,6 +44,20 @@ async function health() {
     $("health").replaceChildren(el("li", { class: "down" }, "orchestrator"));
   }
 }
+// Running steps show elapsed time so slow research never looks frozen.
+function elapsed(s) {
+  if (s.status !== "running" || !s.startedAt) return "";
+  const sec = Math.max(
+    0,
+    Math.round((Date.now() - Date.parse(s.startedAt)) / 1000),
+  );
+  return ` · ${sec} sn`;
+}
+function explanationFor(c, r) {
+  return c.explanation?.recommendations.find(
+    (x) => x.strategyId === r.strategy.strategy_id,
+  );
+}
 function renderSteps(c) {
   $("progress-card").hidden = false;
   $("steps").replaceChildren(
@@ -68,7 +67,86 @@ function renderSteps(c) {
         { class: s.status },
         el("span", { class: "icon" }, ICON[s.status] || "○"),
         el("span", { class: "label" }, s.label),
-        el("span", { class: "summary" }, s.summary || ""),
+        el("span", { class: "summary" }, (s.summary || "") + elapsed(s)),
+      ),
+    ),
+  );
+}
+// Competitor cards from research (Gemini summary or catalog facts).
+function researchBlock(r, cls) {
+  if (!r) return null;
+  if (r.error)
+    return el(
+      "p",
+      { class: cls.note },
+      `Araştırma yapılamadı: ${r.error.message}`,
+    );
+  if (!r.competitors.length)
+    return el(
+      "p",
+      { class: cls.note },
+      "Eşleşen rakip bulunamadı. Bu, rakip olmadığı anlamına gelmez.",
+    );
+  const host = (u) => {
+    try {
+      return new URL(u).hostname.replace(/^www\./, "");
+    } catch {
+      return u;
+    }
+  };
+  return el(
+    "div",
+    { class: cls.wrap },
+    el(
+      "p",
+      { class: cls.note },
+      r.provider === "gemini"
+        ? "Kaynak: Gemini (gemini.google.com) — yapay zekâ özeti, doğrulanmamıştır."
+        : "Kaynak: kayıtlı rakip kataloğu.",
+      r.fallbackFrom ? " Gemini başarısız olduğu için katalog kullanıldı." : "",
+    ),
+    r.summary && el("p", { class: cls.summary }, r.summary),
+    el(
+      "div",
+      { class: cls.grid },
+      r.competitors.map((c) =>
+        el(
+          "article",
+          { class: cls.card },
+          el(
+            "h3",
+            {},
+            c.url
+              ? el(
+                  "a",
+                  { href: c.url, target: "_blank", rel: "noopener" },
+                  c.name,
+                )
+              : c.name,
+          ),
+          el("p", {}, c.summary),
+          c.strengths?.length &&
+            el(
+              "ul",
+              {},
+              c.strengths.map((s) => el("li", {}, s)),
+            ),
+          c.pricing && el("p", { class: cls.note }, `Fiyat: ${c.pricing}`),
+          c.sources?.length &&
+            el(
+              "p",
+              { class: cls.note },
+              "Kaynaklar: ",
+              c.sources.map((u, i) => [
+                i ? ", " : "",
+                el(
+                  "a",
+                  { href: u, target: "_blank", rel: "noopener" },
+                  host(u),
+                ),
+              ]),
+            ),
+        ),
       ),
     ),
   );
@@ -76,144 +154,45 @@ function renderSteps(c) {
 function renderResearch(r) {
   if (!r) return;
   $("research-card").hidden = false;
-  if (r.error) {
-    $("research").replaceChildren(
-      el("p", { class: "muted" }, `Araştırma yapılamadı: ${r.error.message}`),
-    );
-    return;
-  }
-  if (!r.competitors.length) {
-    $("research").replaceChildren(
-      el(
-        "p",
-        { class: "muted" },
-        "Katalogda eşleşen rakip bulunamadı. Bu, rakip olmadığı anlamına gelmez; katalog şimdilik web analitiği, e-ticaret ve görev yönetimini kapsıyor.",
-      ),
-    );
-    return;
-  }
   $("research").replaceChildren(
-    el(
-      "div",
-      { class: "competitors" },
-      r.competitors.map((c) =>
-        el(
-          "article",
-          { class: "competitor" },
-          el("h3", {}, c.name),
-          el(
-            "ul",
-            {},
-            c.facts.map((f) =>
-              el("li", {}, el("b", {}, f.dimension + ": "), f.statement),
-            ),
-          ),
-          el(
-            "p",
-            { class: "muted small" },
-            "Kaynak: ",
-            c.sources.map((s, i) => [
-              i ? ", " : "",
-              el(
-                "a",
-                { href: s.url, target: "_blank", rel: "noopener" },
-                s.title,
-              ),
-            ]),
-          ),
-        ),
-      ),
-    ),
+    researchBlock(r, {
+      note: "muted small",
+      summary: "",
+      wrap: "",
+      grid: "competitors",
+      card: "competitor",
+    }),
   );
 }
-function allocation(a) {
+// The plan view lives in plans.js; an older running server may not serve it yet.
+function planView(c, options) {
+  if (typeof window.renderPlans === "function")
+    return window.renderPlans(c, options);
   return el(
-    "div",
-    { class: "alloc" },
-    Object.entries(CHANNEL).map(([k, label]) => {
-      const bar = el("span", { class: "bar " + k });
-      bar.style.width = `${a[k] * 100}%`;
-      return el(
-        "div",
-        { class: "alloc-row" },
-        el("span", { class: "alloc-label" }, label),
-        el("span", { class: "track" }, bar),
-        el("span", { class: "alloc-val" }, pct(a[k])),
-      );
-    }),
+    "p",
+    { class: "error" },
+    "Plan görünümü yüklenemedi: çalışan sunucu bu sayfadan eski. Sunucuyu yeniden başlatın (npm start) ve sayfayı yenileyin.",
   );
 }
 function renderRecs(c) {
-  const ui = c.recommendations;
-  if (!ui) return;
-  $("assumptions-card").hidden = false;
-  $("assumptions").replaceChildren(
-    ...[...c.input.assumptions, ...(ui.warnings || [])].map((a) =>
-      el("li", {}, a),
-    ),
-  );
+  if (!c.plans?.length) return;
+  if (c.input) {
+    $("assumptions-card").hidden = false;
+    $("assumptions").replaceChildren(
+      ...[...c.input.assumptions, ...(c.recommendations?.warnings || [])].map(
+        (a) => el("li", {}, a),
+      ),
+    );
+  }
   $("recs-card").hidden = false;
   $("recs-note").textContent =
-    `${c.audit.approved} strateji simüle edildi. Rakamlar mock varsayımlara dayanır; gerçek kampanya sonucu değildir.`;
-  const selected = c.selection?.record.strategy;
+    "Rakamlar mock varsayımlara dayanır; gerçek kampanya sonucu değildir.";
+  $("process").replaceChildren();
   $("recs").replaceChildren(
-    ...ui.recommendations.map((r) => {
-      const m = r.metrics,
-        cur = ui.currency;
-      const isSelected =
-        selected &&
-        selected.strategy_id === r.strategy.strategy_id &&
-        selected.revision === r.strategy.revision;
-      return el(
-        "article",
-        { class: "rec" + (isSelected ? " selected" : "") },
-        el("p", { class: "eyebrow" }, PROFILE[r.profile] || r.profile),
-        el("h3", {}, r.strategy.name),
-        el(
-          "p",
-          { class: "muted small" },
-          `Kreatif: ${CREATIVE[r.strategy.creative] || r.strategy.creative}`,
-        ),
-        allocation(r.strategy.initial_allocation),
-        el(
-          "dl",
-          { class: "metrics" },
-          el("dt", {}, "Beklenen satış"),
-          el("dd", {}, fmt(m.expected_purchases)),
-          el("dt", {}, "Beklenen kâr"),
-          el("dd", {}, money(m.expected_contribution_profit, cur)),
-          el("dt", {}, "Kâr aralığı (P10–P90)"),
-          el("dd", {}, `${fmt(m.profit_p10)} – ${fmt(m.profit_p90)}`),
-          el("dt", {}, "ROI"),
-          el("dd", {}, pct(m.roi)),
-          el("dt", {}, "Müşteri edinme maliyeti"),
-          el(
-            "dd",
-            {},
-            m.acquisition_cost == null ? "—" : money(m.acquisition_cost, cur),
-          ),
-          el("dt", {}, "Zarar olasılığı"),
-          el("dd", {}, pct(m.probability_of_loss)),
-          el("dt", {}, "Uyarlamalı vs sabit"),
-          el(
-            "dd",
-            {},
-            `${r.paired_profit_delta?.mean >= 0 ? "+" : ""}${fmt(r.paired_profit_delta?.mean)} ${cur}`,
-          ),
-        ),
-        el("p", { class: "small" }, r.reasons.join(" ")),
-        el("p", { class: "muted small" }, r.tradeoffs[0]),
-        c.status === "awaiting_selection"
-          ? el(
-              "button",
-              { onclick: () => select(r.strategy) },
-              "Bu stratejiyi seç",
-            )
-          : isSelected
-            ? el("p", { class: "badge" }, "Seçildi")
-            : null,
-      );
-    }),
+    planView(c, {
+      onSelect: (_, plan) =>
+        select({ strategy_id: plan.strategyId, revision: 1 }),
+    }) || "",
   );
 }
 function renderSelection(c) {
@@ -269,6 +248,12 @@ async function poll() {
     if (c.status === "running" || c.status === "selecting")
       pollTimer = setTimeout(poll, 800);
   } catch (e) {
+    // A stale #id (another data folder or deleted run) just resets the page.
+    if (location.hash) {
+      history.replaceState(null, "", "/campaign");
+      campaignId = null;
+      return;
+    }
     showError(e.message);
   }
 }
@@ -346,7 +331,7 @@ $("actual-form").addEventListener("submit", async (event) => {
     showError(e.message);
   }
 });
-$("example").addEventListener("click", () => {
+function fillExample() {
   const form = $("campaign-form");
   const values = {
     name: "TakımPlan",
@@ -357,7 +342,12 @@ $("example").addEventListener("click", () => {
     topic: "Görev yönetimi",
   };
   for (const [k, val] of Object.entries(values)) form.elements[k].value = val;
-});
+}
+$("example").addEventListener("click", fillExample);
+// Clicking "Mock veri" fills the form with the example business for quick tests.
+document
+  .querySelector('input[name="dataMode"][value="mock"]')
+  .addEventListener("click", fillExample);
 health();
 setInterval(health, 10000);
 if (location.hash.length > 1) {

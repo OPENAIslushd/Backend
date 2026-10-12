@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Kampanya Simülasyonu</title>
     <link rel="stylesheet" href="/campaign.css" />
+    <link rel="stylesheet" href="/plans.css" />
   </head>
   <body>
     <header class="top">
@@ -115,8 +116,9 @@
       </section>
 
       <section class="card" id="recs-card" hidden>
-        <h2>3 · Önerilen stratejiler</h2>
+        <h2>3 · Planlar ve test sonuçları</h2>
         <p class="muted" id="recs-note"></p>
+        <div id="process"></div>
         <div id="recs" class="recs"></div>
       </section>
 
@@ -158,6 +160,7 @@
         <div id="comparison"></div>
       </section>
     </main>
+    <script src="/plans.js"></script>
     <script src="/campaign.js"></script>
   </body>
 </html>

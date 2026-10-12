@@ -9,7 +9,13 @@ const { demoAdapters } = require("./adapters/demo.cjs");
 const { VERSION, AppError, publicError } = require("./runtime/core.cjs");
 const { CliChat } = require("./runtime/chat.cjs");
 const { CampaignService } = require("./campaign/service.cjs");
-const { simulationClient, researchClient } = require("./campaign/clients.cjs");
+const {
+  simulationClient,
+  researchClient,
+  researchChain,
+} = require("./campaign/clients.cjs");
+const { geminiClient } = require("./campaign/gemini.cjs");
+const { codexPlanner } = require("./campaign/planner.cjs");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function milliseconds(name, fallback) {
   const value = Number(process.env[name] || fallback);
@@ -112,7 +118,13 @@ async function createApp(options = {}) {
   }
   const campaigns = new CampaignService(store, {
     simulation: simulationClient(),
-    research: researchClient(),
+    // RESEARCH_PROVIDER=catalog skips the browser; default tries Gemini, then the catalog.
+    // PLANNER=template skips the Codex call; templates are also the automatic fallback.
+    ...(process.env.PLANNER !== "template" && { planner: codexPlanner() }),
+    research:
+      process.env.RESEARCH_PROVIDER === "catalog"
+        ? researchClient()
+        : researchChain([geminiClient(), researchClient()]),
     ...options.campaign,
   });
   try {
@@ -165,21 +177,29 @@ async function createApp(options = {}) {
         !UUID.test(parts[1])
       )
         throw new AppError("NOT_FOUND", "Kayıt bulunamadı.", 404);
-      const assets = {
-        "/": ["index.html", "text/html; charset=utf-8"],
-        "/cli": ["cli.html", "text/html; charset=utf-8"],
-        "/cli.js": ["cli.js", "text/javascript; charset=utf-8"],
-        "/ui.js": ["ui.js", "text/javascript; charset=utf-8"],
-        "/ui.css": ["ui.css", "text/css; charset=utf-8"],
-        "/campaign": ["campaign.html", "text/html; charset=utf-8"],
-        "/campaign.js": ["campaign.js", "text/javascript; charset=utf-8"],
-        "/campaign.css": ["campaign.css", "text/css; charset=utf-8"],
+      // Any flat .html/.js/.css file in public/ is served, so new UI files need no server restart.
+      const pages = {
+        "/": "index.html",
+        "/cli": "cli.html",
+        "/campaign": "campaign.html",
       };
-      if (req.method === "GET" && Object.hasOwn(assets, url.pathname)) {
-        const [file, contentType] = assets[url.pathname];
-        const content = await fs.readFile(
-          path.join(__dirname, "../public", file),
-        );
+      const types = {
+        ".html": "text/html; charset=utf-8",
+        ".js": "text/javascript; charset=utf-8",
+        ".css": "text/css; charset=utf-8",
+      };
+      const asset =
+        pages[url.pathname] ||
+        (/^\/[A-Za-z0-9_-]+\.(?:html|js|css)$/.test(url.pathname) &&
+          url.pathname.slice(1));
+      if (req.method === "GET" && asset) {
+        const contentType = types[path.extname(asset)];
+        let content;
+        try {
+          content = await fs.readFile(path.join(__dirname, "../public", asset));
+        } catch {
+          throw new AppError("NOT_FOUND", "Dosya bulunamadı.", 404);
+        }
         res.writeHead(200, {
           "Content-Type": contentType,
           "Cache-Control": "no-store",
@@ -407,8 +427,28 @@ async function createApp(options = {}) {
     },
   };
 }
+// Without an explicit SIM_SERVICE_TOKEN the Orchestrator starts its own simulation services.
+// SIM_SERVICES=external skips this when the services run elsewhere (e.g. docker compose).
+async function startServices() {
+  if (process.env.SIM_SERVICE_TOKEN || process.env.SIM_SERVICES === "external")
+    return null;
+  const { launchServices } = require("./campaign/launcher.cjs");
+  const services = await launchServices({
+    dataDir: path.resolve(
+      process.env.DATA_DIR || path.join(__dirname, "../data"),
+    ),
+  });
+  process.env.SIM_SERVICE_TOKEN = services.token;
+  for (const [name, url] of Object.entries(services.urls))
+    process.env[`SIM_${name.toUpperCase()}_URL`] = url;
+  console.log("Simülasyon servisleri başlatıldı (otomatik token).");
+  return services;
+}
 if (require.main === module) {
-  createApp()
+  let services = null;
+  startServices()
+    .then((s) => (services = s))
+    .then(() => createApp())
     .then(async (app) => {
       const port = Number(process.env.PORT || 3001);
       if (!Number.isInteger(port) || port < 0 || port > 65535)
@@ -417,9 +457,15 @@ if (require.main === module) {
         `Orchestrator: ${await app.listen(port, process.env.HOST || "127.0.0.1")}`,
       );
       for (const sig of ["SIGINT", "SIGTERM"])
-        process.once(sig, () => app.close().then(() => process.exit(0)));
+        process.once(sig, () =>
+          app.close().then(() => {
+            services?.stop();
+            process.exit(0);
+          }),
+        );
     })
     .catch((error) => {
+      services?.stop();
       console.error(error.message);
       process.exitCode = 1;
     });

@@ -55,16 +55,20 @@ Kişi 3/4 modülleri hazır olduğunda `AGENT_ADAPTER_MODULE` ile `createAdapter
 Orchestrator, `simulation_agents/` altındaki dört servisi (memory, strategy, simulation, outcome) ve `modules/research/` Python araştırma modülünü birbirine bağlar. Servisler birbirini çağırmaz; tüm yönlendirme, denetim ve hafıza yazımı Orchestrator'dadır.
 
 ```sh
-npm run start:all
+npm start
 ```
 
-Bu komut dört servisi 8081–8084 portlarında, Orchestrator'ı `PORT` (varsayılan 3001) üzerinde başlatır ve her açılışta ortak rastgele bir servis token'ı üretir. Geçici mock arayüz: `http://127.0.0.1:3001/campaign`. Gereksinimler: Node.js 24+ (`node:sqlite`), Python 3.10+ ve `modules/research/requirements.txt`. Simülasyon hafızası `DATA_DIR/simulation/memory.sqlite` dosyasındadır.
+`npm start` (ve `npm run dev`) dört servisi Orchestrator'ın alt süreçleri olarak boş localhost portlarında başlatır ve her açılışta ortak rastgele bir servis token'ı üretir; ek ayar gerekmez. Orchestrator kapanınca servisler de kapanır. `npm run start:all` aynı komutun eski adıdır. Geçici mock arayüz: `http://127.0.0.1:3001/campaign`. Gereksinimler: Node.js 24+ (`node:sqlite`), Python 3.10+ ve `modules/research/requirements.txt`. Simülasyon hafızası `DATA_DIR/simulation/memory.sqlite` dosyasındadır.
 
 Akış:
 
-1. **research**: Python köprüsü (`modules/research/orchestrator_bridge.py`) şirket profilini oluşturur, katalogdan rakip adaylarını getirir. Başarısız olursa simülasyon yine çalışır.
+1. **research**: Playwright (`playwright-core`, kurulu Google Chrome, görünmez pencere) gemini.google.com'a oturum açmadan rakip sorusunu sorar ve yanıttaki JSON'u okur: pazar özeti, 3–5 rakip için özet, öne çıkan özellikler, fiyat ve kaynaklar (~10–30 sn). Çerez onayında “Tümünü reddet” seçilir. Doğrulama/CAPTCHA sayfası aşılmaya çalışılmaz; Gemini başarısız olursa Python kataloğu (`modules/research/orchestrator_bridge.py`) kullanılır. Gemini çıktısı doğrulanmamış yapay zekâ özetidir ve stratejiye yalnız etiketli `context` metni olarak gider. `RESEARCH_PROVIDER=catalog` tarayıcıyı atlar; `GEMINI_HEADED=1` pencereyi gösterir; `GEMINI_BROWSER_CHANNEL` başka Chrome kanalı seçer. Araştırma başarısız olsa da simülasyon çalışır.
 2. **input**: mock veri modu; verilmeyen bütçe, para birimi ve satış başı katkı payı tahmin edilir, kanal varsayımları sentetiktir. Her doldurulan değer `assumptions` listesinde yazılır.
-3. **memory.retrieve** → **strategy.generate** (100 aday) → **audit** (Orchestrator: run_id, kapsam, bütçe, kanal payları, keşif tabanı, tekrar) → **simulation.evaluate** → **outcome.prepare** (3 öneri).
+3. **memory.retrieve** → **plan** → **strategy.generate** → **audit** → **simulation.evaluate** → **outcome.prepare**:
+   - **plan**: Codex (`src/campaign/planner.cjs`, düşük akıl yürütme seviyesi, ~2–4 dk) önce bir durum özeti, sonra 4–5 strateji planı yazar. Her plan: amaç, tez (kanal rakamları ve rakiplere dayalı), kanal payları ve her kanalın rolü/taktikleri, kreatif ve ana mesaj, 1–30. günleri kapsayan aşamalı takvim (hedef, eylemler, kontrol noktası), başarı ölçütleri (satış başı maliyet, zarar olasılığı, satış adedi) ve riskler. Codex başarısız olursa 4 şablon plan kullanılır; `PLANNER=template` Codex'i atlar.
+   - Planlar `orchestrator_supplied` adaylar olarak, 100 rastgele kanal dağılımıyla aynı senaryolarda simüle edilir. Rastgele dağılımlar karşılaştırma tabanıdır.
+   - **Kanıt** (`src/campaign/explain.cjs`): her planın kendi hedefleri simülasyon sonucuyla karşılaştırılır (✓/✗), kârı kaç rastgele dağılımı geçtiği, 3 günlük kaydırma kuralının katkısı ve P10–P90 aralığı gösterilir. Simülasyon kanal paylarını, kreatifi ve kaydırma kuralını test eder; takvim ve taktikler uygulama planıdır, ayrıca simüle edilmez.
+   - **outcome.prepare** planlar arasından her risk profili için (Temkinli/Dengeli/Yüksek risk) en iyi planı önerir.
 4. Kullanıcı bir öneri seçer: **outcome.select** → **memory.save_selection**.
 5. Kampanya bittiğinde gerçek sonuç girilir: **outcome.observe** → **memory.update_actual**; tahmin ile gerçek karşılaştırılır.
 
@@ -76,7 +80,7 @@ Akış:
 | `POST /campaigns/:id/selection` | `{strategyId, strategyRevision}` → 202 |
 | `POST /campaigns/:id/actuals` | `{spend, purchases, source, unitContribution?, status?, attributionEndDay?}` |
 
-Gerçek veri modu henüz yok (`dataMode:"real"` 400 döner); planı [docs/real-data-mode.tr.md](docs/real-data-mode.tr.md). Servisleri ayrı çalıştırıyorsanız Orchestrator'a `SIM_SERVICE_TOKEN` ve gerekirse `SIM_MEMORY_URL`, `SIM_STRATEGY_URL`, `SIM_SIMULATION_URL`, `SIM_OUTCOME_URL` verin.
+Gerçek veri modu henüz yok (`dataMode:"real"` 400 döner); planı [docs/real-data-mode.tr.md](docs/real-data-mode.tr.md). Servisleri ayrı çalıştırıyorsanız (ör. docker compose) Orchestrator'a `SIM_SERVICE_TOKEN` (veya `SIM_SERVICES=external`) ve `SIM_MEMORY_URL`, `SIM_STRATEGY_URL`, `SIM_SIMULATION_URL`, `SIM_OUTCOME_URL` verin.
 
 ## CLI ve MCP
 
@@ -109,8 +113,8 @@ Kapsam: tek Node süreci/tek DATA_DIR yazıcısı; yerel hackathon demosu. Kimli
 
 İlk demo doğrulaması: demo smoke `completed`, memory `completed`, 23 SSE olayı üretti. Sözleşme kontrolleri ve 35 runtime/HTTP/subprocess kabul testi geçti. İlk canlı CLI çıkarımı denemesi **başarılı doğrulanamadı**: güncel masaüstü binary'si ve şema dönüşümüyle son çağrı `429 Too Many Requests` döndürdü. Limit uygun olduğunda `CODEX_MODEL=gpt-6-astra npm run smoke:cli` yeniden çalıştırılmalı; bu başarısızlık demo akışını etkilemez.
 
-## Canlı prompt denemesi
+## Kampanya sohbeti (`/cli`)
 
-`http://127.0.0.1:3001/cli` ekranı, serbest prompt’u doğrudan oturum açılmış Codex CLI’ye gönderir. `POST /cli/messages` gövdesi `{schemaVersion:"4.0.0",clientRequestId:"<uuid>",message:"<prompt>",history?:[{role,content}]}`; başarılı yanıt `origin:"live"` ve `reply` taşır. Ekran son 20 mesajı `history` olarak gönderir; backend bunları düz metin sohbet dökümüne çevirip modele verir. API anahtarı kullanılmaz. Bu endpoint yalnız loopback bağlantılarda çalışır, aynı anda tek CLI çağrısı yapar ve 60 saniye sınırı vardır. Aynı anahtar/gövde tekrarı mevcut yanıtı döndürür; başarılı yanıtlar `data/cli-chat/` altında saklanır. CLI limit ve bağlantı hataları ekranda gösterilir; demo yanıtına dönüşmez.
+`http://127.0.0.1:3001/cli` ekranı oturum açılmış Codex CLI ile sohbet eder ve konuştukça sağdaki kampanya profilini (işletme adı, ürün, açıklama, hedef kitle, bölge, araştırma konusu, web sitesi, bütçe, para birimi, satış başı katkı payı) günceller. Zorunlu alanlar: işletme adı, açıklama, hedef kitle, bölge. Kullanıcı “strateji üret” dediğinde (veya düğmeye bastığında) profil `POST /campaigns` ile mock veri modunda kampanya akışına gider; adımlar ve 3 öneri sohbet içinde görünür, seçim hafızaya yazılır. “Mock veriyle doldur” düğmesi Codex'e gitmeden örnek profil doldurur. Simülasyon servisleri `npm start` ile otomatik başlar.
 
-Güncel canlı bağlantı kontrolü: `/cli/messages` gerçek Codex CLI çağrısıyla HTTP 200, `origin:live` ve “Merhaba, bağlantı çalışıyor.” yanıtını döndürdü. Canlı sohbet ve mevcut backend için toplam 35 kabul testi geçti. Önceki 429 engeli bu son denemede görülmedi.
+`POST /cli/messages` gövdesi `{schemaVersion:"4.0.0",clientRequestId,message,history?,profile?}`; yanıt `{reply, profile, missing, ready, generate}`. Model çıktısı güvenilmez sayılır: alanlar uzunluk/biçim kontrolünden geçer, `generate` yalnız zorunlu alanlar doluysa `true` olur. Ekran son 20 mesajı `history` olarak gönderir. API anahtarı kullanılmaz; endpoint yalnız loopback bağlantılarda çalışır, aynı anda tek CLI çağrısı yapar ve 60 saniye sınırı vardır. Aynı anahtar/gövde tekrarı mevcut yanıtı döndürür; başarılı yanıtlar `data/cli-chat/` altında saklanır.
