@@ -1,93 +1,181 @@
-# Ortak analiz sözleşmesi — v1.0.0 taslağı
+# Agent ve UI sözleşmesi — v2.0.0
 
-İlk 30 dakikada ekipçe dondurulacak sözleşme. Bu klasör Kişi 2'nin sorumluluğundadır. Backend henüz uygulanmadı; dosyalar entegrasyon hedefini tarif eder.
+Bu sürüm v1'in yerini alır; geriye uyumlu değildir. UI yalnız Orchestrator Agent'ın HTTP/SSE arayüzüyle konuşur. Research Agent dört uzmanı yönetir. Memory Agent JSON dosyaları okur/yazar. Strategy Agent önce build suggestion/test planı üretir, sonra demo simülasyon sonuçlarını başarı/başarısızlık gerekçeleriyle değerlendirir. Orchestrator hafızayı günceller ve UI'a nihai sonucu gönderir.
 
-- `analysis.schema.json`: JSON Schema 2020-12; kök şema `Response` doğrular. Diğer tipler `$defs` altında.
-- `examples/analyze.request.json`: frontend isteği.
-- `examples/analyze.demo.response.json`: tam, kurgusal demo sonucu.
-- `examples/analyze.partial.response.json`: araştırma ve kayıt hatasının gösterimi; gerçek CLI çalıştırması değildir.
-- `examples/analyze.error.response.json`: geçersiz istek örneği.
+Bu PR sözleşme, fixture ve doğrulama teslimidir; endpoint/agent runtime uygulaması değildir.
 
-## HTTP sözleşmesi
+## Dosyalar
 
-`POST /analyze`, `Content-Type: application/json`. MVP senkron çalışır. Frontend sonuç gelene kadar yükleniyor durumunu gösterir; gerçek adım olayları olmadığından tamamlanan agent adımlarını uydurmaz.
+| Dosya | Kullanım |
+|---|---|
+| analysis.schema.json | İstek, sonuç, snapshot, agent girdileri/çıktıları; `$defs` altında |
+| events.schema.json | Tek UI ilerleme olayı |
+| memory.schema.json | Kalıcı JSON hafıza kaydı |
+| examples/analyze.request.json | UI -> Orchestrator |
+| examples/analyze.accepted.json | HTTP 202 kabul yanıtı |
+| examples/ui.events.json | Baştan sona 23 olaylık UI örneği |
+| examples/ui.failure.events.json | Başarısız Strategy, atlanan testler ve hafıza kaydı: 21 olay |
+| examples/ui.events.sse | Aynı olayların gerçek SSE wire biçimi |
+| examples/analyze.snapshot.json | Sayfa yenilendiğinde okunacak durum |
+| examples/analyze.demo.response.json | Tamamlanmış demo analizi |
+| examples/analyze.partial.response.json | Trend agent + hafıza yazma hatası örneği |
+| examples/analyze.failed.response.json | Build suggestion başarısız; bağımlı adımlar atlanmış |
+| examples/analyze.error.response.json | HTTP düzeyinde geçersiz istek |
+| examples/memory.record.json | JSON dosyasına yazılacak kayıt |
 
-| Durum | HTTP | Gövde |
+Şemalar JSON Schema 2020-12 kullanır. Validator'a üç dosya `$id` değerleriyle birlikte kaydedilir; URN referansları ağdan indirilmez. `analysis.schema.json` kökü Response doğrular; `$defs.Request`, `$defs.Accepted` vb. ayrı doğrulanabilir.
+
+## Agent ağacı ve veri sırası
+
+```mermaid
+flowchart TD
+  UI[React UI] <-->|HTTP + SSE JSON| O[Orchestrator Agent]
+  O --> R[Research Agent]
+  R --> RR[Risk / Reward Analytics Agent]
+  R --> MR[Marketing Research Agent]
+  R --> CR[Rival Research Agent]
+  R --> TR[Trend Analytics Agent]
+  O <-->|Oku ve en son güncelle| M[Memory Agent]
+  M <--> J[JSON dosyaları]
+  R -->|Dört araştırmanın birleşimi| O
+  O -->|Araştırma + hafıza| S[Strategy Agent: build suggestion]
+  S -->|MVP + test planı| O
+  O --> T[Deterministik demo simülasyonu]
+  T -->|Test sonuçları| O
+  O --> E[Strategy Agent: test değerlendirmesi]
+  E -->|Başarı / başarısızlık + nedenleri| O
+```
+
+Research ve Memory okuma paralel başlayabilir. Research kendi dört uzmanını başlatır ve sonuçlarını birleştirir. Strategy.build iki dalın bitmesini bekler. Testler build suggestion içindeki planla çalışır. Strategy.evaluate test sonuçlarını yorumlar. Memory.update bundan sonra yapılır. `run.finished` ancak hafıza yazma girişimi sonuçlandığında yayınlanır. UI bütün ara adımları da görür.
+
+Strategy aynı mantıksal agent'ın iki ayrı fazıdır; build ve evaluation için ayrı prompt/çıktı şeması kullanılır. Simülasyon bir araçtır; yeni bir uzman agent değildir. Build suggestion bir öneridir; bu akış otomatik uygulama geliştirme veya gerçek ürün testi yapmaz.
+
+## UI HTTP sözleşmesi
+
+| Endpoint | Başarılı yanıt | Amaç |
 |---|---|---|
-| Tüm analiz adımları başarılı | 200 | Response, status=completed |
-| Strategy başarılı, destek adımı/kayıt eksik | 200 | Response, status=partial |
-| Strategy başarısız / çıktı doğrulanamıyor | 502 | Response, status=failed |
-| Genel süre sınırı aşıldı | 504 | Response, status=failed |
-| JSON veya alanlar geçersiz | 400 | ApiError |
-| Demo işlenirken ikinci istek geldi | 429 | ApiError, code=BUSY |
+| POST /analyze | 202 Accepted | İsteği doğrula, run oluştur, beklemeden runId ve URL'leri dön |
+| GET /analyses/:runId | 200 Snapshot | Durum, son sequence, 10 adım ve varsa nihai sonuç |
+| GET /analyses/:runId/events | 200 text/event-stream | Adım ve nihai sonuç olaylarını akıt |
 
-Son satırdaki tek aktif analiz sınırı hem live hem demo için geçerlidir. 429 için Retry-After gönderilir. 502/504 dahil frontend gövdeyi okur; kaybolmayan kısmi sonuçları gösterebilir. Geçersiz JSON, boyut sınırı ve beklenmedik sunucu hataları da HTML yerine ApiError biçiminde dönmelidir; beklenmedik hata HTTP 500 / ANALYSIS_FAILED olur.
+İstek tüm alanları içerir: schemaVersion=2.0.0, clientRequestId (UUID), idea, language=tr|en, targetMarket, targetAudience (bilinmiyorsa null), mode=demo|live, testMode=simulation. `mode=live` gerçek araştırma/CLI anlamına gelir; testler her iki modda da simülasyondur. runId, olay sırası ve zamanlar sunucu tarafından üretilir; model tarafından değil. clientRequestId'yi UI bir kere üretir.
 
-İstek: `schemaVersion`, `idea`, `language`, `targetMarket`, `targetAudience`, `mode` zorunlu. Bilinmeyen hedef kitle `null`; language=tr|en, mode=demo|live. Tüm enum/alan adları İngilizce, kullanıcıya gösterilen metinler istek dilinde. UUID ve zaman damgasını Node.js üretir; model üretmez. Zaman damgaları UTC ISO 8601, süreler milisaniye.
+POST isteği 16 KB ile sınırlandırılır. Aynı clientRequestId ve aynı gövde tekrar gelirse mevcut runId/URL'ler 202 ile döner; ikinci iş başlamaz. Aynı clientRequestId farklı gövdeyle gelirse 409 IDEMPOTENCY_CONFLICT. Kontrol tek yazıcı kilidi altında yapılır. Bu eşleme run'ın request.json dosyasından restart sonrası tekrar kurulabilir.
 
-`mode=demo` sabit örneği çalıştırır. MVP'de yalnızca `analyze.request.json` içindeki idea/language/targetMarket/targetAudience kombinasyonu kabul edilir; başka kombinasyon 400 döner. UI'daki “Demo örneğini yükle” bu alanları doldurur. Her çalıştırmada requestId, createdAt ve durationMs yenilenir. Demo dosyasını farklı bir fikrin gerçek sonucu gibi döndürmeyin. `mode=live` başarısız olursa otomatik olarak demo çıktısı verilmez; kullanıcı açıkça demo moduna geçebilir.
+İstek kabul edilmeden önceki hatalar ApiError: 400 INVALID_REQUEST, 413 INVALID_REQUEST, 429 BUSY (Retry-After), 500 STORAGE_FAILED. Bilinmeyen run 404 NOT_FOUND. SSE cursor hatası 400 INVALID_CURSOR. Başlatılmış bir run içindeki agent hataları HTTP 500 olarak yeniden gönderilmez; step.finished ve run.finished içindeki durumlarla taşınır. Snapshot her terminal durum için HTTP 200 döner.
 
-## Sonucun bölümleri
+MVP tek aktif run işler. Aynı run'ın idempotent POST tekrarı busy kontrolünden önce çözülür. Analiz işi SSE bağlantısından bağımsızdır: sayfanın kapanması/bağlantının kopması agent'ları durdurmaz. Global timeout işi sonlandırır; istemci yeniden bağlanıp sonucu alabilir.
 
-| Alan | Üreten | İçerik |
+Demo isteği örnek dosyadaki idea/language/targetMarket/targetAudience kombinasyonunu kullanır; farklı kombinasyon 400. clientRequestId her yeni demo için değişir. Fixture oynatıcısı her olayda runId, request clientRequestId, recordId, timestamps, URL'ler ve süreyi tutarlı yeniden üretir. Live hatası sessizce mock'a dönüşmez. Tüm örnekler kurgusaldır; örnekler arasındaki aynı runId bağımsız alternatif senaryoları temsil eder.
+
+## UI canlı olayları
+
+Ortak zarf: `{schemaVersion,runId,sequence,timestamp,type,message,progress,payload}`.
+
+| type | payload | UI davranışı |
 |---|---|---|
-| research | Kişi 3 | En fazla 3 rakip, trendler, risk sinyalleri, kaynaklar |
-| strategy | Kişi 2 | Özet, 3 nihai risk, 3 öneri |
-| memory | Kişi 4 | En fazla 3 benzer fikir, eşleştirme yöntemi |
-| simulation | Kişi 4 | İyimser/kötümser varsayımlar ve hesaplanan sonuçlar |
-| persistence | Kişi 4; çağıran Kişi 2 | Kaydın başarılı olup olmadığı ve kayıt kimliği |
+| run.accepted | Accepted | Run ve bağlantıları kaydet |
+| run.started | `{status:"running"}` | Genel yükleniyor durumunu aç |
+| step.started | `{step: Step}` | İlgili agent/adımı running göster |
+| step.finished | `{step: Step}` | Durumu ve doğrulanmış output'u karta yaz |
+| run.finished | `{result: Response}` | Nihai sonucu göster; SSE'yi kapat |
 
-Her analiz modülü aynı zarfı kullanır: `{status, origin, data, error}`.
+Step şu alanları taşır: stepId, parentStepId, agentId, status, startedAt, finishedAt, output. Research alt agent'ları parentStepId=research ile gruplanır. Step.output terminal modül zarfıdır; pending/running sırasında null. Token akışı veya ham model muhakemesi gönderilmez; kısa kullanıcı mesajları ve yapılandırılmış sonuçlar gönderilir.
 
-- status=ok: data dolu, error=null.
-- status=partial: doğrulanmış kısmi data dolu, error dolu ve açıklayıcı.
-- status=failed: data=null, error dolu.
-- status=skipped: data=null, error=null; gerekçesi üst warnings alanında.
-- origin=live: bu çalıştırmada gerçek kaynak/model/depo kullanıldı; doğruluk garantisi değildir.
-- origin=mock: sabit örnek. Canlı modda mock yasak.
-- origin=derived: açık varsayımlardan deterministik hesaplama.
-- origin=none: sonuç üretilemedi veya atlandı.
+Sabit adımlar (totalSteps=10):
 
-Şema yapısal tipleri doğrular. Aşağıdaki kurallar ayrıca Node.js iş kuralı doğrulamasında uygulanmalıdır:
+| stepId | parentStepId | agentId | Step.output tipi |
+|---|---|---|---|
+| memory.read | null | memory | MemoryContextResult |
+| research | null | research | ResearchResult |
+| research.risk_reward | research | risk_reward | RiskRewardResult |
+| research.marketing | research | marketing | MarketingResult |
+| research.rivals | research | rivals | RivalsResult |
+| research.trends | research | trends | TrendsResult |
+| strategy.build | null | strategy | BuildSuggestionResult |
+| tests.run | null | simulation | TestResultsResult |
+| strategy.evaluate | null | strategy | EvaluationResult |
+| memory.update | null | memory | MemoryReceiptResult |
 
-1. Üst mode=input.mode olmalı; schemaVersion aynı olmalı.
-2. Zarf status/data/error ilişkisi yukarıdaki gibi olmalı. failed/skipped için origin=none; ok/partial için origin!=none.
-3. Strategy ok ise tam 3 risk ve 3 öneri olmalı. Strategy partial/failed/skipped genel sonucu failed yapar. Diğer modüller eksikse ve Strategy ok ise genel sonuç partial olur.
-4. Research hedefi 3 doğrulanmış rakiptir. Daha az bulunduysa eksik sayıyı uydurarak tamamlamayın; research=partial ve açıklayıcı hata kullanın. Sıfır rakip de izinlidir.
-5. Canlı sourced iddialar için en az bir sourceId ve erişilmiş kaynak gerekir. Kaynak URL'si uydurulmaz. Her sourceId research.data.sources içinde bulunmalı. İlgili öneri risk kimliği strategy.data.risks içinde bulunmalı. Kimlikler kendi listelerinde benzersiz olmalı.
-6. Hipotezlerin sourceIds alanı boş olabilir. sourceIds=[] ve evidenceType=hypothesis, araştırılmış bilgi gibi gösterilmez. Canlı modda evidenceType=mock yasak.
-7. Simülasyon ok ise tam iki senaryo vardır: optimistic ve pessimistic, her biri bir kez. Para değerleri belirtilen para biriminin ana birimidir, oranlar 0–1 aralığındadır. Başarı yüzdesi üretilmez.
-8. persistence.saved=true ise recordId dolu ve error=null. saved=false ise recordId=null. Canlı kayıt hatası üst sonucu partial yapar; başarılı analiz silinmez. Demo kayıt atlaması completed olmasına engel değildir.
-9. Genel sonuç completed ise dört modül ok olmalı; canlı modda kayıt da başarılı olmalı. failed gövdesi bile mevcut modül sonuçlarını korur.
+progress.settledSteps = completed/partial/failed/skipped durumundaki adım sayısı. Parent research de bir adımdır. Bu sayı süre tahmini veya başarı yüzdesi değildir. Araştırma alt agent'ları farklı sırada bitebilir; UI array sırasına göre değil stepId/sequence ile güncellenir.
 
-Frontend `strategy.data?.summary`, `research.data?.competitors` vb. alanları okur. `null` modül için hata/eksik durum kartı gösterir. `warnings`, `mode=demo`, hipotezler ve `persistence.saved=false` kullanıcıya görünür olmalıdır. Hata mesajlarında token, ham komut veya stack trace dönmez.
+SSE mesajı `id: <sequence>`, `event: <type>`, `data: <tek satır JSON>` ve boş satırdan oluşur. `examples/ui.events.sse` doğrudan örnektir. Content-Type=text/event-stream, Cache-Control=no-cache; proxy buffering kapalı, olay sonrası flush. 15 saniyede bir `: heartbeat` yorumu gönderilebilir; heartbeat iş olayı değildir, sequence artırmaz. Transport davranışı: [MDN SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events).
 
-## İç entegrasyon sınırları
+İlk bağlantıda sequence 1'den itibaren geçmiş olaylar, ardından canlı olaylar gönderilir. Browser reconnect sırasında Last-Event-ID ile kaldığı yeri bildirir. Sayfa yenilemede önce Snapshot alınır, sonra `/events?after=<lastSequence>` açılır. İkisi varsa Last-Event-ID önceliklidir. after/Last-Event-ID run'a ait 0..lastSequence aralığında tamsayı olmalı. UI aynı sequence'i iki kez uygulamaz; atlanan sıra görürse Snapshot ile eşitler.
 
-Backend içinde ikinci HTTP mikroservis katmanı açmayın. Araştırma adaptörü Node.js modülüdür. Kişi 4'ün işlevleri tek yerel MCP sunucusunda sunulur; Node.js orkestratör MCP istemcisidir. Aşağıdaki adlar yeni geliştireceğiniz araç sözleşmeleridir, mevcut Supabase araçlarının isimleri değildir.
+Replay/live geçişi aynı run kilidi altında, olay kaybetmeden yapılır. Terminal olay zaten alındıysa UI Snapshot'tan sonucu gösterip SSE açmaz. Sunucu terminal run için replay bittikten sonra bağlantıyı kapatır; terminal cursor ile yeniden istek gelirse 204 döner. UI run.finished alınca EventSource.close() çağırır; onerror tek başına analiz başarısız demek değildir. React cleanup eski aboneliği kapatır. Ayrı frontend origin kullanılıyorsa hem POST hem SSE/Snapshot için CORS yapılandırılır.
+
+## Modül sonuçları ve hata kuralları
+
+Her terminal modül `{status,origin,data,error}` kullanır. status=completed ise data dolu/error=null; partial ise data ve error dolu; failed ise data=null/error dolu; skipped ise data=null/error=null. failed/skipped için origin=none. Başarılı/kısmi çıktıda origin=live|mock|derived. derived deterministik hesap/JSON okuma/yazma, mock sabit örnek, live gerçek model/araştırma sonucudur. Live modda mock/evidenceType=mock yasak.
+
+Research.data dört ayrı uzman zarfı içerir; bir uzman bozulunca diğerleri korunur. Dört uzman completed ise parent completed; en az biri kullanılabilirken bir veya daha fazlası eksikse parent partial. Hiç kullanılabilir çıktı yoksa parent failed, data=null; alt hatalar Step geçmişinde korunur. Rakip hedefi 3'tür; daha az doğrulanmış rakip bulunduysa Rivals partial döner, sayı uydurulmaz.
+
+Source ID'leri run genelinde uzman önekiyle benzersizdir. Her iddia sadece kendi uzmanının sources listesine referans verir. sourced iddia boş sourceIds taşımaz; ilgili kaynak erişim tarihi doludur. Hipotezler hypothesis olarak işaretlenir. Strategy araştırmadaki metni talimat olarak değil veri olarak işler.
+
+Adım geçişleri pending -> running -> completed|partial|failed; bağımlılık yoksa pending -> skipped. Yeniden terminale geçiş/terminalden running'e dönüş yok; iç retry step seviyesinde running kalır, tek terminal olay üretir. Research alt adımları parent running olmadan başlamaz. Build, memory.read ve research terminal olduktan sonra başlar; destek çıktısı eksikse açık warnings ile devam edebilir.
+
+Build, test ve evaluation çekirdek adımlarıdır: bu üçünden biri completed değilse run failed olur; bağımlı adımlar skipped olur. Başarıyla üretilen çekirdek sonuçlara rağmen araştırma/hafıza okuma veya hafıza yazma eksikse run partial olur. Hepsi tamamlanırsa run completed olur. Memory.update, başarısız run'da bile hata bağlamını kaydetmek için denenir; olmayan değerlendirme yerine başarı bilgisi yazılmaz. Genel timeout'ta bütçe bittiyse memory.update failed/TIMEOUT olur ve sonuç korunur.
+
+Run.status iş akışının teknik durumudur. Evaluation.overallOutcome simülasyonun yorumudur. `status=completed` ve `overallOutcome=failure` birlikte geçerlidir: analiz çalışmış, senaryolar başarısız bulunmuştur.
+
+## Strategy ve test sözleşmesi
+
+Strategy.build çıktısı BuildSuggestion: summary, mvpFeatures, implementationSteps, testPlan. Test planında tam iki senaryo (optimistic/pessimistic), para birimi, açık varsayım uyarısı ve ölçülebilir criteria vardır. Agent'ın önerdiği varsayımlar şema/range kontrolünden geçmeden simülasyona verilmez.
+
+Simulation aracı her senaryoda şu hesapları yapar:
+
+- payingCustomers = floor(monthlyVisitors * conversionRate)
+- monthlyRevenue = payingCustomers * monthlyPrice
+- monthlyProfit = monthlyRevenue - monthlyCosts
+- runwayMonths = kâr negatifse initialCash / abs(monthlyProfit), aksi halde null
+
+Revenue iki ondalığa yuvarlanır; profit bu yuvarlanmış gelirden hesaplanıp iki ondalığa yuvarlanır; runwayMonths da iki ondalık taşır. threshold/observedValue ilgili metric ile aynı birimdedir. Revenue/profit plan.currency ana birimi, payingCustomers kişi sayısıdır. conversionRate 0–1. Her kriter gte/lte operatörüyle uygulanır. Tüm kriterler geçtiyse senaryo success, aksi halde failure. Kriterler boş olamaz. Bu sürüm churn/büyüme/gerçek kullanıcı testi modellemez.
+
+Strategy.evaluate aynı scenarioId/criterionId değerlerini korur. Her senaryo için sonucu, criterionIds'ye bağlı nedenleri ve sonraki aksiyonu açıklar. overallOutcome: iki senaryo success ise success; ikisi failure ise failure; karışıksa inconclusive. successConditions ve failureConditions koşulları açıklar, gözlenmeyen gerçek başarı iddiası değildir. Her değerlendirme simulation sınırlamasını taşır. Strategy deterministik test sonucunu değiştiremez; uyuşmazlık INVALID_OUTPUT olur.
+
+## Agent / MCP entegrasyon sınırları
 
 | Çağrı | Girdi `$defs` | Çıktı `$defs` | Sahip |
 |---|---|---|---|
-| research(input, {runCli, signal}) | ResearchInput | ResearchResult | Kişi 3 |
-| strategy(input, {runCli, signal}) | StrategyInput | StrategyResult | Kişi 2 |
-| MCP find_similar_ideas | MemoryInput | MemoryResult | Kişi 4 |
-| MCP simulate_startup | SimulationInput | SimulationResult | Kişi 4 |
-| MCP save_analysis | SaveInput | Persistence | Kişi 4 |
+| Orchestrator -> Research.run | ResearchInput | ResearchResult | Kişi 3 |
+| Research -> RiskReward.run | SpecialistInput (task=risk_reward) | RiskRewardResult | Kişi 3 |
+| Research -> Marketing.run | SpecialistInput (task=marketing) | MarketingResult | Kişi 3 |
+| Research -> Rivals.run | SpecialistInput (task=rivals) | RivalsResult | Kişi 3 |
+| Research -> Trends.run | SpecialistInput (task=trends) | TrendsResult | Kişi 3 |
+| Orchestrator -> Memory.read | MemoryReadInput | MemoryContextResult | Kişi 4 |
+| Orchestrator -> Strategy.build | BuildInput | BuildSuggestionResult | Kişi 2 |
+| Orchestrator -> Simulation.run | SimulationInput | TestResultsResult | Kişi 4 |
+| Orchestrator -> Strategy.evaluate | EvaluateInput | EvaluationResult | Kişi 2 |
+| Orchestrator -> Memory.update | MemoryUpdateInput | MemoryReceiptResult | Kişi 4 |
 
-Kişi 2'nin ortak `runCli({role, prompt, input, outputSchema, signal})` adaptörü Promise<unknown> döndürür. Role=research|strategy. JSON parse, çıkış kodu, timeout ve süreç temizliği runner'a aittir; şema doğrulaması çağıran adaptöre aittir. Research/Strategy CLI yalnızca Research/Strategy data tipini üretir. status, origin, error ve metadata modelden alınmaz; adaptör bunları kurar.
+Bu adlar proje içi adaptör sözleşmesidir. MCP araç adları memory_read, simulate_scenarios, memory_update; inputSchema/outputSchema ilgili tiplerden üretilir. Sonuç structuredContent içinde taşınır. Research uzmanları bağlı search MCP araçlarını kullanabilir. Protokol hataları adaptörde hata zarfına çevrilir; stdio günlükleri stderr'e gider.
 
-MCP araçları kendi çıktı tipini `structuredContent` içinde döndürür ve `outputSchema` ile ilan eder. Protokol hatası, isError=true veya geçersiz structuredContent Node adaptöründe ilgili hata zarfına dönüştürülür. MCP stdio stdout yalnızca protokole ayrılır; günlükler stderr'e gider.
+Research adaptörüne `{signal, runCli, onStep}` enjekte edilir. Uzman başlangıcı ve doğrulanmış bitişi onStep ile Orchestrator'a iletilir. Agent'lar sequence, runId veya genel progress yazmaz; tek olay yazıcısı Orchestrator'dır. Agent data üretir; status/origin/error ve metadata runtime tarafından oluşturulur. UI hiçbir alt agent'a doğrudan bağlanmaz.
 
-Kişi 4 `save_analysis` içinde requestId ile upsert yapar; tekrar kayıt aynı kimliği döndürür. Girdi analysis.requestId ile dış requestId eşit olmalıdır. Kaydetmeden önce analysis.persistence geçici olarak `{saved:false,recordId:null,error:null}` olur. Veritabanına response içindeki persistence kopyası yerine analiz içeriği (input ve dört modül, warnings, zamanlar, status) ve requestId kaydedilir; kalıcı kayıt başarılı yazımın kendisidir. HTTP yanıtına kayıt sonucu sonradan eklenir. Kayıt hatasında tekrar analizi/modeli çalıştırmayın.
+## JSON hafıza ve çalışma dosyaları
 
-MVP hafıza için keyword araması yeterli; matchMethod=keyword ve similarity=null kullanın. Embedding çalıştırılmadıysa anlamsal benzerlik skoru varmış gibi göstermeyin. Demo kayıtları canlı geçmişe karışmaz.
+İlişkisel DB, Supabase ve SQLite yok. Önerilen düzen:
 
-## Simülasyon formülü
+```
+data/
+  runs/<runId>/request.json
+  runs/<runId>/events.json
+  runs/<runId>/snapshot.json
+  memory/demo/<runId>.json
+  memory/live/<runId>.json
+```
 
-Her senaryo için: payingCustomers=floor(monthlyVisitors*conversionRate); monthlyRevenue=payingCustomers*monthlyPrice; monthlyProfit=monthlyRevenue-monthlyCosts; zarar varsa runwayMonths=initialCash/abs(monthlyProfit), aksi halde null. Para sonuçlarını iki ondalığa yuvarlayın. Müşteri birikimi, churn, vergi veya büyüme modeli yok; sabit bir aylık fotoğraf varsayılıyor.
+MemoryRecord: schemaVersion, recordId (=runId), namespace, revision, createdAt, updatedAt, analysisStatus, analysis, lessons. analysis, MemoryReceipt içermeyen AnalysisContent'tir; böylece kayıt kendi yazma sonucunu içermez. analysisStatus hafıza yazımından önceki analiz durumudur; yazma hatası son Response.status'u partial yapabilir. Demo kayıtları da yazılır; ayrı namespace sayesinde live geçmişe karışmaz.
 
-MVP'de Node yapılandırmasından açıkça gösterilen varsayımlar gelir; model rakam üretmez. Örnek demo için 1000 ziyaretçi, iyimser %5/kötümser %1 dönüşüm, 200 TRY fiyat, 8000 TRY aylık maliyet, 60000 TRY nakit. Canlı analizde de kullanıcıdan veri toplanmıyorsa bu rakamların genel örnek varsayımlar olduğunu gösterin; fikre özel öngörü olarak sunmayın.
+Memory.update tamamlanmış değerlendirmeyi ve mevcut tüm sonuçları tek JSON kaydına yazar. Aynı runId + aynı içerikle tekrar çağrı aynı revision ve receipt'i döndürür; farklı içerik yeni revision üretir. Revision'ı Memory Agent saklama adaptörü belirler. Tek süreç/tek yazıcı varsayımı, süreç içi kilit ve aynı dizinde geçici dosya -> atomic rename kullanılır. `updatedAt` başarılı yazımın zamanıdır; başarısız yazımda receipt üretilmez. Memory.read aynı namespace içinde mevcut runId'yi hariç tutar; en fazla 3 keyword eşleşmesi döner. Henüz embedding yok.
 
-## Sürüm ve paylaşım
+SSE olayları events.json dizisine atomik yazılıp ondan sonra yayınlanır; sıra tek yazıcı tarafından verilir. Snapshot olaylardan yeniden üretilebilir; iki dosyanın birlikte atomik olduğu varsayılmaz. run kabulü request.json ve run.accepted günlüğü kalıcı olmadan 202 dönmez. Bellek güncellemesi başarılı olup son olay yazılamazsa aynı runId ile idempotent tekrar kullanılabilir. Yeniden başlatmada yarım run otomatik model tekrarına sokulmaz; terminal olmayan adımlar failed/RUN_INTERRUPTED veya skipped olur, mevcut çıktılar korunur ve failed run.finished üretilir. Disk tamamen yazılamıyorsa SSE hata sonrası Snapshot/HTTP 500 üzerinden sorun görünür; kaydedildi denmez.
 
-Bu dosya ile şema çelişirse entegrasyon öncesi Kişi 2 düzeltir. İlk dondurmadan sonra alan kaldırma/yeniden adlandırma yok. strict şemada yeni alan eklemek de koordineli sürüm güncellemesi gerektirir. Frontend ayrı repodaysa contracts klasörünü aynı commit'ten kopyalayın; ilk 5 saatte paket yayımlama altyapısı kurmayın.
+Runtime dosyaları git'e girmez; contracts/examples paylaşılabilir fixture'lardır. Örnekteki memory receipt ve kaynaklar gerçek çalıştırma iddiası değildir.
+
+## Doğrulama
+
+Repo kökünden `npm install --prefix contracts` ve `npm test --prefix contracts`. Bu bağımlılıklar yalnız sözleşme doğrulamasına aittir. Şema yanında validate.cjs çapraz ID'leri, simülasyon hesaplarını, olay sırası/bağımlılıklarını, hafıza-sonuç eşleşmesini ve bozuk örneklerin reddedilmesini kontrol eder. Backend aynı iş kurallarını runtime'da da uygulamalıdır.
+
+V1 -> v2 değişiklikleri: POST senkron Response yerine 202 Accepted döner; requestId -> runId/clientRequestId; research dört uzman içerir; strategy -> buildSuggestion + evaluation; simulation -> testResults; persistence -> memoryUpdate; SSE/Snapshot ve JSON MemoryRecord eklenir. Frontend/backend aynı v2 commit'ini birlikte kullanmalıdır.

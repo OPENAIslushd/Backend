@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "2.0.0",
+  "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
+  "status": "failed",
+  "createdAt": "2026-10-12T09:00:00Z",
+  "finishedAt": "2026-10-12T09:00:20Z",
+  "durationMs": 20000,
+  "input": {
+    "schemaVersion": "2.0.0",
+    "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
+    "idea": "Üniversite öğrencileri için bütçeye uygun haftalık yemek planı oluşturan uygulama.",
+    "language": "tr",
+    "targetMarket": "Türkiye",
+    "targetAudience": "Üniversite öğrencileri",
+    "mode": "demo",
+    "testMode": "simulation"
+  },
+  "memoryContext": {
+    "status": "completed",
+    "origin": "derived",
+    "data": {
+      "namespace": "demo",
+      "similarIdeas": [],
+      "matchMethod": "none"
+    },
+    "error": null
+  },
+  "research": {
+    "status": "completed",
+    "origin": "mock",
+    "data": {
+      "summary": "Dört uzman agent çıktısının kurgusal demo özeti.",
+      "riskReward": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "risks": [
+            {
+              "id": "risk-1",
+              "title": "Ödeme isteği",
+              "description": "Öğrenciler abonelik için ödeme yapmayabilir.",
+              "severity": "high",
+              "mitigation": "Küçük bir pilotla ödeme isteğini ölç.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "rewards": [
+            {
+              "id": "reward-1",
+              "description": "Bütçeye göre liste oluşturma zaman kazandırabilir.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": []
+        },
+        "error": null
+      },
+      "marketing": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "targetSegments": [
+            "Üniversite öğrencileri"
+          ],
+          "channels": [
+            {
+              "name": "Kampüs toplulukları",
+              "rationale": "Pilot katılımcı bulmak için örnek kanal."
+            }
+          ],
+          "findings": [
+            {
+              "id": "marketing-1",
+              "description": "Bütçe odaklı konumlandırma test edilebilir.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": []
+        },
+        "error": null
+      },
+      "rivals": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "competitors": [
+            {
+              "id": "rival-1",
+              "name": "Kurgu Rakip 1",
+              "website": "https://example.com/rival-1",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-1"
+              ],
+              "evidenceType": "mock"
+            },
+            {
+              "id": "rival-2",
+              "name": "Kurgu Rakip 2",
+              "website": "https://example.com/rival-2",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-2"
+              ],
+              "evidenceType": "mock"
+            },
+            {
+              "id": "rival-3",
+              "name": "Kurgu Rakip 3",
+              "website": "https://example.com/rival-3",
+              "description": "Sabit demo rakibidir.",
+              "differentiation": "Öğrenci bütçesine odaklanma hipotezi.",
+              "sourceIds": [
+                "rivals-source-3"
+              ],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": [
+            {
+              "id": "rivals-source-1",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-1",
+              "accessedAt": null
+            },
+            {
+              "id": "rivals-source-2",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-2",
+              "accessedAt": null
+            },
+            {
+              "id": "rivals-source-3",
+              "title": "Kurgu kaynak; araştırma kanıtı değildir.",
+              "url": "https://example.com/rival-3",
+              "accessedAt": null
+            }
+          ]
+        },
+        "error": null
+      },
+      "trends": {
+        "status": "completed",
+        "origin": "mock",
+        "data": {
+          "findings": [
+            {
+              "id": "trend-1",
+              "description": "Örnek hipotez: haftalık bütçe planlamasına ilgi.",
+              "sourceIds": [],
+              "evidenceType": "mock"
+            }
+          ],
+          "sources": []
+        },
+        "error": null
+      }
+    },
+    "error": null
+  },
+  "buildSuggestion": {
+    "status": "failed",
+    "origin": "none",
+    "data": null,
+    "error": {
+      "code": "INVALID_OUTPUT",
+      "message": "Strategy build suggestion şemaya uymuyor.",
+      "retryable": true
+    }
+  },
+  "testResults": {
+    "status": "skipped",
+    "origin": "none",
+    "data": null,
+    "error": null
+  },
+  "evaluation": {
+    "status": "skipped",
+    "origin": "none",
+    "data": null,
+    "error": null
+  },
+  "warnings": [
+    "DEMO_DATA: Araştırma kurgusaldır.",
+    "SIMULATION_ONLY: Gerçek ürün testi yapılmadı.",
+    "Build suggestion başarısız; tests.run ve strategy.evaluate atlandı. Hata bağlamı Memory Agent ile kaydedildi."
+  ],
+  "memoryUpdate": {
+    "status": "completed",
+    "origin": "derived",
+    "data": {
+      "namespace": "demo",
+      "recordId": "dc722ed7-196b-4911-9820-66fd641d190b",
+      "revision": 1,
+      "updatedAt": "2026-10-12T09:00:19Z"
+    },
+    "error": null
+  }
+}

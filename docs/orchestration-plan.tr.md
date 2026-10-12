@@ -1,105 +1,68 @@
-# Kişi 2 — beş saatlik orkestrasyon planı
+# Kişi 2 — Orchestrator Agent uygulama planı
 
-Hedef: React'tan tek POST /analyze isteği; Node.js iki uzman CLI agent'ını ve hafıza/simülasyon MCP araçlarını yönetir; doğrulanmış tek JSON döner. İlk teslim, ../contracts altındaki sözleşme ve sabit örnektir. Bu belge uygulama planıdır; çalışan endpoint veya bağlantı teslimi değildir.
+Sözleşmenin tek kaynağı [contracts/README.md](../contracts/README.md) ve üç JSON Schema dosyasıdır. Bu plan v2 mimarisini uygular. Test girdileri gerçek ürün testi değil demo simülasyonudur.
 
-## Mimari kararı
+## İş akışı
 
-CLI için Codex varsayılmıştır; farklı CLI seçilirse yalnızca runner adaptörü değişir. CLI model çalıştırır, MCP araçlara erişim sağlar. Orkestrasyon sırası, timeout, doğrulama ve kayıt Node.js kodunda belirlenir.
+1. React, Orchestrator'a POST /analyze gönderir. Node.js girişini doğrular, idempotency kontrolü yapar ve runId/olay URL'siyle 202 döner.
+2. Orchestrator Agent, Memory Agent'tan JSON geçmişini okutur ve Research Agent'ı başlatır. İki dal paralel çalışabilir.
+3. Research Agent, risk/reward analytics, marketing research, rival research ve trend analytics agent'larına ayrılır. Uzman çıktıları ayrı şemalarda doğrulanır; Research bunları birleştirir.
+4. Orchestrator, araştırmayı ve hafızayı Strategy Agent'a vererek build suggestion ve test planı ister.
+5. Test planının iki senaryosu deterministik simülasyon aracında çalışır. Araç metric, criterion checks ve success/failure üretir.
+6. Orchestrator Strategy Agent'ı değerlendirme fazında çağırır. Strategy başarılı/başarısız senaryoları nedenleri, koşulları, sonraki adımları ve sınırlamalarıyla açıklar.
+7. Orchestrator, Memory Agent üzerinden analiz ve çıkarılan dersleri JSON hafızasına yazar.
+8. Memory yazma girişimi sonuçlandıktan sonra run.finished ile nihai sonuç UI'a gönderilir. Yazma başarısızsa sonuç kaybolmaz, durum partial olur.
 
-```mermaid
-flowchart TD
-  UI[React] --> API[Node.js POST /analyze]
-  API --> MODE{demo / live}
-  MODE -->|demo| FIX[Doğrulanmış sabit fixture]
-  MODE -->|live| RES[Research CLI agent]
-  MODE -->|live| MEM[Memory MCP: find_similar_ideas]
-  RES --> SEARCH[Bağlı search MCP]
-  RES --> JOIN[Araştırma + hafıza sonuçları]
-  MEM --> JOIN
-  JOIN --> STR[Strategy CLI agent]
-  STR --> SIM[Simulation MCP: simulate_startup]
-  SIM --> VAL[Şema + iş kuralı doğrulaması]
-  VAL --> SAVE[Memory MCP: save_analysis]
-  SAVE --> OUT[Birleştirilmiş JSON]
-  FIX --> OUT
-  OUT --> UI
-```
+Her başlangıç/bitişte Orchestrator olay üretir. Research kendi alt adımlarını onStep callback'iyle bildirir; global sıra numarasını yalnız Orchestrator verir. Önceki plandaki Supabase/ilişkisel depolama ve senkron tek-yanıt yaklaşımı kaldırılmıştır.
 
-Research ve Strategy ayrı prompt, araç erişimi ve çıktı şemasına sahip iki gerçek model çalıştırmasıdır. Memory/Simulation deterministik araçlardır; ek LLM çağrısına ihtiyaçları yoktur. Research araştırma MCP'sini kullanır; Strategy yalnızca verilen araştırma ve hafızadan değerlendirme üretir. Veritabanına yazmayı Node çağırır; modelin araç seçimine bırakılmaz.
+## Sorumluluklar ve branch'ler
 
-## API anahtarı olmadan demo sınırı
-
-Codex yerel istemcisi ChatGPT oturumuyla veya API anahtarıyla giriş destekler. Bu plan ekip bilgisayarında oturum açılmış, erişimi sınırlı bir yerel demo varsayar. Kullanım hesabın erişimine ve limitlerine bağlıdır. Resmî belgeler programatik CI/CD için API key önerir; genel erişime açık uygulamada kişisel CLI oturumunu servis hesabı gibi kullanmayı bu MVP'ye dahil etmeyin. [Kimlik doğrulama](https://learn.chatgpt.com/docs/auth)
-
-CLI'nin bağlı araçlarını `codex mcp list` ile, oturumu `codex login status` ile kontrol edin. Chat ekranında araç görmek, Node'dan başlatılan süreçte çalıştığını kanıtlamaz; gerçek child process ile küçük bir smoke test yapın. Codex STDIO ve Streamable HTTP MCP bağlantılarını destekler. [MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
-
-API key kullanmama kararı, bütün servislerin kimliksiz çalışacağı anlamına gelmez. Kişi 3 çalışır bir arama MCP bağlantısı; Kişi 4 kullanılabilir Supabase erişimi sağlamalıdır. Bağlantı OAuth/servis kimliği gerektiriyorsa kurulum demo makinesinde yapılır; kimlik bilgileri repoya girmez. Beş saatte erişim kurulamazsa açıkça işaretli demo verisi ve yerel JSON/SQLite kayıt adaptörü yedektir; bunlar Supabase/canlı araştırma tamamlandı diye gösterilmez.
-
-## Dosya sahipliği ve branch düzeni
-
-İncelenen repo `backend/`, remote OPENAIslushd/Backend; başlangıçta main üzerinde yalnızca boş README vardı. Sözleşme taslağı `codex/contracts-orchestration-plan` branch'inde hazırlandı. Frontend ayrı repodaysa onun main/feature branch düzeni kendi reposunda uygulanır.
-
-| Sahip | Önerilen branch | Düzenleyeceği alan |
+| Sahip | Branch | Dosyalar / teslim |
 |---|---|---|
-| Kişi 1 | feat/frontend-dashboard | Frontend repo: form, yükleniyor/sonuç/hata ekranları |
-| Kişi 2 | feat/orchestrator | contracts/, src/orchestrator/, src/runtime/, src/app.*, kök paket yapılandırması |
-| Kişi 3 | feat/research | src/research/, araştırma prompt'u ve search bağlantısı |
-| Kişi 4 | feat/memory-simulation | src/memory/, src/simulation/, src/mcp/, db/ |
+| Kişi 1 | feat/frontend-dashboard | Frontend repo; POST, EventSource, 10 adımlık agent görünümü, snapshot/reconnect |
+| Kişi 2 | feat/orchestrator | contracts/, src/orchestrator/, src/runtime/, src/strategy/, src/events/, Node HTTP |
+| Kişi 3 | feat/research | src/research/; parent + dört uzman, kaynak doğrulama, onStep bildirimleri |
+| Kişi 4 | feat/json-memory-simulation | src/memory/, src/simulation/, src/mcp/; JSON kayıt ve simülasyon |
 
-Önce sözleşme PR'ı main'e alınır; herkes aynı main commit'inden branch açar. Orkestratör iskeleti hemen ardından main'e alınır. root package.json ve lockfile değişikliklerini Kişi 2 toplar; diğerleri bağımlılık ihtiyacını bildirir. Kişi 3/4 ortak şemayı kendi branch'inde farklılaştırmaz; değişikliği Kişi 2 ile netleştirir.
+Sözleşme branch'i codex/contracts-orchestration-plan. PR'ı kullanıcı açacak. Sözleşme main'e alındıktan sonra herkes aynı commit'ten kendi branch'ini açar. Ortak şema ve kök bağımlılık/lockfile değişikliklerini Kişi 2 koordine eder. Frontend ayrı repodaysa contracts aynı sürümden kopyalanır. Ayrı clone/worktree kullanın; aynı dizinde eşzamanlı branch değiştirmeyin.
 
-Her geliştirici kendi clone'unda çalışır. Aynı bilgisayardaki eşzamanlı işler ayrı worktree kullanır; aynı dizinde branch değiştirme yapılmaz. İlk 30 dakikadan sonra kısa PR'lar, saatlik entegrasyon; son saati ilk birleştirmeye ayırmayın. main her zaman demo çalıştırabilir durumda kalır. Ekip entegrasyonunu Kişi 2 yönetir, paylaşılan branch'e force-push yapılmaz.
+İlk PR sözleşme; ikinci PR Orchestrator'ın fixture+SSE iskeleti. Research ve JSON Memory entegrasyonlarını küçük PR'larla ekleyin. Son saati ilk merge için beklemeyin.
 
-Sözleşme birleştikten sonra, temiz çalışma ağacında:
+## Beş saatlik sıra
 
-```sh
-git fetch origin
-git switch main
-git pull --ff-only
-git switch -c feat/orchestrator
-```
-
-Research ve memory ekip arkadaşları son komutta kendi branch adlarını kullanır. Hazır PR'ları önce mock entegrasyonu, sonra research, sonra memory/simulation sırasıyla alın; her merge sonrası aynı demo isteğini çalıştırın.
-
-## Zaman kutuları ve teslim koşulları
-
-| Süre | Senin yapacağın | Çıkış koşulu |
+| Süre | Senin teslimin | Paralel ekip teslimi |
 |---|---|---|
-| 00:00–00:30 | Sözleşmeyi paylaş, alanlar/araç adları/klasör sahipliğini dondur; CLI login ve MCP erişimini dene | Herkes aynı fixture'ı okuyabiliyor; canlı bağlantı engelleri biliniyor |
-| 00:30–01:15 | Node endpoint, input doğrulaması, requestId, sabit demo yanıtı, hata middleware'i, React origin için CORS | React -> /analyze -> sonuç kartları çalışıyor |
-| 01:15–02:15 | Ortak CLI runner, Strategy prompt'u, schema validation, timeout, research/memory stub'ları | Bir CLI çağrısı doğrulanmış Strategy üretiyor |
-| 02:15–03:15 | Research ve Memory adaptörleri, paralel çağrılar, Simulation, kayıt | Aynı fikirle ilk canlı uçtan uca akış; eksik modül de yanıtı bozmuyor |
-| 03:15–04:00 | Geçersiz JSON, süreç hatası, timeout, MCP kesintisi, kayıt hatası, çift istek testleri | UI hatada takılmıyor, kısmi sonuç ve kayıt durumu doğru |
-| 04:00–05:00 | Özellikleri dondur, 3 demo provası, sabit örnek ve ekran kaydı hazırla | Tek komutla yerel demo açılıyor; ağ kesilince açık demo modu çalışıyor |
+| 00:00–00:30 | v2 şema/olay adlarını dondur, bağlantıları doğrula | Herkes fixture'ı okuyabilir |
+| 00:30–01:15 | POST 202, snapshot ve fixture SSE oynatıcı | UI agent ağacını ve canlı adımları gösterir |
+| 01:15–02:15 | CLI runner + Strategy build/evaluate | Research uzman stub'ları; JSON memory ve simülasyon |
+| 02:15–03:15 | Gerçek adaptörleri bağla, tek olay yazıcısı | Dört araştırma sonucu + memory receipt |
+| 03:15–04:00 | Reconnect, hata, kaynak/ID, timeout, kayıt tekrar testleri | Uçtan uca ortak demo |
+| 04:00–05:00 | Özellik dondurma, 3 prova ve yedek video | Aynı commit ile sunum |
 
-## Node.js uygulama adımları
+## Runtime kararları
 
-1. Request boyutunu sınırla (ör. 16 KB), JSON/schema doğrulamasını yap. Backend üretimi UUID'yi bütün çağrılara taşı. MVP'de tek aktif analiz; ikinci isteğe 429. Ağ hatasında frontend otomatik POST retry yapmaz.
-2. Demo isteğinde fixture'ın kopyasını yükle, metadata'yı yenile, şemayı doğrula ve dön. Live istek için aynı şemaya bağlı gerçek adaptörleri kullan.
-3. Research (60 saniye) ve Memory lookup (5 saniye) çağrılarını Promise.allSettled ile başlat. Her çağrıda gerçek iptal sinyali kullan; yalnız Promise.race kullanıp süreçleri arkada bırakma.
-4. İki sonucu Strategy'ye ver (40 saniye). Araştırma yoksa yalnız hipotez üretebilir; araştırmanın yapılmadığı summary/warnings içinde açıkça belirtilir. Model çıktısına kimlik veya kayıt durumu ekletme.
-5. Strategy başarısızsa failed yanıtını mevcut araştırma/hafıza ile dön; simülasyon skipped olur, kaydetme. Başarılıysa açık varsayımlarla simulate_startup çağır (5 saniye).
-6. Her modül çıktısını kendi şeması ve iş kurallarıyla doğrula; en sonda birleştirilmiş yanıtı doğrula. Kayıt çağrısına geçici persistence alanı ile gönder (5 saniye). Son kayıt sonucunu yanıta yaz ve tekrar doğrula.
-7. Genel bütçe 120 saniye; proxy ve frontend bekleme süresi bundan uzun (ör. 135 saniye). İstemci bağlantısı kapanınca işlemleri iptal et. Analiz sürecinin ve ona ait child süreçlerin temizlendiğini test et. Canlı limitleri smoke test sürelerine göre ayarla; garanti edilen gecikme gibi sunma.
+Orchestrator ve Research'ün fan-out/fan-in davranışı Node.js runtime tarafından yürütülür; model çıktısı iş sırasını veya HTTP şemasını değiştiremez. CLI çalıştırmaları rol prompt'u + görev verisi + çıktı şeması alır. Research parent kendi dört uzman görevini koordine eder; sınırsız agent açma/döngü yok. Strategy build ve evaluate ayrı çağrılardır; test sonuçları ikinci çağrının açık girdisidir.
 
-CLI runner: `child_process.spawn` ve argüman dizisi kullan; shell=false. Sabit rol prompt'u argüman, JSON veri stdin üzerinden aktarılır. Kullanıcı fikrini komut metnine ekleme. İstek/rol başına benzersiz geçici dizin; çıkışta temizlik. İzinler dar tutulur, araştırmada sadece gereken read-only MCP araçları açılır. Araştırma sonuçlarını talimat değil veri olarak ele al.
+Ortak runner: child_process.spawn, shell=false, sabit prompt argümanı ve JSON veri stdin'den; her run/rol için ayrı çalışma/geçici çıktı alanı. Süreç exit code, JSON parse ve output schema kontrolü zorunlu. CLI olayları uygulamanın SSE olayları değildir; kullanıcıya yalnız doğrulanmış adım sonuçları gönderilir. Runner değişse de agent sözleşmesi değişmez.
 
-Codex `--output-schema` son yanıtın şemasını tanımlar; `--json` olay akışıdır, analiz JSON'u değildir. `--output-last-message` ile final veriyi ayrı dosyadan oku; exit code, parse ve şema kontrolü yap. [Non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode)
+Codex kullanılıyorsa daha önce doğrulanan [non-interactive çıktı şeması](https://learn.chatgpt.com/docs/non-interactive-mode) desteği adaptörde kullanılabilir. HTTP Response yerine ilgili agent'ın data şemasını verin. [MCP bağlantısı](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) ve [hesap oturumu](https://learn.chatgpt.com/docs/auth) demo bilgisayarında gerçek child process ile test edilmelidir. Bu PR model/bağlantı kurulumu yapmaz.
 
-Runner geliştirilirken ortak şemanın `$defs.Research` veya `$defs.Strategy` bölümünden, referansları da içeren bağımsız çıktı şeması üret. Tam HTTP Response şemasını modele verme. CLI'nin structured-output alt kümesiyle uyumluluğunu smoke test ile doğrula; ortak API şemasını gevşetmek yerine runner adaptörü kullan. Üretilecek dosyanın kökü ilgili tip olur; `$defs` içindeki referanslar taşınır.
+Başlangıç bütçesi: toplam 240 saniye; memory.read 5 s, araştırma dalı en fazla 120 s (dört uzman, varsayılan concurrency=2, her biri 50 s + birleştirme 20 s), strategy.build 45 s, simülasyon 5 s, strategy.evaluate 45 s, memory.update 5 s; kalan süre doğrulama ve süreç temizliği payıdır. Bunlar hedef sınırlar, gecikme garantisi değil. Gerçek oturum/limitlere göre smoke test sonrası ayarlayın. Memory read araştırmayla paraleldir.
 
-Research prompt: fikri/hedef pazarı kullan; en fazla 3 doğrulanmış rakip; her iddiaya kaynak; hipotezleri ayır; kaynak bulamadığında uydurma. Strategy prompt: mevcut araştırma/hafızadan kısa özet, tam 3 risk ve 3 uygulanabilir öneri; ilgili risk/source ID'lerini koru; başarı olasılığı uydurma. İlk MVP'de agent'ın agent başlatması, agent döngüsü, kuyruk servisi, vektör DB ve WebSocket yok.
+AbortSignal ve süreç ağacı temizliği sağlayın. Promise.race tek başına süreç durdurmaz. SSE client disconnect analiz iptali değildir; yeniden bağlanma desteklenir. Global timeout çalışan adımları failed/TIMEOUT, bağımlıları skipped yapar; kullanıcıya terminal olay ulaşır. Agent retry aynı step içinde sınırlıdır, yeni bir run yaratmaz.
 
-## Kabul kontrolü
+JSON kaydı tek yazıcı ile yapılır; DB servisi yoktur. Demo/live namespace'leri ayrıdır. Sunucudan gelen metni React metin olarak gösterir; HTML olarak işlemez. Anahtar/oturum bilgileri, yerel dosya yolları ve ham tool logları UI payload'una girmez.
 
-- Fixture ve gerçek adaptörlerin hepsi aynı şemadan geçer; bilinmeyen alan reddedilir.
-- Normal demo: 3 kurgusal rakip, 3 risk, 3 öneri, 2 hesaplanmış senaryo görünür; demo etiketi ve kaydedilmedi durumu vardır.
-- Normal live: doğrulanmış kaynaklar ve başarılı kalıcı kayıt görülür. CLI ve MCP gerçek çalıştırmasıyla ayrıca doğrulanır.
-- Research timeout: rakipler uydurulmaz; Strategy başarılıysa HTTP 200 partial.
-- CLI login eksik/bozuk JSON/Strategy timeout: kontrollü failed yanıtı, sonsuz spinner yok.
-- Memory/Simulation/kayıt hatası: kalan sonuçlar korunur; kayıt başarılı diye gösterilmez.
-- Aynı requestId ile save_analysis tekrar çağrısı tek kayıt üretir.
-- Simülasyon para/oran birimleri, iki senaryo, formüller ve kaynak/risk referansları iş kuralı kontrolünden geçer.
-- Frontend iptali ve backend timeout sonrası orphan CLI/MCP süreçleri kalmaz.
+## Entegrasyon kabul koşulları
 
-İlk öncelik: sözleşmeyi ekibe paylaş ve 30. dakikada dondur. İkinci öncelik: herkesin ekrandan görebildiği çalışan mock akışı. Üçüncü öncelik: modülleri aynı sözleşmeyi bozmadan canlı adaptörlerle değiştir.
+- UI yalnız Orchestrator'a bağlı; dört uzman Research altında ayrı görülebiliyor.
+- İki Strategy fazı ve aralarındaki simülasyon ayrı adımlar olarak görünüyor.
+- İyimser başarı ve kötümser başarısızlığın kriterlere dayalı nedenleri gösteriliyor.
+- Gerçek ürün testi yapılmadığı, tüm rakamların varsayımsal olduğu görünür.
+- Memory okuma/güncelleme JSON üzerinden çalışıyor; son UI sonucu yazma girişiminden sonra geliyor.
+- UI reconnect erken olayları kaybetmiyor, duplicate sequence sonucu iki kez işlemiyor.
+- Trend agent hatasında diğer üç araştırma sonucu korunuyor.
+- Strategy hatasında bağımlı adımlar atlanıyor; UI sonsuz spinner göstermiyor.
+- Hafıza yazma hatasında kullanıcı sonucu görebiliyor; kayıt başarılı diye gösterilmiyor.
+- Aynı clientRequestId ikinci model akışı başlatmıyor; aynı runId tekrar kaydı çoğaltmıyor.
+- npm test --prefix contracts başarılı; canlı runtime ayrıca uçtan uca test ediliyor.

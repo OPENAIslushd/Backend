@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "2.0.0",
+  "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
+  "status": "queued",
+  "links": {
+    "events": "/analyses/dc722ed7-196b-4911-9820-66fd641d190b/events",
+    "snapshot": "/analyses/dc722ed7-196b-4911-9820-66fd641d190b"
+  }
+}

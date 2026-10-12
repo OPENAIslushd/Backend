@@ -1,0 +1,4 @@
+# Local run state and idea memory
+/data/
+# Contract validation dependencies
+/contracts/node_modules/
