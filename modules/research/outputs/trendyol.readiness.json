@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "profile_hash": "78ac3754b091a5aee57d80fcb284332ea469df22a0d88e4079f126a83ca18c8c",
+  "brief": {
+    "topic": "ayarlanabilir pamuklu şapka",
+    "target_market": "Türkiye",
+    "analysis_goal": "Ürün grubu ve teklif koşullarını araştırmak",
+    "perspective": "prospective_seller"
+  },
+  "mode": "marketplace_category",
+  "subject": {
+    "scope": "category",
+    "product_ids": [],
+    "category": "Şapka",
+    "perspective": "unknown"
+  },
+  "is_demo": false,
+  "request_id": "4b4437864b3f21c5863c9875629bfc357e1a8bd4d7f85c0ed02467d380cc8578",
+  "missing_fields": [
+    "profile_confirmation"
+  ],
+  "status": "needs_input",
+  "queries": []
+}

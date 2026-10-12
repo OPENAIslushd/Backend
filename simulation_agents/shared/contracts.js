@@ -2,10 +2,10 @@ import { readFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import { ServiceError } from './core.js';
 
-export const astraSchema = JSON.parse(readFileSync(new URL('../contracts/astra-request.schema.json', import.meta.url), 'utf8'));
+export const orchestratorSchema = JSON.parse(readFileSync(new URL('../contracts/orchestrator-request.schema.json', import.meta.url), 'utf8'));
 export const uiSchema = JSON.parse(readFileSync(new URL('../contracts/ui-response.schema.json', import.meta.url), 'utf8'));
 const ajv = new Ajv({ allErrors: true, strict: true, allowUnionTypes: true });
-ajv.addSchema(astraSchema);
+ajv.addSchema(orchestratorSchema);
 ajv.addSchema(uiSchema);
 const validators = new Map();
 export function validate(schema, value) {
@@ -20,6 +20,6 @@ export function validate(schema, value) {
   }
   return value;
 }
-export const validateRequest = value => validate(astraSchema.$id, value);
+export const validateRequest = value => validate(orchestratorSchema.$id, value);
 export const validateUi = value => validate(uiSchema.$id, value);
-export const validateDefinition = (name, value) => validate(`${astraSchema.$id}#/definitions/${name}`, value);
+export const validateDefinition = (name, value) => validate(`${orchestratorSchema.$id}#/definitions/${name}`, value);

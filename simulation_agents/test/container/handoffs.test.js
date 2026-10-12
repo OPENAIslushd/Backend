@@ -4,7 +4,7 @@ import { fixture, envelope, actualFixture } from '../helpers.js';
 import { validateUi } from '../../shared/contracts.js';
 import { call } from './client.js';
 
-// This test client only forwards handoffs. It is not an Astra implementation or audit engine.
+// This test client only forwards handoffs. It is not an Orchestrator implementation or audit engine.
 test('mock orchestrator exercises all eight actions across four containers', async () => {
   const request = fixture();
   const input = request.payload.input;

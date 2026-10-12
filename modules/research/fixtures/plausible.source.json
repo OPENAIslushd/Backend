@@ -1,0 +1,9 @@
+{
+  "id": "s1",
+  "type": "website",
+  "url": "https://plausible.io/",
+  "title": "Plausible Analytics",
+  "accessed_at": "2026-10-12T08:33:23.419739+00:00",
+  "collection_method": "direct_http_download",
+  "sha256": "008ee2f6668e6e32e325f934d5f0f05b89dc95df051656e3fef3903e867cd14c"
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.2",
+  "input_mode": "idea",
+  "is_demo": true,
+  "review_status": "needs_review",
+  "status": "partial",
+  "company": null,
+  "platform": null,
+  "idea": {
+    "description": "Türkiye'deki üniversite öğrencilerine yapay zekâ destekli kariyer rehberliği sunmak istiyorum.",
+    "target_customers": [
+      "Üniversite öğrencileri"
+    ],
+    "target_market": "Türkiye",
+    "analysis_goal": "Hangi ihtiyaca odaklanmalıyım ve benzer çözümlerden nasıl ayrışabilirim?",
+    "hypotheses": [
+      "Öğrenciler kişiselleştirilmiş staj önerilerine ihtiyaç duyuyor olabilir."
+    ],
+    "source_ids": [
+      "u1"
+    ]
+  },
+  "products": [],
+  "market_products": [],
+  "sources": [
+    {
+      "id": "u1",
+      "type": "user_input",
+      "url": null,
+      "title": "Kurgusal fikir girdisi",
+      "accessed_at": null
+    }
+  ],
+  "unknowns": [
+    "Pazar talebinin kanıtı",
+    "Rakip araştırması",
+    "Fiyat ve maliyet verileri"
+  ],
+  "warnings": [
+    "Fikir ve hipotezler mevcut şirket, mevcut ürün veya doğrulanmış pazar bulgusu değildir."
+  ],
+  "research_status": "not_started",
+  "simulation_status": "not_started",
+  "selection": {
+    "scope": "idea",
+    "product_ids": [],
+    "category": null,
+    "perspective": "prospective_founder"
+  },
+  "catalog_coverage": {
+    "status": "not_applicable",
+    "discovered_count": 0,
+    "total_count": null
+  }
+}

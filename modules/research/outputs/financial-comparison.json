@@ -1,0 +1,194 @@
+{
+  "status": "partial",
+  "entities": [
+    {
+      "id": "shopify",
+      "name": "Shopify Inc.",
+      "role": "example_company",
+      "identity_status": "source_matched"
+    },
+    {
+      "id": "commerce",
+      "name": "Commerce.com, Inc. (formerly BigCommerce Holdings, Inc.)",
+      "role": "example_peer",
+      "identity_status": "source_matched",
+      "listing": {
+        "exchange": "Nasdaq",
+        "ticker": "CMRC",
+        "source_url": "https://investors.bigcommerce.com/news-releases/news-release-details/commerce-announces-fourth-quarter-and-fiscal-year-2025-financial"
+      }
+    }
+  ],
+  "reported_facts": [
+    {
+      "entity_id": "shopify",
+      "metric": "revenue",
+      "value": 11556,
+      "scale": 1000000,
+      "currency": "USD",
+      "period_start": "2025-01-01",
+      "period_end": "2025-12-31",
+      "scope": "consolidated_company",
+      "accounting_basis": "US_GAAP",
+      "measurement_basis": "actual",
+      "inflation_basis": "nominal",
+      "definition": "total_revenue",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1594805/000159480526000007/shop-20251231.htm",
+      "source_locator": "2025 consolidated income statement / revenue",
+      "accessed_on": "2026-10-12",
+      "audit_status": "audited"
+    },
+    {
+      "entity_id": "shopify",
+      "metric": "net_income",
+      "value": 1231,
+      "scale": 1000000,
+      "currency": "USD",
+      "period_start": "2025-01-01",
+      "period_end": "2025-12-31",
+      "scope": "consolidated_company",
+      "accounting_basis": "US_GAAP",
+      "measurement_basis": "actual",
+      "inflation_basis": "nominal",
+      "definition": "consolidated_net_income",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1594805/000159480526000007/shop-20251231.htm",
+      "source_locator": "2025 consolidated income statement / net_income",
+      "accessed_on": "2026-10-12",
+      "audit_status": "audited"
+    },
+    {
+      "entity_id": "commerce",
+      "metric": "revenue",
+      "value": 342349,
+      "scale": 1000,
+      "currency": "USD",
+      "period_start": "2025-01-01",
+      "period_end": "2025-12-31",
+      "scope": "consolidated_company",
+      "accounting_basis": "US_GAAP",
+      "measurement_basis": "actual",
+      "inflation_basis": "nominal",
+      "definition": "total_revenue",
+      "source_url": "https://investors.bigcommerce.com/news-releases/news-release-details/commerce-announces-fourth-quarter-and-fiscal-year-2025-financial",
+      "source_locator": "2025 consolidated income statement / revenue",
+      "accessed_on": "2026-10-12",
+      "audit_status": "unaudited_release"
+    },
+    {
+      "entity_id": "commerce",
+      "metric": "net_income",
+      "value": -19342,
+      "scale": 1000,
+      "currency": "USD",
+      "period_start": "2025-01-01",
+      "period_end": "2025-12-31",
+      "scope": "consolidated_company",
+      "accounting_basis": "US_GAAP",
+      "measurement_basis": "actual",
+      "inflation_basis": "nominal",
+      "definition": "consolidated_net_income",
+      "source_url": "https://investors.bigcommerce.com/news-releases/news-release-details/commerce-announces-fourth-quarter-and-fiscal-year-2025-financial",
+      "source_locator": "2025 consolidated income statement / net_income",
+      "accessed_on": "2026-10-12",
+      "audit_status": "unaudited_release"
+    }
+  ],
+  "comparisons": [
+    {
+      "metric": "net_income",
+      "left_entity": "shopify",
+      "right_entity": "commerce",
+      "source_urls": [
+        "https://www.sec.gov/Archives/edgar/data/1594805/000159480526000007/shop-20251231.htm",
+        "https://investors.bigcommerce.com/news-releases/news-release-details/commerce-announces-fourth-quarter-and-fiscal-year-2025-financial"
+      ],
+      "status": "comparable",
+      "left_value": 1231000000.0,
+      "right_value": -19342000.0,
+      "currency": "USD",
+      "difference": 1250342000.0,
+      "relative_difference_pct": null,
+      "note": "Pozitif referansa göre fark; büyüklük farkı başarı veya ürün üstünlüğü değildir."
+    },
+    {
+      "metric": "revenue",
+      "left_entity": "shopify",
+      "right_entity": "commerce",
+      "source_urls": [
+        "https://www.sec.gov/Archives/edgar/data/1594805/000159480526000007/shop-20251231.htm",
+        "https://investors.bigcommerce.com/news-releases/news-release-details/commerce-announces-fourth-quarter-and-fiscal-year-2025-financial"
+      ],
+      "status": "comparable",
+      "left_value": 11556000000.0,
+      "right_value": 342349000.0,
+      "currency": "USD",
+      "difference": 11213651000.0,
+      "relative_difference_pct": 3275.5027764065326,
+      "note": "Pozitif referansa göre fark; büyüklük farkı başarı veya ürün üstünlüğü değildir."
+    }
+  ],
+  "calculated_metrics": [
+    {
+      "entity_id": "shopify",
+      "status": "calculated",
+      "metric": "net_margin_pct",
+      "value": 10.652474904811353,
+      "formula": "net_income / revenue * 100",
+      "source_urls": [
+        "https://www.sec.gov/Archives/edgar/data/1594805/000159480526000007/shop-20251231.htm",
+        "https://www.sec.gov/Archives/edgar/data/1594805/000159480526000007/shop-20251231.htm"
+      ]
+    },
+    {
+      "entity_id": "commerce",
+      "status": "calculated",
+      "metric": "net_margin_pct",
+      "value": -5.6497901264499095,
+      "formula": "net_income / revenue * 100",
+      "source_urls": [
+        "https://investors.bigcommerce.com/news-releases/news-release-details/commerce-announces-fourth-quarter-and-fiscal-year-2025-financial",
+        "https://investors.bigcommerce.com/news-releases/news-release-details/commerce-announces-fourth-quarter-and-fiscal-year-2025-financial"
+      ]
+    }
+  ],
+  "unavailable_metrics": [
+    {
+      "metric": "ROI",
+      "status": "not_collected",
+      "note": "Bu örnekte kaynaklı veri toplanmadı; yayımlanmadığı iddia edilmiyor."
+    },
+    {
+      "metric": "budget",
+      "status": "not_collected",
+      "note": "Bu örnekte kaynaklı veri toplanmadı; yayımlanmadığı iddia edilmiyor."
+    },
+    {
+      "metric": "CAC",
+      "status": "not_collected",
+      "note": "Bu örnekte kaynaklı veri toplanmadı; yayımlanmadığı iddia edilmiyor."
+    },
+    {
+      "metric": "LTV",
+      "status": "not_collected",
+      "note": "Bu örnekte kaynaklı veri toplanmadı; yayımlanmadığı iddia edilmiyor."
+    },
+    {
+      "metric": "churn",
+      "status": "not_collected",
+      "note": "Bu örnekte kaynaklı veri toplanmadı; yayımlanmadığı iddia edilmiyor."
+    },
+    {
+      "metric": "product_profit",
+      "status": "not_collected",
+      "note": "Bu örnekte kaynaklı veri toplanmadı; yayımlanmadığı iddia edilmiyor."
+    }
+  ],
+  "collection_method": "assistant_manual_transcription_from_official_reports",
+  "limitations": [
+    "Otomatik rapor indirme bağlı değil; kaynaklı veri paketi işlenir.",
+    "Şirket konsolide sonuçları tek ürünün kârı değildir.",
+    "ROI için belirli yatırımın maliyeti ve atfedilebilir net getirisi gerekir; hasılattan ROI türetilmez.",
+    "Bütçe gerçekleşmiş gider değildir; GMV hasılat değildir.",
+    "Farklı tanım, dönem, para birimi ve muhasebe esası otomatik eşitlenmez."
+  ]
+}

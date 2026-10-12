@@ -25,6 +25,6 @@ test('deterministic generator returns 100–200 diverse, valid and traceable str
 test('self-contained context changes strategy identity and there is no raw-history input', () => {
   const request = fixture();
   const first = generate(request);
-  request.payload.input.context = 'A different Astra-supplied instruction';
+  request.payload.input.context = 'A different Orchestrator-supplied instruction';
   assert.notEqual(generate(request).strategies[0].strategy_id, first.strategies[0].strategy_id);
 });

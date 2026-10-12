@@ -1,6 +1,6 @@
 # Advertising strategy simulation agents
 
-Four Node.js services generate advertising options, compare them in a numerical simulator, prepare three UI recommendations, and retain user selections with later observed results in SQLite. Astra is an external orchestrator. Each service answers Astra and never invokes another service.
+Four Node.js services generate advertising options, compare them in a numerical simulator, prepare three UI recommendations, and retain user selections with later observed results in SQLite. The Orchestrator is an external orchestrator. Each service answers the Orchestrator and never invokes another service.
 
 **Implementation status:** code, contracts, examples, tests and CI configuration are written. No dependencies, application code, tests, builds or containers have been run locally. Runtime correctness remains unverified until the GitHub Actions checks run.
 
@@ -9,7 +9,7 @@ Four Node.js services generate advertising options, compare them in a numerical 
 ```mermaid
 sequenceDiagram
     participant UI
-    participant A as Astra (external)
+    participant A as Orchestrator
     participant M as memory / SQLite
     participant S as strategy
     participant X as simulation
@@ -36,9 +36,9 @@ sequenceDiagram
     M-->>A: New record revision
 ```
 
-Astra supplies the business/product scope, keeps evaluations for later selection, removes held-out actuals from generation/simulation tasks, and owns all audits, retries, corrections and UI routing. Strategy does not query memory or accept raw history. Free-text `context` is Astra-curated context, not a place for raw observed outcomes. Automatic semantic detection of leaked information in text is not implemented.
+The Orchestrator supplies the business/product scope, keeps evaluations for later selection, removes held-out actuals from generation/simulation tasks, and owns all audits, retries, corrections and UI routing. Strategy does not query memory or accept raw history. Free-text `context` is Orchestrator-curated context, not a place for raw observed outcomes. Automatic semantic detection of leaked information in text is not implemented.
 
-Memory owns the only database. Outcome prepares proposed writes and returns them to Astra. A simulation winner and a user selection are never recorded as evidence of actual campaign success. A selected record contains the exact input, strategy/revision, evaluation identity, model version, seed, scenario count, assumptions, adaptive prediction, fixed prediction, and separately nullable actuals/comparison.
+Memory owns the only database. Outcome prepares proposed writes and returns them to the Orchestrator. A simulation winner and a user selection are never recorded as evidence of actual campaign success. A selected record contains the exact input, strategy/revision, evaluation identity, model version, seed, scenario count, assumptions, adaptive prediction, fixed prediction, and separately nullable actuals/comparison.
 
 ## Layout and stack
 
@@ -57,7 +57,7 @@ Node.js 24 supplies HTTP, testing, cryptography and SQLite without native npm ad
 
 ## Interfaces
 
-Every service exposes `GET /health` and authenticated `POST /v1/execute`. Requests require `Content-Type: application/json` and `Authorization: Bearer <SERVICE_TOKEN>`. The token must contain at least 16 characters. Health checks require no token. The maximum JSON body is 24 MiB. This MVP assumes a trusted Astra backend; the shared token is not an end-user or multi-tenant authorization system. Do not give the browser this token. Public deployment needs TLS and request/concurrency limits in front of these synchronous CPU-bound services.
+Every service exposes `GET /health` and authenticated `POST /v1/execute`. Requests require `Content-Type: application/json` and `Authorization: Bearer <SERVICE_TOKEN>`. The token must contain at least 16 characters. Health checks require no token. The maximum JSON body is 24 MiB. This MVP assumes a trusted Orchestrator backend; the shared token is not an end-user or multi-tenant authorization system. Do not give the browser this token. Public deployment needs TLS and request/concurrency limits in front of these synchronous CPU-bound services.
 
 ```json
 {
@@ -84,13 +84,13 @@ Failure: `{ "contract_version": "1.0", "request_id": "... or null", "error": { "
 | `outcome.observe` | outcome | Latest `record`, complete cumulative `actual` snapshot | `{proposed_action: "memory.update_actual", payload: ...}` |
 | `memory.update_actual` | memory | `idempotency_key`, scope, `selection_id`, `expected_revision`, `actual`, `comparison` | `{record}` with incremented revision |
 
-An outcome proposal is **not** already a request and does not persist anything. Astra wraps its `proposed_action` and `payload` in a fresh envelope with a request ID and the original campaign `run_id`, audits it, and sends it to memory. Selection and observation actions retain the original campaign run ID. Retrieval may use the new run's ID.
+An outcome proposal is **not** already a request and does not persist anything. The Orchestrator wraps its `proposed_action` and `payload` in a fresh envelope with a request ID and the original campaign `run_id`, audits it, and sends it to memory. Selection and observation actions retain the original campaign run ID. Retrieval may use the new run's ID.
 
-See [the contract reference](contracts/README.md), [Astra request schema](contracts/astra-request.schema.json), [UI data schema](contracts/ui-response.schema.json), [complete synthetic generation request](test/fixtures/generate-request.json), and [the UI fallback example](contracts/examples/ui-insufficient.json). The [container handoff test](test/container/handoffs.test.js) is a complete eight-action client example, without Astra's audit logic.
+See [the contract reference](contracts/README.md), [Orchestrator request schema](contracts/orchestrator-request.schema.json), [UI data schema](contracts/ui-response.schema.json), [complete synthetic generation request](test/fixtures/generate-request.json), and [the UI fallback example](contracts/examples/ui-insufficient.json). The [container handoff test](test/container/handoffs.test.js) is a complete eight-action client example, without the Orchestrator's audit logic.
 
 ## Campaign and simulation specification
 
-These are engineering defaults, not supplied business facts: purchases, a fixed total budget, a 30-day campaign, paid social/search/influencer channels, checkpoints every three days, at most 20% of the remaining budget moved per checkpoint, and an exploration floor. Astra must supply all numerical channel assumptions and the product contribution per purchase. Currency is one consistent three-letter uppercase code; there is no exchange-rate conversion.
+These are engineering defaults, not supplied business facts: purchases, a fixed total budget, a 30-day campaign, paid social/search/influencer channels, checkpoints every three days, at most 20% of the remaining budget moved per checkpoint, and an exploration floor. The Orchestrator must supply all numerical channel assumptions and the product contribution per purchase. Currency is one consistent three-letter uppercase code; there is no exchange-rate conversion.
 
 Generation defaults to 150 candidates (allowed 100–200). Seeded allocation sampling includes three channel-heavy anchors and one nearly even anchor. Each candidate has a stable ID, revision, full audience/region/timing, allocation, creative approach, assumptions and adaptation rules. `proof` means evidence/testimonials, `discovery` means awareness-led discovery, and `offer` means a purchase offer. The current generator varies allocations, creative approach and evidence thresholds. Audience/region/timing remain constrained to the supplied task. It does not understand natural-language instructions or claim LLM generation. All results are labeled `deterministic-diversity-v1`.
 
@@ -146,8 +146,8 @@ npm test
 
 The optional `npm run test:containers` requires a fresh, empty test Compose volume and running healthy services. It tests all handoffs, recreates the memory container, and verifies persistence. Do not run it against a real dataset. The GitHub workflow provisions a fresh isolated runner and performs these stages explicitly.
 
-Opening or updating a GitHub pull request that touches this project triggers `.github/workflows/simulation-agents.yml`. Pushes to main/master and manual workflow dispatch are also enabled. One job validates both contracts and exercises malformed inputs, generation, adaptation, leakage prevention, paired controls, distinct recommendations, selection, observations, HTTP boundaries and SQLite persistence/retries. A dependent job builds all four images, waits for health, runs HTTP handoffs through a mock Astra client, recreates memory with the same volume, and checks persisted data. Logs and the resolved npm lock are uploaded. The workflow does not publish images or deploy services.
+Opening or updating a GitHub pull request that touches this project triggers `.github/workflows/simulation-agents.yml`. Pushes to main/master and manual workflow dispatch are also enabled. One job validates both contracts and exercises malformed inputs, generation, adaptation, leakage prevention, paired controls, distinct recommendations, selection, observations, HTTP boundaries and SQLite persistence/retries. A dependent job builds all four images, waits for health, runs HTTP handoffs through a mock the Orchestrator client, recreates memory with the same volume, and checks persisted data. Logs and the resolved npm lock are uploaded. The workflow does not publish images or deploy services.
 
 No lockfile was fabricated and npm was not run locally. The direct dependency is pinned; transitive dependencies and the Node image currently resolve during CI/build. Review and commit the lockfile emitted by the first hosted run, then replace `npm install` with `npm ci` in CI and Dockerfiles (and copy the lock into each image). Pin an image digest when reproducible release builds become necessary.
 
-The friend supplying Astra remains responsible for research, business/demo data and surrounding demo systems. All repository fixtures are explicitly synthetic. Nothing here fabricates historical results for real businesses, scrapes public-company data, or infers campaign performance from company revenue.
+The Orchestrator owner remains responsible for research, business/demo data and surrounding demo systems. All repository fixtures are explicitly synthetic. Nothing here fabricates historical results for real businesses, scrapes public-company data, or infers campaign performance from company revenue.

@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.1",
+  "is_demo": true,
+  "review_status": "confirmed",
+  "company": {
+    "name": "Örnek Yazılım",
+    "website_url": "https://ornek.example",
+    "business_models": [
+      "subscription"
+    ]
+  },
+  "target_market": "Türkiye",
+  "analysis_goal": "Deneme kullanıcılarının ücretli aboneliğe geçişini artırmak",
+  "known_competitors": [],
+  "language": "tr",
+  "unknowns": [
+    "Mevcut denemeden ücretliye geçiş oranı"
+  ],
+  "sources": [
+    {
+      "id": "u1",
+      "type": "user_input",
+      "url": null,
+      "title": "Kurgusal kullanıcı tarafından sağlanan profil",
+      "accessed_at": null
+    }
+  ],
+  "products": [
+    {
+      "id": "product_1",
+      "name": "Randevu",
+      "description": "Salonlar için online randevu yönetimi.",
+      "target_customers": [
+        "Kuaförler",
+        "Güzellik salonları"
+      ],
+      "features": [
+        {
+          "name": "Online rezervasyon",
+          "source_ids": [
+            "u1"
+          ]
+        }
+      ],
+      "pricing": {
+        "status": "published",
+        "plans": [
+          {
+            "name": "Başlangıç",
+            "amount": 500,
+            "currency": "TRY",
+            "billing_period": "month",
+            "unit": "business",
+            "tax_included": null,
+            "source_ids": [
+              "u1"
+            ],
+            "usage_limits": null
+          }
+        ],
+        "source_ids": [
+          "u1"
+        ],
+        "offers": []
+      },
+      "source_ids": [
+        "u1"
+      ],
+      "product_type": "digital",
+      "category": "İş yönetimi yazılımı",
+      "brand": "Örnek Yazılım",
+      "attributes": [],
+      "variants": [],
+      "url": null,
+      "unknowns": []
+    }
+  ],
+  "selection": {
+    "scope": "product",
+    "product_ids": [
+      "product_1"
+    ],
+    "category": null,
+    "perspective": "brand_owner"
+  },
+  "catalog_coverage": {
+    "status": "partial",
+    "discovered_count": 1,
+    "total_count": null,
+    "notes": "Kurgusal örnek; tüm katalog doğrulanmadı."
+  }
+}

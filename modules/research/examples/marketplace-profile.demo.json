@@ -1,0 +1,175 @@
+{
+  "schema_version": "1.1",
+  "is_demo": true,
+  "review_status": "needs_review",
+  "company": {
+    "name": "Örnek Pazar",
+    "website_url": "https://pazar.example",
+    "business_models": [
+      "marketplace"
+    ],
+    "description": "Kurgusal ayakkabı ve şapka pazaryeri.",
+    "source_ids": [
+      "s1"
+    ]
+  },
+  "catalog_coverage": {
+    "status": "partial",
+    "discovered_count": 2,
+    "total_count": null,
+    "notes": "Yalnızca iki örnek ürün; tüm katalog değildir."
+  },
+  "products": [
+    {
+      "id": "shoe_1",
+      "name": "Günlük spor ayakkabı",
+      "url": "https://pazar.example/shoe_1",
+      "description": null,
+      "product_type": "physical",
+      "category": "Ayakkabı",
+      "brand": "Örnek Marka",
+      "target_customers": null,
+      "features": [],
+      "attributes": [],
+      "variants": [
+        {
+          "id": "shoe_1_v1",
+          "sku": null,
+          "attributes": [
+            {
+              "name": "size",
+              "value": "42",
+              "source_ids": [
+                "s1"
+              ]
+            },
+            {
+              "name": "color",
+              "value": "Siyah",
+              "source_ids": [
+                "s1"
+              ]
+            }
+          ],
+          "source_ids": [
+            "s1"
+          ]
+        }
+      ],
+      "pricing": {
+        "status": "published",
+        "plans": [],
+        "offers": [
+          {
+            "seller": {
+              "id": "a",
+              "name": "Satıcı A"
+            },
+            "variant_id": "shoe_1_v1",
+            "amount": 1200,
+            "currency": "TRY",
+            "billing_period": "one_time",
+            "unit": "pair",
+            "tax_included": null,
+            "availability": "unknown",
+            "shipping": null,
+            "returns": null,
+            "url": "https://pazar.example/shoe_1",
+            "source_ids": [
+              "s1"
+            ]
+          },
+          {
+            "seller": {
+              "id": "b",
+              "name": "Satıcı B"
+            },
+            "variant_id": "shoe_1_v1",
+            "amount": 1250,
+            "currency": "TRY",
+            "billing_period": "one_time",
+            "unit": "pair",
+            "tax_included": null,
+            "availability": "unknown",
+            "shipping": null,
+            "returns": null,
+            "url": "https://pazar.example/shoe_1",
+            "source_ids": [
+              "s1"
+            ]
+          }
+        ],
+        "source_ids": [
+          "s1"
+        ]
+      },
+      "source_ids": [
+        "s1"
+      ],
+      "unknowns": [
+        "Malzeme bilgisi",
+        "Satış ve dönüşüm verileri"
+      ]
+    },
+    {
+      "id": "hat_1",
+      "name": "Pamuklu şapka",
+      "url": "https://pazar.example/hat_1",
+      "description": null,
+      "product_type": "physical",
+      "category": "Şapka",
+      "brand": "Örnek Marka",
+      "target_customers": null,
+      "features": [],
+      "attributes": [],
+      "variants": [
+        {
+          "id": "hat_1_v1",
+          "sku": null,
+          "attributes": [
+            {
+              "name": "size",
+              "value": "Ayarlanabilir",
+              "source_ids": [
+                "s1"
+              ]
+            },
+            {
+              "name": "color",
+              "value": "Mavi",
+              "source_ids": [
+                "s1"
+              ]
+            }
+          ],
+          "source_ids": [
+            "s1"
+          ]
+        }
+      ],
+      "pricing": {
+        "status": "unknown",
+        "plans": [],
+        "offers": [],
+        "source_ids": []
+      },
+      "source_ids": [
+        "s1"
+      ],
+      "unknowns": [
+        "Malzeme bilgisi",
+        "Satış ve dönüşüm verileri",
+        "Fiyat"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "type": "website",
+      "url": "https://pazar.example",
+      "title": "Kurgusal pazaryeri",
+      "accessed_at": null
+    }
+  ]
+}

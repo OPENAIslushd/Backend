@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kampanya Simülasyonu</title>
+    <link rel="stylesheet" href="/campaign.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <p class="eyebrow">Orchestrator · geçici mock arayüz</p>
+        <h1>Reklam kampanyası simülasyonu</h1>
+      </div>
+      <ul id="health" class="health" aria-label="Servis durumu"></ul>
+    </header>
+
+    <main>
+      <section class="card" id="form-card">
+        <h2>1 · İşletme bilgisi</h2>
+        <form id="campaign-form">
+          <div class="mode">
+            <label
+              ><input type="radio" name="dataMode" value="mock" checked /> Mock
+              veri</label
+            >
+            <label class="disabled" title="docs/real-data-mode.tr.md"
+              ><input type="radio" name="dataMode" value="real" disabled />
+              Gerçek veri (yakında)</label
+            >
+          </div>
+          <div class="grid">
+            <label
+              >İşletme adı *<input name="name" required maxlength="120"
+            /></label>
+            <label>Ürün adı<input name="productName" maxlength="120" /></label>
+            <label class="wide"
+              >Ne yapıyor? *<textarea
+                name="description"
+                required
+                maxlength="2000"
+                rows="3"
+              ></textarea>
+            </label>
+            <label
+              >Hedef kitle *<input name="audience" required maxlength="500"
+            /></label>
+            <label
+              >Bölge / pazar *<input name="region" required maxlength="200"
+            /></label>
+            <label
+              >Araştırma konusu<input
+                name="topic"
+                maxlength="200"
+                placeholder="ör. Görev yönetimi"
+            /></label>
+            <label
+              >Web sitesi<input
+                name="url"
+                maxlength="500"
+                placeholder="https://"
+            /></label>
+          </div>
+          <details>
+            <summary>
+              Bütçe bilgisi (opsiyonel — boş kalırsa tahmin edilir)
+            </summary>
+            <div class="grid">
+              <label
+                >30 günlük reklam bütçesi<input
+                  name="budget"
+                  type="number"
+                  min="1"
+                  step="any"
+              /></label>
+              <label
+                >Para birimi<input
+                  name="currency"
+                  maxlength="3"
+                  placeholder="TRY"
+              /></label>
+              <label
+                >Satış başı katkı payı<input
+                  name="unitContribution"
+                  type="number"
+                  min="0"
+                  step="any"
+              /></label>
+            </div>
+          </details>
+          <div class="actions">
+            <button type="button" id="example" class="ghost">
+              Örnek doldur
+            </button>
+            <button type="submit" id="start">Analizi başlat</button>
+          </div>
+        </form>
+      </section>
+
+      <p id="error" class="error" hidden></p>
+
+      <section class="card" id="progress-card" hidden>
+        <h2>2 · Orchestrator adımları</h2>
+        <ol id="steps" class="steps"></ol>
+      </section>
+
+      <section class="card" id="research-card" hidden>
+        <h2>Rakip araştırması</h2>
+        <div id="research"></div>
+      </section>
+
+      <section class="card" id="assumptions-card" hidden>
+        <h2>Varsayımlar</h2>
+        <ul id="assumptions" class="assumptions"></ul>
+      </section>
+
+      <section class="card" id="recs-card" hidden>
+        <h2>3 · Önerilen stratejiler</h2>
+        <p class="muted" id="recs-note"></p>
+        <div id="recs" class="recs"></div>
+      </section>
+
+      <section class="card" id="selection-card" hidden>
+        <h2>4 · Seçim kaydedildi</h2>
+        <div id="selection"></div>
+        <form id="actual-form" class="grid">
+          <p class="wide muted">
+            Kampanya bittiğinde gerçek sonucu girin; tahminle karşılaştırılıp
+            hafızaya yazılır.
+          </p>
+          <label
+            >Gerçek harcama<input
+              name="spend"
+              type="number"
+              min="0"
+              step="any"
+              required
+          /></label>
+          <label
+            >Gerçek satış adedi<input
+              name="purchases"
+              type="number"
+              min="0"
+              step="1"
+              required
+          /></label>
+          <label class="wide"
+            >Kaynak<input
+              name="source"
+              required
+              maxlength="500"
+              placeholder="ör. Meta Ads raporu, Ekim 2026"
+          /></label>
+          <div class="actions wide">
+            <button type="submit">Gerçek sonucu kaydet</button>
+          </div>
+        </form>
+        <div id="comparison"></div>
+      </section>
+    </main>
+    <script src="/campaign.js"></script>
+  </body>
+</html>

@@ -1,0 +1,788 @@
+{
+  "is_demo": true,
+  "confirmation_note": "Test onayıdır; gerçek kullanıcı doğrulaması değildir.",
+  "profile": {
+    "revision": 1,
+    "profile": {
+      "schema_version": "1.2",
+      "input_mode": "website",
+      "is_demo": true,
+      "review_status": "confirmed",
+      "status": "partial",
+      "company": {
+        "name": "Plausible",
+        "website_url": "https://plausible.io/",
+        "business_models": [
+          "subscription"
+        ]
+      },
+      "platform": null,
+      "idea": null,
+      "products": [
+        {
+          "id": "plausible_analytics",
+          "name": "Plausible Analytics",
+          "product_type": "digital",
+          "lifecycle": "existing",
+          "url": "https://plausible.io/",
+          "description": "Plausible is a lightweight and open-source Google Analytics alternative. Your website data is 100% yours and the privacy of your visitors is respected.",
+          "category": null,
+          "brand": null,
+          "target_customers": null,
+          "features": [],
+          "attributes": [],
+          "variants": [],
+          "pricing": {
+            "status": "published",
+            "plans": [
+              {
+                "name": "Starter",
+                "status": "published",
+                "amount": 9.0,
+                "currency": null,
+                "currency_symbol": "$",
+                "billing_period": "month",
+                "unit": "subscription",
+                "tax_included": null,
+                "usage_limits": {
+                  "monthly_pageviews": null
+                },
+                "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                "features": [
+                  "One site",
+                  "3 years of data retention",
+                  "Intuitive, fast and privacy-friendly dashboard",
+                  "Email/Slack reports",
+                  "Google Analytics import",
+                  "Goals and custom events",
+                  "Saved Segments",
+                  "Annotations"
+                ],
+                "source_ids": [
+                  "s1"
+                ]
+              },
+              {
+                "name": "Growth",
+                "status": "published",
+                "amount": 14.0,
+                "currency": null,
+                "currency_symbol": "$",
+                "billing_period": "month",
+                "unit": "subscription",
+                "tax_included": null,
+                "usage_limits": {
+                  "monthly_pageviews": null
+                },
+                "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                "features": [
+                  "Everything in Starter",
+                  "Up to 3 sites",
+                  "Up to 3 team members",
+                  "Team Management",
+                  "Shared Links",
+                  "Embedded Dashboards",
+                  "Shared Segments",
+                  "Shared Annotations"
+                ],
+                "source_ids": [
+                  "s1"
+                ]
+              },
+              {
+                "name": "Business",
+                "status": "published",
+                "amount": 19.0,
+                "currency": null,
+                "currency_symbol": "$",
+                "billing_period": "month",
+                "unit": "subscription",
+                "tax_included": null,
+                "usage_limits": {
+                  "monthly_pageviews": null
+                },
+                "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                "features": [
+                  "Everything in Growth",
+                  "Up to 10 sites",
+                  "Up to 10 team members",
+                  "5 years of data retention",
+                  "Custom Properties",
+                  "Stats API (600 requests per hour)",
+                  "Data Studio Connector",
+                  "Ecommerce revenue attribution",
+                  "Funnels and user journeys",
+                  "Consolidated View"
+                ],
+                "source_ids": [
+                  "s1"
+                ]
+              },
+              {
+                "name": "Enterprise",
+                "status": "contact_sales",
+                "amount": null,
+                "currency": null,
+                "currency_symbol": null,
+                "billing_period": null,
+                "unit": "subscription",
+                "tax_included": null,
+                "usage_limits": {
+                  "monthly_pageviews": null
+                },
+                "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                "features": [
+                  "Everything in Business",
+                  "10+ sites",
+                  "10+ team members",
+                  "600+ Stats API requests per hour",
+                  "Sites API access",
+                  "Single Sign-On (SSO)",
+                  "Managed Proxy",
+                  "Scheduled raw event data exports",
+                  "5+ years of data retention",
+                  "Priority support"
+                ],
+                "source_ids": [
+                  "s1"
+                ]
+              }
+            ],
+            "offers": []
+          },
+          "source_ids": [
+            "s1"
+          ],
+          "unknowns": []
+        }
+      ],
+      "market_products": [],
+      "sources": [
+        {
+          "id": "s1",
+          "type": "website",
+          "url": "https://plausible.io/",
+          "title": "Plausible Analytics",
+          "accessed_at": "2026-10-12T08:33:23.419739+00:00",
+          "collection_method": "direct_http_download",
+          "sha256": "008ee2f6668e6e32e325f934d5f0f05b89dc95df051656e3fef3903e867cd14c"
+        }
+      ],
+      "unknowns": [
+        "Hedef pazar",
+        "Kullanıcının analiz hedefi",
+        "Seçili trafik hacmi",
+        "Kesin ISO para birimi"
+      ],
+      "warnings": [
+        "Paketler aynı ürünün seçenekleridir. JavaScript çalıştırılmadı; tüm hacim ve yıllık fiyatlar çıkarılmadı."
+      ],
+      "research_status": "not_started",
+      "simulation_status": "not_started",
+      "adapter": "plausible_static_html_v1",
+      "selection": {
+        "scope": "product",
+        "product_ids": [
+          "plausible_analytics"
+        ],
+        "category": null,
+        "perspective": "brand_owner"
+      },
+      "catalog_coverage": {
+        "status": "partial",
+        "discovered_count": 1,
+        "total_count": null
+      },
+      "workflow_revision": 1
+    },
+    "brief": {
+      "topic": "privacy friendly website analytics",
+      "target_market": "Global",
+      "analysis_goal": "Rakip ürün bilgilerini karşılaştırmak",
+      "own_website": "https://plausible.io/"
+    },
+    "confirmation": {
+      "revision": 1,
+      "confirmed_at": "2026-10-12T09:09:39.982688+00:00"
+    }
+  },
+  "cards": [
+    {
+      "id": "6d50fcdc52d0a025",
+      "name": "Fathom Analytics",
+      "url": "https://usefathom.com/",
+      "relationship": "candidate",
+      "reason": "Web sitesi trafiği ölçümü ve sade kullanım odağı nedeniyle Plausible ile örtüşen ihtiyaca hitap ediyor.",
+      "selected_for_display": true
+    },
+    {
+      "id": "ccaa72eeb40efa69",
+      "name": "Simple Analytics",
+      "url": "https://www.simpleanalytics.com/",
+      "relationship": "candidate",
+      "reason": "Web analitiğinde benzer bir ihtiyaca hitap ediyor; güncel konumlandırması GA4 yanında ek bir ölçüm katmanı olmayı da içeriyor.",
+      "selected_for_display": true
+    },
+    {
+      "id": "961c9c40b37e9760",
+      "name": "Matomo",
+      "url": "https://matomo.org/",
+      "relationship": "candidate",
+      "reason": "Web analitiği ihtiyacını karşılayan daha geniş kapsamlı bir alternatif adayı; birebir ürün eşdeğerliği ayrıca değerlendirilmeli.",
+      "selected_for_display": true
+    }
+  ],
+  "opened_detail": {
+    "name": "Fathom Analytics",
+    "url": "https://usefathom.com/",
+    "relationship": "candidate",
+    "relevance": {
+      "type": "analyst_inference",
+      "text": "Web sitesi trafiği ölçümü ve sade kullanım odağı nedeniyle Plausible ile örtüşen ihtiyaca hitap ediyor."
+    },
+    "facts": [
+      {
+        "dimension": "temel çözüm",
+        "statement": "Site, çerez kullanmadan ziyaret kaynakları, okunan sayfalar ve dönüşümleri ölçmeyi sunduğunu belirtiyor.",
+        "source_ids": [
+          "fathom"
+        ]
+      }
+    ],
+    "pricing": null,
+    "unknowns": [
+      "Aynı trafik hacmindeki toplam maliyet",
+      "Paket bazında entegrasyonlar"
+    ],
+    "id": "6d50fcdc52d0a025",
+    "sources": [
+      {
+        "id": "fathom",
+        "url": "https://usefathom.com/",
+        "kind": "official_page",
+        "title": "Fathom Analytics",
+        "accessed_on": "2026-10-12"
+      }
+    ],
+    "financials": {
+      "status": "not_collected_for_this_candidate"
+    }
+  },
+  "handoff": {
+    "scope": "research_only",
+    "comparison": {
+      "schema_version": "1.0",
+      "profile_revision": 1,
+      "request_id": "99f9301f773b388ccae1b303468beb9df430afc20baef924ee23318f704d4e6c",
+      "is_demo": true,
+      "status": "partial",
+      "own_profile": {
+        "company": {
+          "name": "Plausible",
+          "website_url": "https://plausible.io/",
+          "business_models": [
+            "subscription"
+          ]
+        },
+        "idea": null,
+        "products": [
+          {
+            "id": "plausible_analytics",
+            "name": "Plausible Analytics",
+            "product_type": "digital",
+            "lifecycle": "existing",
+            "url": "https://plausible.io/",
+            "description": "Plausible is a lightweight and open-source Google Analytics alternative. Your website data is 100% yours and the privacy of your visitors is respected.",
+            "category": null,
+            "brand": null,
+            "target_customers": null,
+            "features": [],
+            "attributes": [],
+            "variants": [],
+            "pricing": {
+              "status": "published",
+              "plans": [
+                {
+                  "name": "Starter",
+                  "status": "published",
+                  "amount": 9.0,
+                  "currency": null,
+                  "currency_symbol": "$",
+                  "billing_period": "month",
+                  "unit": "subscription",
+                  "tax_included": null,
+                  "usage_limits": {
+                    "monthly_pageviews": null
+                  },
+                  "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                  "features": [
+                    "One site",
+                    "3 years of data retention",
+                    "Intuitive, fast and privacy-friendly dashboard",
+                    "Email/Slack reports",
+                    "Google Analytics import",
+                    "Goals and custom events",
+                    "Saved Segments",
+                    "Annotations"
+                  ],
+                  "source_ids": [
+                    "s1"
+                  ]
+                },
+                {
+                  "name": "Growth",
+                  "status": "published",
+                  "amount": 14.0,
+                  "currency": null,
+                  "currency_symbol": "$",
+                  "billing_period": "month",
+                  "unit": "subscription",
+                  "tax_included": null,
+                  "usage_limits": {
+                    "monthly_pageviews": null
+                  },
+                  "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                  "features": [
+                    "Everything in Starter",
+                    "Up to 3 sites",
+                    "Up to 3 team members",
+                    "Team Management",
+                    "Shared Links",
+                    "Embedded Dashboards",
+                    "Shared Segments",
+                    "Shared Annotations"
+                  ],
+                  "source_ids": [
+                    "s1"
+                  ]
+                },
+                {
+                  "name": "Business",
+                  "status": "published",
+                  "amount": 19.0,
+                  "currency": null,
+                  "currency_symbol": "$",
+                  "billing_period": "month",
+                  "unit": "subscription",
+                  "tax_included": null,
+                  "usage_limits": {
+                    "monthly_pageviews": null
+                  },
+                  "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                  "features": [
+                    "Everything in Growth",
+                    "Up to 10 sites",
+                    "Up to 10 team members",
+                    "5 years of data retention",
+                    "Custom Properties",
+                    "Stats API (600 requests per hour)",
+                    "Data Studio Connector",
+                    "Ecommerce revenue attribution",
+                    "Funnels and user journeys",
+                    "Consolidated View"
+                  ],
+                  "source_ids": [
+                    "s1"
+                  ]
+                },
+                {
+                  "name": "Enterprise",
+                  "status": "contact_sales",
+                  "amount": null,
+                  "currency": null,
+                  "currency_symbol": null,
+                  "billing_period": null,
+                  "unit": "subscription",
+                  "tax_included": null,
+                  "usage_limits": {
+                    "monthly_pageviews": null
+                  },
+                  "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                  "features": [
+                    "Everything in Business",
+                    "10+ sites",
+                    "10+ team members",
+                    "600+ Stats API requests per hour",
+                    "Sites API access",
+                    "Single Sign-On (SSO)",
+                    "Managed Proxy",
+                    "Scheduled raw event data exports",
+                    "5+ years of data retention",
+                    "Priority support"
+                  ],
+                  "source_ids": [
+                    "s1"
+                  ]
+                }
+              ],
+              "offers": []
+            },
+            "source_ids": [
+              "s1"
+            ],
+            "unknowns": []
+          }
+        ],
+        "sources": [
+          {
+            "id": "s1",
+            "type": "website",
+            "url": "https://plausible.io/",
+            "title": "Plausible Analytics",
+            "accessed_at": "2026-10-12T08:33:23.419739+00:00",
+            "collection_method": "direct_http_download",
+            "sha256": "008ee2f6668e6e32e325f934d5f0f05b89dc95df051656e3fef3903e867cd14c"
+          }
+        ]
+      },
+      "selected_competitors": [
+        {
+          "name": "Fathom Analytics",
+          "url": "https://usefathom.com/",
+          "relationship": "candidate",
+          "relevance": {
+            "type": "analyst_inference",
+            "text": "Web sitesi trafiği ölçümü ve sade kullanım odağı nedeniyle Plausible ile örtüşen ihtiyaca hitap ediyor."
+          },
+          "facts": [
+            {
+              "dimension": "temel çözüm",
+              "statement": "Site, çerez kullanmadan ziyaret kaynakları, okunan sayfalar ve dönüşümleri ölçmeyi sunduğunu belirtiyor.",
+              "source_ids": [
+                "fathom"
+              ]
+            }
+          ],
+          "pricing": null,
+          "unknowns": [
+            "Aynı trafik hacmindeki toplam maliyet",
+            "Paket bazında entegrasyonlar"
+          ],
+          "id": "6d50fcdc52d0a025",
+          "sources": [
+            {
+              "id": "fathom",
+              "url": "https://usefathom.com/",
+              "kind": "official_page",
+              "title": "Fathom Analytics",
+              "accessed_on": "2026-10-12"
+            }
+          ],
+          "financials": {
+            "status": "not_collected_for_this_candidate"
+          }
+        },
+        {
+          "name": "Simple Analytics",
+          "url": "https://www.simpleanalytics.com/",
+          "relationship": "candidate",
+          "relevance": {
+            "type": "analyst_inference",
+            "text": "Web analitiğinde benzer bir ihtiyaca hitap ediyor; güncel konumlandırması GA4 yanında ek bir ölçüm katmanı olmayı da içeriyor."
+          },
+          "facts": [
+            {
+              "dimension": "temel çözüm",
+              "statement": "GA4 yanında kullanılabilen, ziyaretçi kimliği oluşturmadan trafik ölçen bir çözüm olarak tanıtılıyor.",
+              "source_ids": [
+                "simple"
+              ]
+            },
+            {
+              "dimension": "entegrasyon",
+              "statement": "API ve dışa aktarma yoluyla analitik verilerin diğer raporlama sistemlerine aktarılabildiği belirtiliyor.",
+              "source_ids": [
+                "simple"
+              ]
+            }
+          ],
+          "pricing": null,
+          "unknowns": [
+            "Eşdeğer hacim ve ödeme dönemindeki fiyat"
+          ],
+          "id": "ccaa72eeb40efa69",
+          "sources": [
+            {
+              "id": "simple",
+              "url": "https://www.simpleanalytics.com/",
+              "kind": "official_page",
+              "title": "Simple Analytics",
+              "accessed_on": "2026-10-12"
+            }
+          ],
+          "financials": {
+            "status": "not_collected_for_this_candidate"
+          }
+        }
+      ],
+      "comparison_rows": [
+        {
+          "dimension": "hedef müşteri",
+          "own": {
+            "status": "unknown",
+            "values": []
+          },
+          "candidates": [
+            {
+              "candidate_id": "6d50fcdc52d0a025",
+              "status": "unknown",
+              "facts": []
+            },
+            {
+              "candidate_id": "ccaa72eeb40efa69",
+              "status": "unknown",
+              "facts": []
+            }
+          ]
+        },
+        {
+          "dimension": "temel çözüm",
+          "own": {
+            "status": "profile_data",
+            "values": [
+              {
+                "product_id": "plausible_analytics",
+                "value": "Plausible is a lightweight and open-source Google Analytics alternative. Your website data is 100% yours and the privacy of your visitors is respected.",
+                "source_ids": [
+                  "s1"
+                ]
+              }
+            ]
+          },
+          "candidates": [
+            {
+              "candidate_id": "6d50fcdc52d0a025",
+              "status": "reported",
+              "facts": [
+                {
+                  "dimension": "temel çözüm",
+                  "statement": "Site, çerez kullanmadan ziyaret kaynakları, okunan sayfalar ve dönüşümleri ölçmeyi sunduğunu belirtiyor.",
+                  "source_ids": [
+                    "fathom"
+                  ]
+                }
+              ]
+            },
+            {
+              "candidate_id": "ccaa72eeb40efa69",
+              "status": "reported",
+              "facts": [
+                {
+                  "dimension": "temel çözüm",
+                  "statement": "GA4 yanında kullanılabilen, ziyaretçi kimliği oluşturmadan trafik ölçen bir çözüm olarak tanıtılıyor.",
+                  "source_ids": [
+                    "simple"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "özellikler",
+          "own": {
+            "status": "unknown",
+            "values": []
+          },
+          "candidates": [
+            {
+              "candidate_id": "6d50fcdc52d0a025",
+              "status": "unknown",
+              "facts": []
+            },
+            {
+              "candidate_id": "ccaa72eeb40efa69",
+              "status": "unknown",
+              "facts": []
+            }
+          ]
+        },
+        {
+          "dimension": "fiyat koşulları",
+          "own": {
+            "status": "profile_data",
+            "values": [
+              {
+                "product_id": "plausible_analytics",
+                "value": {
+                  "status": "published",
+                  "plans": [
+                    {
+                      "name": "Starter",
+                      "status": "published",
+                      "amount": 9.0,
+                      "currency": null,
+                      "currency_symbol": "$",
+                      "billing_period": "month",
+                      "unit": "subscription",
+                      "tax_included": null,
+                      "usage_limits": {
+                        "monthly_pageviews": null
+                      },
+                      "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                      "features": [
+                        "One site",
+                        "3 years of data retention",
+                        "Intuitive, fast and privacy-friendly dashboard",
+                        "Email/Slack reports",
+                        "Google Analytics import",
+                        "Goals and custom events",
+                        "Saved Segments",
+                        "Annotations"
+                      ],
+                      "source_ids": [
+                        "s1"
+                      ]
+                    },
+                    {
+                      "name": "Growth",
+                      "status": "published",
+                      "amount": 14.0,
+                      "currency": null,
+                      "currency_symbol": "$",
+                      "billing_period": "month",
+                      "unit": "subscription",
+                      "tax_included": null,
+                      "usage_limits": {
+                        "monthly_pageviews": null
+                      },
+                      "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                      "features": [
+                        "Everything in Starter",
+                        "Up to 3 sites",
+                        "Up to 3 team members",
+                        "Team Management",
+                        "Shared Links",
+                        "Embedded Dashboards",
+                        "Shared Segments",
+                        "Shared Annotations"
+                      ],
+                      "source_ids": [
+                        "s1"
+                      ]
+                    },
+                    {
+                      "name": "Business",
+                      "status": "published",
+                      "amount": 19.0,
+                      "currency": null,
+                      "currency_symbol": "$",
+                      "billing_period": "month",
+                      "unit": "subscription",
+                      "tax_included": null,
+                      "usage_limits": {
+                        "monthly_pageviews": null
+                      },
+                      "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                      "features": [
+                        "Everything in Growth",
+                        "Up to 10 sites",
+                        "Up to 10 team members",
+                        "5 years of data retention",
+                        "Custom Properties",
+                        "Stats API (600 requests per hour)",
+                        "Data Studio Connector",
+                        "Ecommerce revenue attribution",
+                        "Funnels and user journeys",
+                        "Consolidated View"
+                      ],
+                      "source_ids": [
+                        "s1"
+                      ]
+                    },
+                    {
+                      "name": "Enterprise",
+                      "status": "contact_sales",
+                      "amount": null,
+                      "currency": null,
+                      "currency_symbol": null,
+                      "billing_period": null,
+                      "unit": "subscription",
+                      "tax_included": null,
+                      "usage_limits": {
+                        "monthly_pageviews": null
+                      },
+                      "conditions": "Statik HTML varsayılanı; trafik hacmi ve para birimi kullanıcı arayüzünde doğrulanmalı.",
+                      "features": [
+                        "Everything in Business",
+                        "10+ sites",
+                        "10+ team members",
+                        "600+ Stats API requests per hour",
+                        "Sites API access",
+                        "Single Sign-On (SSO)",
+                        "Managed Proxy",
+                        "Scheduled raw event data exports",
+                        "5+ years of data retention",
+                        "Priority support"
+                      ],
+                      "source_ids": [
+                        "s1"
+                      ]
+                    }
+                  ],
+                  "offers": []
+                },
+                "source_ids": [
+                  "s1"
+                ]
+              }
+            ]
+          },
+          "candidates": [
+            {
+              "candidate_id": "6d50fcdc52d0a025",
+              "status": "unknown",
+              "facts": []
+            },
+            {
+              "candidate_id": "ccaa72eeb40efa69",
+              "status": "unknown",
+              "facts": []
+            }
+          ]
+        },
+        {
+          "dimension": "entegrasyon",
+          "own": {
+            "status": "unknown",
+            "values": []
+          },
+          "candidates": [
+            {
+              "candidate_id": "6d50fcdc52d0a025",
+              "status": "unknown",
+              "facts": []
+            },
+            {
+              "candidate_id": "ccaa72eeb40efa69",
+              "status": "reported",
+              "facts": [
+                {
+                  "dimension": "entegrasyon",
+                  "statement": "API ve dışa aktarma yoluyla analitik verilerin diğer raporlama sistemlerine aktarılabildiği belirtiliyor.",
+                  "source_ids": [
+                    "simple"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "price_comparison": {
+        "status": "not_comparable",
+        "reason": "Rakip paket fiyatları ve eşdeğer koşulları henüz toplanmadı."
+      },
+      "warnings": [
+        "Boş hücre özellik yok demek değildir.",
+        "Rakip adayı sınıflandırması doğrulanmış doğrudan rakip anlamına gelmez.",
+        "Kullanıcı profili ayrı gösterilir; serbest metinden otomatik özellik eşleştirmesi yapılmadı."
+      ]
+    },
+    "downstream_tasks": [
+      "suggestion_generation",
+      "prediction_and_simulation"
+    ],
+    "note": "Bu paket öneri, başarı yüzdesi veya tahmin üretmez."
+  }
+}
