@@ -40,6 +40,7 @@ async function runCli({
   role,
   prompt,
   input,
+  text,
   outputSchema: shape,
   signal,
   timeoutMs = 30000,
@@ -177,7 +178,10 @@ async function runCli({
           );
         }
       });
-      child.stdin.end(JSON.stringify({ role, instructions: prompt, input }));
+      // Chat callers pass a ready plain-text transcript; agents keep the JSON envelope.
+      child.stdin.end(
+        text ?? JSON.stringify({ role, instructions: prompt, input }),
+      );
     });
   } finally {
     await fs.rm(dir, { recursive: true, force: true });

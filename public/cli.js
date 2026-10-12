@@ -34,6 +34,10 @@ $("prompt-form").addEventListener("submit", async (event) => {
       schemaVersion: "4.0.0",
       clientRequestId: crypto.randomUUID(),
       message: text,
+      // Last 20 turns give the model conversation context.
+      history: messages
+        .slice(-20)
+        .map((m) => ({ role: m.role, content: m.content.slice(0, 8000) })),
     };
     messages.push({ role: "user", content: text });
     render();
