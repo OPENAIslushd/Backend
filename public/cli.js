@@ -1,34 +1,360 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
-let busy = false,
-  retry = null;
+const FIELDS = [
+  ["name", "İşletme adı", true],
+  ["productName", "Ürün adı", false],
+  ["description", "Ne yapıyor?", true],
+  ["audience", "Hedef kitle", true],
+  ["region", "Bölge / pazar", true],
+  ["topic", "Araştırma konusu", false],
+  ["url", "Web sitesi", false],
+  ["budget", "30 günlük bütçe", false, "number"],
+  ["currency", "Para birimi", false],
+  ["unitContribution", "Satış başı katkı payı", false, "number"],
+];
+const MOCK_PROFILES = [
+  {
+    name: "Yakalıyo",
+    productName: "Yakalıyo Sadakat",
+    description:
+      "Kafe ve restoranlara NFC ve QR ile check-in, markalı sadakat programı, otomatik geri kazanma kampanyaları ve segmentli müşteri paneli sunar.",
+    audience: "İstanbul’daki bağımsız kafe ve restoran sahipleri",
+    region: "Türkiye",
+    topic: "Müşteri sadakat programı",
+    url: null,
+    budget: 50000,
+    currency: "TRY",
+    unitContribution: 900,
+  },
+  {
+    name: "TakımPlan",
+    productName: "TakımPlan Pro",
+    description: "Küçük ekipler için görev ve proje yönetimi uygulaması.",
+    audience: "10–50 kişilik ajans ve yazılım ekipleri",
+    region: "Türkiye",
+    topic: "Görev yönetimi",
+    url: null,
+    budget: null,
+    currency: null,
+    unitContribution: null,
+  },
+];
+const PROFILE_LABEL = {
+  conservative: "Temkinli",
+  balanced: "Dengeli",
+  high_risk_high_reward: "Yüksek risk / getiri",
+};
+const CHANNEL = {
+  paid_social: "Sosyal medya",
+  paid_search: "Arama reklamı",
+  influencer: "Influencer",
+};
+const ICON = { pending: "○", running: "◐", completed: "●", failed: "✕" };
+const emptyProfile = () => Object.fromEntries(FIELDS.map(([k]) => [k, null]));
+let profile = emptyProfile(),
+  busy = false,
+  retry = null,
+  mockIndex = 0;
 const messages = [];
+const campaigns = new Map();
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs))
+    if (k === "class") node.className = v;
+    else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+    else node.setAttribute(k, v);
+  for (const c of children.flat(Infinity))
+    if (c != null && c !== false)
+      node.append(c instanceof Node ? c : String(c));
+  return node;
+}
+const fmt = (n, d = 0) =>
+  n == null
+    ? "—"
+    : Number(n).toLocaleString("tr-TR", { maximumFractionDigits: d });
+const pct = (n) => (n == null ? "—" : `%${fmt(n * 100, 1)}`);
+const missing = () =>
+  FIELDS.filter(([k, , required]) => required && !profile[k]).map(
+    ([, label]) => label,
+  );
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    ...options,
+    headers: options.body ? { "Content-Type": "application/json" } : {},
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+  return data;
+}
+function showError(message) {
+  $("error").textContent = message || "";
+  $("error").hidden = !message;
+}
+function renderProfile() {
+  $("profile-fields").replaceChildren(
+    ...FIELDS.map(([key, label, required, type]) => {
+      const input = el("input", {
+        type: type || "text",
+        "data-key": key,
+        placeholder: required ? "zorunlu" : "opsiyonel",
+      });
+      input.value = profile[key] ?? "";
+      input.addEventListener("change", () => {
+        const v = input.value.trim();
+        profile[key] =
+          v === ""
+            ? null
+            : type === "number"
+              ? Number(v)
+              : key === "currency"
+                ? v.toUpperCase()
+                : v;
+        renderProfile();
+      });
+      return el(
+        "label",
+        { class: "cp-field" + (profile[key] ? " filled" : "") },
+        el("span", {}, label, required ? " *" : ""),
+        input,
+      );
+    }),
+  );
+  const gaps = missing();
+  $("missing").textContent = gaps.length
+    ? `Eksik: ${gaps.join(", ")}`
+    : "Zorunlu bilgiler tamam. Bütçe boşsa mock varsayım kullanılır.";
+  $("profile-status").textContent = gaps.length ? "Eksik" : "Hazır";
+  $("profile-status").className = "cp-status" + (gaps.length ? "" : " ready");
+  $("generate").disabled = busy || gaps.length > 0;
+}
+function allocation(a) {
+  return el(
+    "div",
+    { class: "cp-alloc" },
+    Object.entries(CHANNEL).map(([k, label]) => {
+      const bar = el("span", { class: "cp-bar " + k });
+      bar.style.width = `${a[k] * 100}%`;
+      return el(
+        "div",
+        { class: "cp-alloc-row" },
+        el("span", {}, label),
+        el("span", { class: "cp-track" }, bar),
+        el("span", { class: "cp-num" }, pct(a[k])),
+      );
+    }),
+  );
+}
+function campaignView(c) {
+  if (!c) return el("p", {}, "Strateji hazırlanıyor…");
+  const cur = c.recommendations?.currency || c.input?.currency || "";
+  const selected = c.selection?.record.strategy;
+  const research = c.research?.competitors?.length
+    ? `Rakipler: ${c.research.competitors.map((x) => x.name).join(", ")}`
+    : null;
+  return el(
+    "div",
+    { class: "cp-campaign" },
+    el(
+      "ol",
+      { class: "cp-steps" },
+      c.steps.map((s) =>
+        el(
+          "li",
+          { class: s.status },
+          el("span", { class: "cp-icon" }, ICON[s.status]),
+          el("span", {}, s.label),
+          el("span", { class: "cp-summary" }, s.summary || ""),
+        ),
+      ),
+    ),
+    research && el("p", { class: "cp-note" }, research),
+    c.input &&
+      el(
+        "details",
+        { class: "cp-assumptions" },
+        el("summary", {}, `Varsayımlar (${c.input.assumptions.length})`),
+        el(
+          "ul",
+          {},
+          c.input.assumptions.map((a) => el("li", {}, a)),
+        ),
+      ),
+    c.recommendations &&
+      el(
+        "div",
+        { class: "cp-recs" },
+        c.recommendations.recommendations.map((r) => {
+          const m = r.metrics;
+          const isSelected =
+            selected?.strategy_id === r.strategy.strategy_id &&
+            selected?.revision === r.strategy.revision;
+          return el(
+            "article",
+            { class: "cp-rec" + (isSelected ? " selected" : "") },
+            el(
+              "p",
+              { class: "eyebrow" },
+              PROFILE_LABEL[r.profile] || r.profile,
+            ),
+            el("h3", {}, r.strategy.name),
+            allocation(r.strategy.initial_allocation),
+            el(
+              "dl",
+              {},
+              el("dt", {}, "Beklenen satış"),
+              el("dd", {}, fmt(m.expected_purchases)),
+              el("dt", {}, "Beklenen kâr"),
+              el("dd", {}, `${fmt(m.expected_contribution_profit)} ${cur}`),
+              el("dt", {}, "P10–P90"),
+              el("dd", {}, `${fmt(m.profit_p10)} – ${fmt(m.profit_p90)}`),
+              el("dt", {}, "ROI"),
+              el("dd", {}, pct(m.roi)),
+              el("dt", {}, "Zarar olasılığı"),
+              el("dd", {}, pct(m.probability_of_loss)),
+            ),
+            c.status === "awaiting_selection"
+              ? el(
+                  "button",
+                  {
+                    class: "primary",
+                    type: "button",
+                    onclick: () => select(c.campaignId, r.strategy),
+                  },
+                  "Bu stratejiyi seç",
+                )
+              : isSelected &&
+                  el(
+                    "p",
+                    { class: "cp-badge" },
+                    "Seçildi · hafızaya kaydedildi",
+                  ),
+          );
+        }),
+      ),
+    c.error && el("p", { class: "cp-error" }, c.error.message),
+  );
+}
 function render() {
   if (!messages.length) return;
   $("messages").replaceChildren(
-    ...messages.map((message) => {
-      const el = document.createElement("div");
-      el.className = "bubble " + message.role;
-      const label = document.createElement("span");
-      label.className = "speaker";
-      label.textContent = message.role === "user" ? "SEN" : "CODEX · CANLI";
-      const content = document.createElement("span");
-      content.textContent = message.content;
-      el.append(label, content);
-      return el;
-    }),
+    ...messages.map((m) =>
+      el(
+        "div",
+        { class: "bubble " + m.role },
+        el(
+          "span",
+          { class: "speaker" },
+          m.role === "user"
+            ? "SEN"
+            : m.campaignId
+              ? "ORCHESTRATOR · STRATEJİ"
+              : "CODEX · CANLI",
+        ),
+        m.campaignId
+          ? campaignView(campaigns.get(m.campaignId))
+          : el("span", {}, m.content),
+      ),
+    ),
   );
   $("messages").scrollTop = $("messages").scrollHeight;
+}
+function setBusy(value, label) {
+  busy = value;
+  for (const id of ["send", "prompt", "example", "clear-chat", "mock-fill"])
+    $(id).disabled = value;
+  $("send").textContent = value ? label || "Codex yanıtlıyor…" : "Gönder ↑";
+  renderProfile();
+}
+function summarize(c) {
+  if (c.status === "failed") return `Strateji üretilemedi: ${c.error?.message}`;
+  if (!c.recommendations) return "Strateji hazırlanıyor.";
+  const names = c.recommendations.recommendations
+    .map((r) => `${PROFILE_LABEL[r.profile]}: ${r.strategy.name}`)
+    .join("; ");
+  const chosen = c.selection
+    ? ` Kullanıcı seçti: ${c.selection.record.strategy.name}.`
+    : "";
+  return `3 strateji önerildi (${names}).${chosen}`;
+}
+async function poll(id) {
+  try {
+    const c = await api(`/campaigns/${id}`);
+    campaigns.set(id, c);
+    const m = messages.find((x) => x.campaignId === id);
+    if (m) m.content = summarize(c);
+    render();
+    if (c.status === "running" || c.status === "selecting")
+      return setTimeout(() => poll(id), 800);
+    setBusy(false);
+  } catch (e) {
+    showError(e.message);
+    setBusy(false);
+  }
+}
+async function generate() {
+  if (busy || missing().length) return;
+  showError("");
+  const business = {};
+  for (const k of [
+    "name",
+    "productName",
+    "description",
+    "audience",
+    "region",
+    "topic",
+    "url",
+  ])
+    if (profile[k]) business[k] = profile[k];
+  const request = {
+    clientRequestId: crypto.randomUUID(),
+    dataMode: "mock",
+    business,
+  };
+  for (const k of ["budget", "currency", "unitContribution"])
+    if (profile[k] != null) request[k] = profile[k];
+  setBusy(true, "Strateji üretiliyor…");
+  try {
+    const c = await api("/campaigns", {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+    campaigns.set(c.campaignId, c);
+    messages.push({
+      role: "assistant",
+      campaignId: c.campaignId,
+      content: "Strateji hazırlanıyor.",
+    });
+    render();
+    poll(c.campaignId);
+  } catch (e) {
+    showError(e.message);
+    setBusy(false);
+  }
+}
+async function select(id, strategy) {
+  if (busy) return;
+  showError("");
+  setBusy(true, "Seçim kaydediliyor…");
+  try {
+    await api(`/campaigns/${id}/selection`, {
+      method: "POST",
+      body: JSON.stringify({
+        strategyId: strategy.strategy_id,
+        strategyRevision: strategy.revision,
+      }),
+    });
+    poll(id);
+  } catch (e) {
+    showError(e.message);
+    setBusy(false);
+  }
 }
 $("prompt-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const text = $("prompt").value.trim();
   if (busy || !text) return;
-  busy = true;
-  for (const id of ["send", "prompt", "example", "clear-chat"])
-    $(id).disabled = true;
-  $("send").textContent = "Codex yanıtlıyor…";
-  $("error").hidden = true;
+  setBusy(true);
+  showError("");
   if (!retry || retry.message !== text) {
     retry = {
       schemaVersion: "4.0.0",
@@ -38,33 +364,30 @@ $("prompt-form").addEventListener("submit", async (event) => {
       history: messages
         .slice(-20)
         .map((m) => ({ role: m.role, content: m.content.slice(0, 8000) })),
+      profile: { ...profile },
     };
     messages.push({ role: "user", content: text });
     render();
   }
+  let start = false;
   try {
-    const response = await fetch("/cli/messages", {
+    const data = await api("/cli/messages", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(retry),
     });
-    const data = await response.json();
-    if (!response.ok)
-      throw new Error(data.error?.message || "CLI çağrısı tamamlanamadı.");
     messages.push({ role: "assistant", content: data.reply });
+    profile = data.profile;
     $("prompt").value = "";
     retry = null;
+    start = data.generate;
     render();
-  } catch (error) {
-    $("error").textContent = error.message;
-    $("error").hidden = false;
+  } catch (e) {
+    showError(e.message);
   } finally {
-    busy = false;
-    for (const id of ["send", "prompt", "example", "clear-chat"])
-      $(id).disabled = false;
-    $("send").textContent = "Codex’e gönder ↑";
+    setBusy(false);
     $("prompt").focus();
   }
+  if (start) generate();
 });
 $("prompt").addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
@@ -74,14 +397,45 @@ $("prompt").addEventListener("keydown", (event) => {
 });
 $("example").onclick = () => {
   $("prompt").value =
-    "Merhaba! Bana bir yemek planlama uygulaması için üç basit MVP özelliği öner.";
+    "Merhaba! Yakalıyo adında bir işletmem var. Kafe ve restoranlara NFC ve QR ile sadakat programı sunuyoruz; Türkiye’de satıyoruz.";
   $("prompt").focus();
 };
+$("mock-fill").onclick = () => {
+  profile = { ...emptyProfile(), ...MOCK_PROFILES[mockIndex] };
+  mockIndex = (mockIndex + 1) % MOCK_PROFILES.length;
+  renderProfile();
+};
+$("generate").onclick = generate;
 $("clear-chat").onclick = () => {
   messages.length = 0;
+  campaigns.clear();
   retry = null;
+  profile = emptyProfile();
   $("messages").replaceChildren();
   $("prompt").value = "";
-  $("error").hidden = true;
+  showError("");
+  renderProfile();
   $("prompt").focus();
 };
+async function health() {
+  try {
+    const { services } = await api("/campaigns/health");
+    $("health").replaceChildren(
+      ...Object.entries(services).map(([name, state]) =>
+        el(
+          "li",
+          {
+            class: state,
+            title: state === "ok" ? "çalışıyor" : "kapalı — npm run start:all",
+          },
+          name,
+        ),
+      ),
+    );
+  } catch {
+    $("health").replaceChildren(el("li", { class: "down" }, "orchestrator"));
+  }
+}
+renderProfile();
+health();
+setInterval(health, 10000);
