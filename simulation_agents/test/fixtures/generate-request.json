@@ -1,0 +1,31 @@
+{
+  "contract_version": "1.0",
+  "request_id": "request-synthetic-generate",
+  "run_id": "run-synthetic-demo",
+  "action": "strategy.generate",
+  "payload": {
+    "candidate_count": 100,
+    "seed": 42,
+    "revision": 1,
+    "input": {
+      "business_id": "business-synthetic",
+      "product_id": "product-synthetic",
+      "product_label": "Synthetic test product",
+      "audience": "Synthetic adult audience",
+      "region": "Synthetic test region",
+      "objective": "purchases",
+      "budget": 12000,
+      "currency": "USD",
+      "duration_days": 30,
+      "unit_contribution": 55,
+      "data_provenance": "synthetic",
+      "assumptions": ["Entirely synthetic test data; not a real business or observed campaign."],
+      "context": "Compare channel allocations for this explicitly synthetic example.",
+      "channels": {
+        "paid_social": { "cost_per_click": 1.2, "conversion_rate": 0.055, "daily_saturation_spend": 700, "fatigue_per_day": 0.012, "conversion_delay_days": 2, "cost_relative_sd": 0.2, "conversion_relative_sd": 0.35 },
+        "paid_search": { "cost_per_click": 1.8, "conversion_rate": 0.09, "daily_saturation_spend": 450, "fatigue_per_day": 0.004, "conversion_delay_days": 1, "cost_relative_sd": 0.12, "conversion_relative_sd": 0.2 },
+        "influencer": { "cost_per_click": 0.9, "conversion_rate": 0.045, "daily_saturation_spend": 1000, "fatigue_per_day": 0.02, "conversion_delay_days": 7, "cost_relative_sd": 0.4, "conversion_relative_sd": 0.8 }
+      }
+    }
+  }
+}

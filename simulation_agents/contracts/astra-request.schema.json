@@ -1,0 +1,201 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://simulation-agents.local/contracts/astra-request-1.0.json",
+  "title": "Astra to advertising simulation services v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "request_id", "run_id", "action", "payload"],
+  "properties": {
+    "contract_version": { "const": "1.0" },
+    "request_id": { "$ref": "#/definitions/id" },
+    "run_id": { "$ref": "#/definitions/id" },
+    "action": { "enum": ["memory.retrieve", "memory.save_selection", "memory.update_actual", "strategy.generate", "simulation.evaluate", "outcome.prepare", "outcome.select", "outcome.observe"] },
+    "payload": { "type": "object" }
+  },
+  "oneOf": [
+    { "properties": { "action": { "const": "memory.retrieve" }, "payload": { "$ref": "#/definitions/scope" } } },
+    { "properties": { "action": { "const": "memory.save_selection" }, "payload": { "$ref": "#/definitions/saveSelection" } } },
+    { "properties": { "action": { "const": "memory.update_actual" }, "payload": { "$ref": "#/definitions/updateActual" } } },
+    { "properties": { "action": { "const": "strategy.generate" }, "payload": { "$ref": "#/definitions/generate" } } },
+    { "properties": { "action": { "const": "simulation.evaluate" }, "payload": { "$ref": "#/definitions/evaluate" } } },
+    { "properties": { "action": { "const": "outcome.prepare" }, "payload": { "$ref": "#/definitions/prepare" } } },
+    { "properties": { "action": { "const": "outcome.select" }, "payload": { "$ref": "#/definitions/select" } } },
+    { "properties": { "action": { "const": "outcome.observe" }, "payload": { "$ref": "#/definitions/observe" } } }
+  ],
+  "definitions": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 120, "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{3})?Z$" },
+    "scope": {
+      "type": "object", "additionalProperties": false, "required": ["business_id", "product_id"],
+      "properties": { "business_id": { "$ref": "#/definitions/id" }, "product_id": { "$ref": "#/definitions/id" }, "selection_id": { "$ref": "#/definitions/id", "description": "Optional exact lookup for an older selected record; omit for last ten." } }
+    },
+    "allocation": {
+      "type": "object", "additionalProperties": false, "required": ["paid_social", "paid_search", "influencer"],
+      "properties": { "paid_social": { "type": "number", "minimum": 0, "maximum": 1 }, "paid_search": { "type": "number", "minimum": 0, "maximum": 1 }, "influencer": { "type": "number", "minimum": 0, "maximum": 1 } }
+    },
+    "channelAssumption": {
+      "type": "object", "additionalProperties": false,
+      "required": ["cost_per_click", "conversion_rate", "daily_saturation_spend", "fatigue_per_day", "conversion_delay_days", "cost_relative_sd", "conversion_relative_sd"],
+      "properties": {
+        "cost_per_click": { "type": "number", "minimum": 0.01, "maximum": 100000 },
+        "conversion_rate": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "daily_saturation_spend": { "type": "number", "minimum": 1, "maximum": 1000000000 },
+        "fatigue_per_day": { "type": "number", "minimum": 0, "maximum": 0.2 },
+        "conversion_delay_days": { "type": "integer", "minimum": 0, "maximum": 7 },
+        "cost_relative_sd": { "type": "number", "minimum": 0, "maximum": 2 },
+        "conversion_relative_sd": { "type": "number", "minimum": 0, "maximum": 2 }
+      }
+    },
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["business_id", "product_id", "product_label", "audience", "region", "objective", "budget", "currency", "duration_days", "unit_contribution", "data_provenance", "assumptions", "channels"],
+      "properties": {
+        "business_id": { "$ref": "#/definitions/id" }, "product_id": { "$ref": "#/definitions/id" },
+        "product_label": { "$ref": "#/definitions/text" }, "audience": { "$ref": "#/definitions/text" }, "region": { "$ref": "#/definitions/text" },
+        "objective": { "const": "purchases" }, "budget": { "type": "number", "minimum": 1, "maximum": 1000000000 },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }, "duration_days": { "const": 30 },
+        "unit_contribution": { "type": "number", "minimum": 0, "maximum": 1000000 },
+        "data_provenance": { "enum": ["synthetic", "user_supplied", "measured"] },
+        "assumptions": { "type": "array", "minItems": 1, "maxItems": 30, "items": { "$ref": "#/definitions/text" } },
+        "context": { "type": "string", "maxLength": 10000, "description": "Optional Astra-curated instruction; no raw history or held-out outcomes." },
+        "channels": {
+          "type": "object", "additionalProperties": false, "required": ["paid_social", "paid_search", "influencer"],
+          "properties": { "paid_social": { "$ref": "#/definitions/channelAssumption" }, "paid_search": { "$ref": "#/definitions/channelAssumption" }, "influencer": { "$ref": "#/definitions/channelAssumption" } }
+        }
+      }
+    },
+    "adaptation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enabled", "checkpoint_days", "max_reallocation_fraction", "min_clicks_per_channel", "min_purchases_per_channel", "exploration_floor"],
+      "properties": {
+        "enabled": { "type": "boolean" }, "checkpoint_days": { "const": 3 },
+        "max_reallocation_fraction": { "type": "number", "minimum": 0, "maximum": 0.2 },
+        "min_clicks_per_channel": { "type": "integer", "minimum": 1, "maximum": 1000000 },
+        "min_purchases_per_channel": { "type": "integer", "minimum": 1, "maximum": 1000000 },
+        "exploration_floor": { "type": "number", "minimum": 0.05, "maximum": 0.2 }
+      }
+    },
+    "strategy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["strategy_id", "revision", "run_id", "business_id", "product_id", "name", "generator", "budget", "currency", "objective", "audience", "region", "start_day", "end_day", "initial_allocation", "creative", "assumptions", "adaptation"],
+      "properties": {
+        "strategy_id": { "$ref": "#/definitions/id" }, "revision": { "type": "integer", "minimum": 1 }, "run_id": { "$ref": "#/definitions/id" },
+        "business_id": { "$ref": "#/definitions/id" }, "product_id": { "$ref": "#/definitions/id" }, "name": { "$ref": "#/definitions/text" },
+        "generator": { "enum": ["deterministic-diversity-v1", "astra_supplied"] },
+        "budget": { "type": "number", "minimum": 1, "maximum": 1000000000 }, "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "objective": { "const": "purchases" }, "audience": { "$ref": "#/definitions/text" }, "region": { "$ref": "#/definitions/text" },
+        "start_day": { "const": 1 }, "end_day": { "const": 30 }, "initial_allocation": { "$ref": "#/definitions/allocation" },
+        "creative": { "enum": ["proof", "discovery", "offer"] },
+        "assumptions": { "type": "array", "minItems": 1, "maxItems": 40, "items": { "$ref": "#/definitions/text" } },
+        "adaptation": { "$ref": "#/definitions/adaptation" }
+      }
+    },
+    "generate": {
+      "type": "object", "additionalProperties": false, "required": ["input"],
+      "properties": { "input": { "$ref": "#/definitions/input" }, "candidate_count": { "type": "integer", "minimum": 100, "maximum": 200, "default": 150 }, "seed": { "type": "integer", "minimum": 0, "maximum": 2147483647, "default": 42 }, "revision": { "type": "integer", "minimum": 1, "default": 1 } }
+    },
+    "evaluate": {
+      "type": "object", "additionalProperties": false, "required": ["input", "strategies"],
+      "properties": {
+        "input": { "$ref": "#/definitions/input" },
+        "strategies": { "type": "array", "minItems": 1, "maxItems": 200, "items": { "$ref": "#/definitions/strategy" } },
+        "scenario_count": { "type": "integer", "minimum": 20, "maximum": 500, "default": 100 },
+        "seed": { "type": "integer", "minimum": 0, "maximum": 2147483647, "default": 42 }
+      }
+    },
+    "nullableNumber": { "type": ["number", "null"] },
+    "metrics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["expected_spend", "expected_purchases", "expected_contribution_profit", "roi", "acquisition_cost", "profit_p10", "profit_p50", "profit_p90", "profit_stddev", "probability_of_loss"],
+      "properties": {
+        "expected_spend": { "type": "number", "minimum": 0 }, "expected_purchases": { "type": "number", "minimum": 0 },
+        "expected_contribution_profit": { "type": "number" }, "roi": { "$ref": "#/definitions/nullableNumber" },
+        "acquisition_cost": { "type": ["number", "null"], "minimum": 0 },
+        "profit_p10": { "type": "number" }, "profit_p50": { "type": "number" }, "profit_p90": { "type": "number" },
+        "profit_stddev": { "type": "number", "minimum": 0 }, "probability_of_loss": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "result": {
+      "type": "object", "additionalProperties": false, "required": ["strategy", "adaptive", "fixed", "paired_profit_delta"],
+      "properties": {
+        "strategy": { "$ref": "#/definitions/strategy" }, "adaptive": { "$ref": "#/definitions/metrics" }, "fixed": { "$ref": "#/definitions/metrics" },
+        "paired_profit_delta": {
+          "type": "object", "additionalProperties": false, "required": ["mean", "p10", "p90"],
+          "properties": { "mean": { "type": "number" }, "p10": { "type": "number" }, "p90": { "type": "number" } }
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evaluation_id", "run_id", "model_version", "input", "seed", "scenario_count", "attribution_end_day", "assumptions", "results"],
+      "properties": {
+        "evaluation_id": { "$ref": "#/definitions/id" }, "run_id": { "$ref": "#/definitions/id" }, "model_version": { "const": "numerical-mvp-1.0.0" },
+        "input": { "$ref": "#/definitions/input" }, "seed": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+        "scenario_count": { "type": "integer", "minimum": 20, "maximum": 500 }, "attribution_end_day": { "type": "integer", "minimum": 30, "maximum": 37 },
+        "assumptions": { "type": "array", "minItems": 1, "maxItems": 50, "items": { "$ref": "#/definitions/text" } },
+        "results": { "type": "array", "minItems": 1, "maxItems": 200, "items": { "$ref": "#/definitions/result" } }
+      }
+    },
+    "prepare": {
+      "type": "object", "additionalProperties": false, "required": ["evaluation"],
+      "properties": { "evaluation": { "$ref": "#/definitions/evaluation" } }
+    },
+    "select": {
+      "type": "object", "additionalProperties": false, "required": ["evaluation", "strategy_id", "strategy_revision", "selection_id", "selected_at"],
+      "properties": {
+        "evaluation": { "$ref": "#/definitions/evaluation" }, "strategy_id": { "$ref": "#/definitions/id" }, "strategy_revision": { "type": "integer", "minimum": 1 },
+        "selection_id": { "$ref": "#/definitions/id" }, "selected_at": { "$ref": "#/definitions/timestamp" }
+      }
+    },
+    "actual": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observation_id", "observed_at", "source", "status", "attribution_end_day", "spend", "purchases", "unit_contribution", "currency"],
+      "properties": {
+        "observation_id": { "$ref": "#/definitions/id" }, "observed_at": { "$ref": "#/definitions/timestamp" }, "source": { "$ref": "#/definitions/text" },
+        "status": { "enum": ["partial", "final"] }, "attribution_end_day": { "type": "integer", "minimum": 1, "maximum": 365 },
+        "spend": { "type": "number", "minimum": 0, "maximum": 10000000000 }, "purchases": { "type": "integer", "minimum": 0, "maximum": 1000000000000 },
+        "unit_contribution": { "type": "number", "minimum": 0, "maximum": 1000000 }, "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      }
+    },
+    "comparison": {
+      "type": "object", "additionalProperties": false,
+      "required": ["comparable", "reason", "actual_contribution_profit", "actual_roi", "actual_acquisition_cost", "purchases_difference", "profit_difference", "roi_difference", "purchases_relative_error", "profit_relative_error"],
+      "properties": {
+        "comparable": { "type": "boolean" }, "reason": { "$ref": "#/definitions/text" }, "actual_contribution_profit": { "type": "number" },
+        "actual_roi": { "$ref": "#/definitions/nullableNumber" }, "actual_acquisition_cost": { "$ref": "#/definitions/nullableNumber" },
+        "purchases_difference": { "$ref": "#/definitions/nullableNumber" }, "profit_difference": { "$ref": "#/definitions/nullableNumber" },
+        "roi_difference": { "$ref": "#/definitions/nullableNumber" }, "purchases_relative_error": { "$ref": "#/definitions/nullableNumber" }, "profit_relative_error": { "$ref": "#/definitions/nullableNumber" }
+      }
+    },
+    "record": {
+      "type": "object", "additionalProperties": false,
+      "required": ["selection_id", "record_revision", "business_id", "product_id", "run_id", "selected_at", "selection_kind", "input", "strategy", "evaluation_id", "model_version", "seed", "scenario_count", "attribution_end_day", "simulation_assumptions", "predicted", "fixed_prediction", "actual", "comparison"],
+      "properties": {
+        "selection_id": { "$ref": "#/definitions/id" }, "record_revision": { "type": "integer", "minimum": 1 }, "business_id": { "$ref": "#/definitions/id" }, "product_id": { "$ref": "#/definitions/id" },
+        "run_id": { "$ref": "#/definitions/id" }, "selected_at": { "$ref": "#/definitions/timestamp" }, "selection_kind": { "const": "user_selected" },
+        "input": { "$ref": "#/definitions/input" }, "strategy": { "$ref": "#/definitions/strategy" }, "evaluation_id": { "$ref": "#/definitions/id" }, "model_version": { "const": "numerical-mvp-1.0.0" },
+        "seed": { "type": "integer", "minimum": 0, "maximum": 2147483647 }, "scenario_count": { "type": "integer", "minimum": 20, "maximum": 500 }, "attribution_end_day": { "type": "integer", "minimum": 30, "maximum": 37 },
+        "simulation_assumptions": { "type": "array", "minItems": 1, "maxItems": 50, "items": { "$ref": "#/definitions/text" } },
+        "predicted": { "$ref": "#/definitions/metrics" }, "fixed_prediction": { "$ref": "#/definitions/metrics" },
+        "actual": { "anyOf": [{ "type": "null" }, { "$ref": "#/definitions/actual" }] }, "comparison": { "anyOf": [{ "type": "null" }, { "$ref": "#/definitions/comparison" }] }
+      }
+    },
+    "saveSelection": {
+      "type": "object", "additionalProperties": false, "required": ["idempotency_key", "record"],
+      "properties": { "idempotency_key": { "$ref": "#/definitions/id" }, "record": { "$ref": "#/definitions/record" } }
+    },
+    "observe": {
+      "type": "object", "additionalProperties": false, "required": ["record", "actual"],
+      "properties": { "record": { "$ref": "#/definitions/record" }, "actual": { "$ref": "#/definitions/actual" } }
+    },
+    "updateActual": {
+      "type": "object", "additionalProperties": false, "required": ["idempotency_key", "business_id", "product_id", "selection_id", "expected_revision", "actual", "comparison"],
+      "properties": {
+        "idempotency_key": { "$ref": "#/definitions/id" }, "business_id": { "$ref": "#/definitions/id" }, "product_id": { "$ref": "#/definitions/id" },
+        "selection_id": { "$ref": "#/definitions/id" }, "expected_revision": { "type": "integer", "minimum": 1 },
+        "actual": { "$ref": "#/definitions/actual" }, "comparison": { "$ref": "#/definitions/comparison" }
+      }
+    }
+  }
+}
