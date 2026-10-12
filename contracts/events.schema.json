@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:slushd:events:2.0.0",
+  "$id": "urn:slushd:events:3.0.0",
   "oneOf": [
     {
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "type": "string",
@@ -46,7 +46,7 @@
           "const": "run.accepted"
         },
         "payload": {
-          "$ref": "urn:slushd:analysis:2.0.0#/$defs/Accepted"
+          "$ref": "urn:slushd:analysis:3.0.0#/$defs/Accepted"
         }
       },
       "required": [
@@ -65,7 +65,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "type": "string",
@@ -133,7 +133,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "type": "string",
@@ -176,7 +176,7 @@
           "type": "object",
           "properties": {
             "step": {
-              "$ref": "urn:slushd:analysis:2.0.0#/$defs/Step"
+              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Step"
             }
           },
           "required": [
@@ -201,7 +201,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "type": "string",
@@ -244,7 +244,7 @@
           "type": "object",
           "properties": {
             "step": {
-              "$ref": "urn:slushd:analysis:2.0.0#/$defs/Step"
+              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Step"
             }
           },
           "required": [
@@ -269,7 +269,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "type": "string",
@@ -312,7 +312,7 @@
           "type": "object",
           "properties": {
             "result": {
-              "$ref": "urn:slushd:analysis:2.0.0#/$defs/Response"
+              "$ref": "urn:slushd:analysis:3.0.0#/$defs/Response"
             }
           },
           "required": [

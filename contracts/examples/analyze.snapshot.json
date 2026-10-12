@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2.0.0",
+  "schemaVersion": "3.0.0",
   "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
   "status": "completed",
   "lastSequence": 23,
@@ -536,21 +536,89 @@
     }
   ],
   "result": {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "status": "completed",
     "createdAt": "2026-10-12T09:00:00Z",
     "finishedAt": "2026-10-12T09:00:22Z",
     "durationMs": 22000,
     "input": {
-      "schemaVersion": "2.0.0",
+      "schemaVersion": "3.0.0",
       "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
-      "idea": "Üniversite öğrencileri için bütçeye uygun haftalık yemek planı oluşturan uygulama.",
+      "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+      "intakeRevision": 2,
       "language": "tr",
-      "targetMarket": "Türkiye",
-      "targetAudience": "Üniversite öğrencileri",
       "mode": "demo",
-      "testMode": "simulation"
+      "testMode": "simulation",
+      "product": {
+        "productDescription": {
+          "status": "provided",
+          "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+          "sourceMessageIds": [
+            "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+          ]
+        },
+        "website": {
+          "status": "not_applicable",
+          "value": null,
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "targetCustomer": {
+          "status": "provided",
+          "value": "Üniversite öğrencileri",
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "targetMarket": {
+          "status": "provided",
+          "value": "Türkiye",
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "currentFeatures": {
+          "status": "provided",
+          "value": [
+            "Bütçe girişi",
+            "Haftalık yemek planı",
+            "Alışveriş listesi"
+          ],
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "pricing": {
+          "status": "provided",
+          "value": {
+            "model": "subscription",
+            "amount": 200,
+            "currency": "TRY",
+            "billingPeriod": "monthly"
+          },
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "userGoal": {
+          "status": "provided",
+          "value": "Deneme kullanıcılarını ücretli aboneye dönüştürmek.",
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        },
+        "knownCompetitors": {
+          "status": "not_applicable",
+          "value": null,
+          "sourceMessageIds": [
+            "f8aa69af-1c90-4368-8077-b20229c33351"
+          ]
+        }
+      },
+      "limitations": [],
+      "allowIncomplete": false
     },
     "memoryContext": {
       "status": "completed",

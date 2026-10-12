@@ -1,6 +1,6 @@
 [
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 1,
     "timestamp": "2026-10-12T09:00:00Z",
@@ -11,7 +11,7 @@
     },
     "type": "run.accepted",
     "payload": {
-      "schemaVersion": "2.0.0",
+      "schemaVersion": "3.0.0",
       "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
       "status": "queued",
       "links": {
@@ -21,7 +21,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 2,
     "timestamp": "2026-10-12T09:00:01Z",
@@ -36,7 +36,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 3,
     "timestamp": "2026-10-12T09:00:02Z",
@@ -59,7 +59,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 4,
     "timestamp": "2026-10-12T09:00:03Z",
@@ -82,7 +82,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 5,
     "timestamp": "2026-10-12T09:00:04Z",
@@ -105,7 +105,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 6,
     "timestamp": "2026-10-12T09:00:05Z",
@@ -128,7 +128,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 7,
     "timestamp": "2026-10-12T09:00:06Z",
@@ -151,7 +151,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 8,
     "timestamp": "2026-10-12T09:00:07Z",
@@ -174,7 +174,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 9,
     "timestamp": "2026-10-12T09:00:08Z",
@@ -206,7 +206,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 10,
     "timestamp": "2026-10-12T09:00:09Z",
@@ -255,7 +255,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 11,
     "timestamp": "2026-10-12T09:00:10Z",
@@ -302,7 +302,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 12,
     "timestamp": "2026-10-12T09:00:11Z",
@@ -386,7 +386,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 13,
     "timestamp": "2026-10-12T09:00:12Z",
@@ -424,7 +424,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 14,
     "timestamp": "2026-10-12T09:00:13Z",
@@ -584,7 +584,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 15,
     "timestamp": "2026-10-12T09:00:14Z",
@@ -607,7 +607,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 16,
     "timestamp": "2026-10-12T09:00:15Z",
@@ -639,7 +639,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 17,
     "timestamp": "2026-10-12T09:00:16Z",
@@ -667,7 +667,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 18,
     "timestamp": "2026-10-12T09:00:17Z",
@@ -695,7 +695,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 19,
     "timestamp": "2026-10-12T09:00:18Z",
@@ -718,7 +718,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 20,
     "timestamp": "2026-10-12T09:00:19Z",
@@ -751,7 +751,7 @@
     }
   },
   {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "3.0.0",
     "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
     "sequence": 21,
     "timestamp": "2026-10-12T09:00:20Z",
@@ -763,21 +763,89 @@
     "type": "run.finished",
     "payload": {
       "result": {
-        "schemaVersion": "2.0.0",
+        "schemaVersion": "3.0.0",
         "runId": "dc722ed7-196b-4911-9820-66fd641d190b",
         "status": "failed",
         "createdAt": "2026-10-12T09:00:00Z",
         "finishedAt": "2026-10-12T09:00:20Z",
         "durationMs": 20000,
         "input": {
-          "schemaVersion": "2.0.0",
+          "schemaVersion": "3.0.0",
           "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
-          "idea": "Üniversite öğrencileri için bütçeye uygun haftalık yemek planı oluşturan uygulama.",
+          "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+          "intakeRevision": 2,
           "language": "tr",
-          "targetMarket": "Türkiye",
-          "targetAudience": "Üniversite öğrencileri",
           "mode": "demo",
-          "testMode": "simulation"
+          "testMode": "simulation",
+          "product": {
+            "productDescription": {
+              "status": "provided",
+              "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+              "sourceMessageIds": [
+                "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+              ]
+            },
+            "website": {
+              "status": "not_applicable",
+              "value": null,
+              "sourceMessageIds": [
+                "f8aa69af-1c90-4368-8077-b20229c33351"
+              ]
+            },
+            "targetCustomer": {
+              "status": "provided",
+              "value": "Üniversite öğrencileri",
+              "sourceMessageIds": [
+                "f8aa69af-1c90-4368-8077-b20229c33351"
+              ]
+            },
+            "targetMarket": {
+              "status": "provided",
+              "value": "Türkiye",
+              "sourceMessageIds": [
+                "f8aa69af-1c90-4368-8077-b20229c33351"
+              ]
+            },
+            "currentFeatures": {
+              "status": "provided",
+              "value": [
+                "Bütçe girişi",
+                "Haftalık yemek planı",
+                "Alışveriş listesi"
+              ],
+              "sourceMessageIds": [
+                "f8aa69af-1c90-4368-8077-b20229c33351"
+              ]
+            },
+            "pricing": {
+              "status": "provided",
+              "value": {
+                "model": "subscription",
+                "amount": 200,
+                "currency": "TRY",
+                "billingPeriod": "monthly"
+              },
+              "sourceMessageIds": [
+                "f8aa69af-1c90-4368-8077-b20229c33351"
+              ]
+            },
+            "userGoal": {
+              "status": "provided",
+              "value": "Deneme kullanıcılarını ücretli aboneye dönüştürmek.",
+              "sourceMessageIds": [
+                "f8aa69af-1c90-4368-8077-b20229c33351"
+              ]
+            },
+            "knownCompetitors": {
+              "status": "not_applicable",
+              "value": null,
+              "sourceMessageIds": [
+                "f8aa69af-1c90-4368-8077-b20229c33351"
+              ]
+            }
+          },
+          "limitations": [],
+          "allowIncomplete": false
         },
         "memoryContext": {
           "status": "completed",

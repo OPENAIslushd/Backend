@@ -1,10 +1,11 @@
 # Kişi 2 — Orchestrator Agent uygulama planı
 
-Sözleşmenin tek kaynağı [contracts/README.md](../contracts/README.md) ve üç JSON Schema dosyasıdır. Bu plan v2 mimarisini uygular. Test girdileri gerçek ürün testi değil demo simülasyonudur.
+Sözleşmenin tek kaynağı [contracts/README.md](../contracts/README.md) ve dört JSON Schema dosyasıdır. Bu plan v3 mimarisini uygular. Test girdileri gerçek ürün testi değil demo simülasyonudur.
 
 ## İş akışı
 
-1. React, Orchestrator'a POST /analyze gönderir. Node.js girişini doğrular, idempotency kontrolü yapar ve runId/olay URL'siyle 202 döner.
+0. React chatbox, POST /intakes ile ürün açıklamasını gönderir. Orchestrator alanları çıkarır; needs_input durumunda questions döndürür. UI cevapları POST /intakes/:intakeId/messages ile iletir. Hazır profil veya açık eksik bilgi onayı olmadan Research başlamaz. Ayrıntı: [intake sözleşmesi](../contracts/intake.md).
+1. React, hazır intakeId/intakeRevision ile Orchestrator'a POST /analyze gönderir. Node.js intake durumunu/sürümünü doğrulayıp yapılandırılmış AnalysisInput kopyasını alır, idempotency kontrolü yapar ve runId/olay URL'siyle 202 döner.
 2. Orchestrator Agent, Memory Agent'tan JSON geçmişini okutur ve Research Agent'ı başlatır. İki dal paralel çalışabilir.
 3. Research Agent, risk/reward analytics, marketing research, rival research ve trend analytics agent'larına ayrılır. Uzman çıktıları ayrı şemalarda doğrulanır; Research bunları birleştirir.
 4. Orchestrator, araştırmayı ve hafızayı Strategy Agent'a vererek build suggestion ve test planı ister.
@@ -19,8 +20,8 @@ Her başlangıç/bitişte Orchestrator olay üretir. Research kendi alt adımlar
 
 | Sahip | Branch | Dosyalar / teslim |
 |---|---|---|
-| Kişi 1 | feat/frontend-dashboard | Frontend repo; POST, EventSource, 10 adımlık agent görünümü, snapshot/reconnect |
-| Kişi 2 | feat/orchestrator | contracts/, src/orchestrator/, src/runtime/, src/strategy/, src/events/, Node HTTP |
+| Kişi 1 | feat/frontend-dashboard | Frontend repo; chatbox, eksik bilgi soruları, intake endpoint'leri, POST, EventSource, 10 adımlık agent görünümü, snapshot/reconnect |
+| Kişi 2 | feat/orchestrator | contracts/, src/orchestrator/, src/intake/, src/runtime/, src/strategy/, src/events/, Node HTTP |
 | Kişi 3 | feat/research | src/research/; parent + dört uzman, kaynak doğrulama, onStep bildirimleri |
 | Kişi 4 | feat/json-memory-simulation | src/memory/, src/simulation/, src/mcp/; JSON kayıt ve simülasyon |
 
@@ -32,8 +33,8 @@ Sözleşme branch'i codex/contracts-orchestration-plan. PR'ı kullanıcı açaca
 
 | Süre | Senin teslimin | Paralel ekip teslimi |
 |---|---|---|
-| 00:00–00:30 | v2 şema/olay adlarını dondur, bağlantıları doğrula | Herkes fixture'ı okuyabilir |
-| 00:30–01:15 | POST 202, snapshot ve fixture SSE oynatıcı | UI agent ağacını ve canlı adımları gösterir |
+| 00:00–00:30 | v3 şema/olay adlarını dondur, bağlantıları doğrula | Herkes fixture'ı okuyabilir |
+| 00:30–01:15 | Chat intake fixture akışı, POST 202, snapshot ve fixture SSE oynatıcı | UI agent ağacını ve canlı adımları gösterir |
 | 01:15–02:15 | CLI runner + Strategy build/evaluate | Research uzman stub'ları; JSON memory ve simülasyon |
 | 02:15–03:15 | Gerçek adaptörleri bağla, tek olay yazıcısı | Dört araştırma sonucu + memory receipt |
 | 03:15–04:00 | Reconnect, hata, kaynak/ID, timeout, kayıt tekrar testleri | Uçtan uca ortak demo |
@@ -47,7 +48,7 @@ Ortak runner: child_process.spawn, shell=false, sabit prompt argümanı ve JSON 
 
 Codex kullanılıyorsa daha önce doğrulanan [non-interactive çıktı şeması](https://learn.chatgpt.com/docs/non-interactive-mode) desteği adaptörde kullanılabilir. HTTP Response yerine ilgili agent'ın data şemasını verin. [MCP bağlantısı](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) ve [hesap oturumu](https://learn.chatgpt.com/docs/auth) demo bilgisayarında gerçek child process ile test edilmelidir. Bu PR model/bağlantı kurulumu yapmaz.
 
-Başlangıç bütçesi: toplam 240 saniye; memory.read 5 s, araştırma dalı en fazla 120 s (dört uzman, varsayılan concurrency=2, her biri 50 s + birleştirme 20 s), strategy.build 45 s, simülasyon 5 s, strategy.evaluate 45 s, memory.update 5 s; kalan süre doğrulama ve süreç temizliği payıdır. Bunlar hedef sınırlar, gecikme garantisi değil. Gerçek oturum/limitlere göre smoke test sonrası ayarlayın. Memory read araştırmayla paraleldir.
+Intake çıkarımı mesaj başına en fazla 30 saniye; kullanıcı cevabını beklemek analiz bütçesine dahil değildir. Başlangıç analiz bütçesi: toplam 240 saniye; memory.read 5 s, araştırma dalı en fazla 120 s (dört uzman, varsayılan concurrency=2, her biri 50 s + birleştirme 20 s), strategy.build 45 s, simülasyon 5 s, strategy.evaluate 45 s, memory.update 5 s; kalan süre doğrulama ve süreç temizliği payıdır. Bunlar hedef sınırlar, gecikme garantisi değil. Gerçek oturum/limitlere göre smoke test sonrası ayarlayın. Memory read araştırmayla paraleldir.
 
 AbortSignal ve süreç ağacı temizliği sağlayın. Promise.race tek başına süreç durdurmaz. SSE client disconnect analiz iptali değildir; yeniden bağlanma desteklenir. Global timeout çalışan adımları failed/TIMEOUT, bağımlıları skipped yapar; kullanıcıya terminal olay ulaşır. Agent retry aynı step içinde sınırlıdır, yeni bir run yaratmaz.
 
@@ -55,6 +56,10 @@ JSON kaydı tek yazıcı ile yapılır; DB servisi yoktur. Demo/live namespace'l
 
 ## Entegrasyon kabul koşulları
 
+- Chat mesajı sekiz ürün alanına dönüşüyor; bilinmeyen fiyat/pazar uydurulmuyor.
+- Eksik alanlar gerekçeli sorularla UI'a dönüyor; yanıt endpoint'i aynı intake'ı güncelliyor.
+- Ready olmadan Research başlayamıyor; kullanıcı açıkça eksik bilgilerle devam edebiliyor.
+- Eski revision ve tekrar gönderilen mesajlar çift analiz/yanlış profil üretmiyor.
 - UI yalnız Orchestrator'a bağlı; dört uzman Research altında ayrı görülebiliyor.
 - İki Strategy fazı ve aralarındaki simülasyon ayrı adımlar olarak görünüyor.
 - İyimser başarı ve kötümser başarısızlığın kriterlere dayalı nedenleri gösteriliyor.

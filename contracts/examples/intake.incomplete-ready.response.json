@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "3.0.0",
+  "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+  "revision": 2,
+  "status": "ready",
+  "language": "tr",
+  "mode": "demo",
+  "testMode": "simulation",
+  "createdAt": "2026-10-12T08:58:00Z",
+  "updatedAt": "2026-10-12T08:59:05Z",
+  "messages": [
+    {
+      "id": "8b3e0adf-e27f-452d-9f26-2277e157e39e",
+      "role": "user",
+      "content": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+      "createdAt": "2026-10-12T08:58:00Z"
+    },
+    {
+      "id": "32e3d908-79f4-40a8-a715-0fca644e717e",
+      "role": "assistant",
+      "content": "Ürün açıklamasını çıkardım. Araştırmayı netleştirmek için aşağıdaki ayrıntıları paylaşabilir misiniz? Bilmediklerinizi boş bırakabilir veya eksik bilgilerle devam edebilirsiniz.",
+      "createdAt": "2026-10-12T08:58:05Z"
+    },
+    {
+      "id": "49e6396e-46c2-49d8-87a2-a712e8141ed0",
+      "role": "user",
+      "content": "Eksik bilgilerle devam et.",
+      "createdAt": "2026-10-12T08:59:00Z"
+    },
+    {
+      "id": "471f17e6-46f9-40e7-b3e7-5a3bb47a40f8",
+      "role": "assistant",
+      "content": "Eksik alanlar bilinmiyor olarak korunacak; sonuçların kapsamı sınırlı olacak.",
+      "createdAt": "2026-10-12T08:59:05Z"
+    }
+  ],
+  "product": {
+    "productDescription": {
+      "status": "provided",
+      "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+      "sourceMessageIds": [
+        "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+      ]
+    },
+    "website": {
+      "status": "unknown",
+      "value": null,
+      "sourceMessageIds": []
+    },
+    "targetCustomer": {
+      "status": "unknown",
+      "value": null,
+      "sourceMessageIds": []
+    },
+    "targetMarket": {
+      "status": "unknown",
+      "value": null,
+      "sourceMessageIds": []
+    },
+    "currentFeatures": {
+      "status": "unknown",
+      "value": null,
+      "sourceMessageIds": []
+    },
+    "pricing": {
+      "status": "unknown",
+      "value": null,
+      "sourceMessageIds": []
+    },
+    "userGoal": {
+      "status": "unknown",
+      "value": null,
+      "sourceMessageIds": []
+    },
+    "knownCompetitors": {
+      "status": "unknown",
+      "value": null,
+      "sourceMessageIds": []
+    }
+  },
+  "missingFields": [
+    "website",
+    "targetCustomer",
+    "targetMarket",
+    "currentFeatures",
+    "pricing",
+    "userGoal",
+    "knownCompetitors"
+  ],
+  "questions": [],
+  "allowIncomplete": true,
+  "limitations": [
+    "Hedef müşteri ve pazar henüz bilinmiyor.",
+    "Fiyat karşılaştırması yapılamaz: fiyatlandırma bilgisi eksik."
+  ]
+}

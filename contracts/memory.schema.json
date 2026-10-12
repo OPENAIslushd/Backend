@@ -1,5 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:slushd:memory:2.0.0",
-  "$ref": "urn:slushd:analysis:2.0.0#/$defs/MemoryRecord"
+  "$id": "urn:slushd:memory:3.0.0",
+  "$ref": "urn:slushd:analysis:3.0.0#/$defs/MemoryRecord"
 }

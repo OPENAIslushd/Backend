@@ -1,10 +1,6 @@
 {
-  "schemaVersion": "2.0.0",
+  "schemaVersion": "3.0.0",
   "clientRequestId": "172760a6-5080-41e2-a5cb-f072119908ac",
-  "idea": "Üniversite öğrencileri için bütçeye uygun haftalık yemek planı oluşturan uygulama.",
-  "language": "tr",
-  "targetMarket": "Türkiye",
-  "targetAudience": "Üniversite öğrencileri",
-  "mode": "demo",
-  "testMode": "simulation"
+  "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+  "intakeRevision": 2
 }

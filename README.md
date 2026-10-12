@@ -1,7 +1,8 @@
 # Startup Analysis — Backend Contracts
 
-Orchestrator, Research (dört uzman), Strategy ve JSON Memory agent'ları için v2 sözleşme taslağı.
+Orchestrator, Research (dört uzman), Strategy ve JSON Memory agent'ları için v3 sözleşme taslağı.
 
+- [Chatbox ve eksik bilgi endpoint'leri](contracts/intake.md)
 - [Ortak JSON ve canlı UI/SSE sözleşmesi](contracts/README.md)
 - [Orkestrasyon ve branch planı](docs/orchestration-plan.tr.md)
 - [UI olay örnekleri](contracts/examples/ui.events.json)

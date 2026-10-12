@@ -10,7 +10,8 @@ addFormats(ajv);
 const analysis = read('analysis.schema.json');
 const eventSchema = read('events.schema.json');
 const memorySchema = read('memory.schema.json');
-for (const schema of [analysis, eventSchema, memorySchema]) ajv.addSchema(schema);
+const intakeSchema = read('intake.schema.json');
+for (const schema of [intakeSchema, analysis, eventSchema, memorySchema]) ajv.addSchema(schema);
 const typeId = type => `${analysis.$id}#/$defs/${type}`;
 function validate(id, value) {
   const check = ajv.getSchema(id);
@@ -19,12 +20,51 @@ function validate(id, value) {
 }
 // Compile every public type, not only those reached from Response.
 for (const name of Object.keys(analysis.$defs)) assert(ajv.getSchema(typeId(name)));
+for (const name of Object.keys(intakeSchema.$defs)) assert(ajv.getSchema(`${intakeSchema.$id}#/$defs/${name}`));
 const terminal = new Set(['completed', 'partial', 'failed', 'skipped']);
 const stepIds = ['memory.read', 'research', 'research.risk_reward', 'research.marketing',
   'research.rivals', 'research.trends', 'strategy.build', 'tests.run', 'strategy.evaluate', 'memory.update'];
 const round = n => Math.round((n + Number.EPSILON) * 100) / 100;
 function unique(items, key) {
   assert.equal(new Set(items.map(x => x[key])).size, items.length, `Duplicate ${key}`);
+}
+function missingFields(product) {
+  return Object.entries(product).filter(([key, field]) => {
+    if (field.status === 'unknown' || field.status === 'declined') return true;
+    if (key !== 'pricing' || field.status !== 'provided') return false;
+    const p = field.value;
+    return ['undecided', 'custom'].includes(p.model) || (p.model !== 'free' &&
+      (p.amount === null || p.currency === null || p.billingPeriod === null));
+  }).map(([key]) => key);
+}
+function checkIntake(value) {
+  validate(intakeSchema.$id, value);
+  unique(value.messages, 'id'); unique(value.questions, 'id'); unique(value.questions, 'field');
+  const userIds = new Set(value.messages.filter(x => x.role === 'user').map(x => x.id));
+  for (const field of Object.values(value.product)) {
+    for (const id of field.sourceMessageIds) assert(userIds.has(id), `Invalid user evidence ${id}`);
+  }
+  const missing = missingFields(value.product);
+  assert.deepEqual([...value.missingFields].sort(), [...missing].sort());
+  const canStart = value.product.productDescription.status === 'provided' &&
+    (missing.length === 0 || value.allowIncomplete);
+  assert.equal(value.status, canStart ? 'ready' : 'needs_input');
+  if (canStart) assert.equal(value.questions.length, 0);
+  else {
+    const askable = missing.filter(key => key === 'productDescription' || value.product[key].status !== 'declined');
+    assert.deepEqual(value.questions.map(x => x.field).sort(), askable.sort());
+    for (const question of value.questions) assert.equal(question.blocking, question.field === 'productDescription');
+  }
+  if (missing.length) assert(value.limitations.length > 0);
+  if (value.product.pricing.status === 'provided' && value.product.pricing.value.model === 'free') {
+    assert.equal(value.product.pricing.value.amount, 0);
+  }
+}
+function checkStart(request, intake) {
+  validate(typeId('Request'), request); checkIntake(intake);
+  assert.equal(request.intakeId, intake.intakeId);
+  assert.equal(request.intakeRevision, intake.revision, 'Stale intake revision');
+  assert.equal(intake.status, 'ready', 'Research must wait for intake');
 }
 function assertOrigins(value, mode) {
   if (!value || typeof value !== 'object') return;
@@ -105,6 +145,11 @@ function checkTests(build, tests, evaluation) {
 }
 function checkResponse(result) {
   validate(typeId('Response'), result);
+  assert.equal(result.input.product.productDescription.status, 'provided');
+  if (missingFields(result.input.product).length) {
+    assert(result.input.allowIncomplete, 'Explicit consent is required for missing data');
+    assert(result.input.limitations.length > 0);
+  }
   assertOrigins(result, result.input.mode);
   checkResearch(result.research);
   checkTests(result.buildSuggestion, result.testResults, result.evaluation);
@@ -210,7 +255,36 @@ assert.deepEqual(snapshot.steps, states);
 assert.deepEqual(snapshot.result, events.at(-1).payload.result);
 assert.equal(snapshot.status, snapshot.result.status);
 assert.deepEqual(snapshot.result, read('examples/analyze.demo.response.json'));
-assert.deepEqual(snapshot.result.input, read('examples/analyze.request.json'));
+const startRequest = read('examples/analyze.request.json');
+for (const [key, value] of Object.entries(startRequest)) assert.deepEqual(snapshot.result.input[key], value);
+for (const [file, type] of [
+  ['intake.create.request.json','CreateRequest'], ['intake.message.request.json','MessageRequest'],
+  ['intake.continue.request.json','MessageRequest']
+]) validate(`${intakeSchema.$id}#/$defs/${type}`, read(`examples/${file}`));
+const intakeWaiting = read('examples/intake.needs-input.response.json');
+const intakeReady = read('examples/intake.ready.response.json');
+const intakeIncomplete = read('examples/intake.incomplete-ready.response.json');
+for (const intake of [intakeWaiting, intakeReady, intakeIncomplete]) checkIntake(intake);
+const intakeRecord = read('examples/intake.record.json');
+validate(`${intakeSchema.$id}#/$defs/Record`, intakeRecord);
+assert.deepEqual(intakeRecord.snapshot, intakeReady);
+assert.deepEqual(intakeRecord.createResponse, intakeWaiting);
+assert.equal(intakeRecord.createRequest.message, intakeWaiting.messages[0].content);
+assert.equal(intakeReady.revision, intakeRecord.processedMessages[0].request.expectedRevision + 1);
+assert.deepEqual(intakeRecord.processedMessages[0].response, intakeReady);
+const submittedMessage = intakeRecord.processedMessages[0].request;
+assert.equal(intakeReady.messages.find(x => x.id === submittedMessage.clientMessageId).content, submittedMessage.message);
+checkStart(startRequest, intakeReady);
+checkStart(startRequest, intakeIncomplete); // Same ID/revision are independent alternative fixtures.
+assert.deepEqual(snapshot.result.input.product, intakeReady.product);
+assert.deepEqual(snapshot.result.input.limitations, intakeReady.limitations);
+assert.equal(snapshot.result.input.allowIncomplete, intakeReady.allowIncomplete);
+assert.equal(snapshot.result.input.language, intakeReady.language);
+assert.equal(snapshot.result.input.mode, intakeReady.mode);
+const researchInput = read('examples/research.input.json');
+validate(typeId('ResearchInput'), researchInput);
+assert.deepEqual(researchInput.input, snapshot.result.input);
+assert.equal(researchInput.runId, snapshot.runId);
 const record = read('examples/memory.record.json'); validate(memorySchema.$id, record);
 assert.equal(record.recordId, snapshot.runId);
 assert.equal(record.namespace, record.analysis.input.mode);
@@ -235,7 +309,7 @@ function rejects(label, original, mutate, check) {
 }
 const request = read('examples/analyze.request.json');
 rejects('unknown request field', request, x => x.unknown = true, x => validate(typeId('Request'), x));
-rejects('wrong test mode', request, x => x.testMode = 'real', x => validate(typeId('Request'), x));
+rejects('wrong test mode', snapshot.result, x => x.input.testMode = 'real', checkResponse);
 rejects('partial without error', snapshot.result, x => x.research.status = 'partial', checkResponse);
 rejects('false simulation verdict', snapshot.result, x => x.evaluation.data.scenarioAssessments[0].outcome = 'failure', checkResponse);
 rejects('unresolved source', snapshot.result, x => x.research.data.rivals.data.competitors[0].sourceIds = ['missing'], checkResponse);
@@ -245,4 +319,16 @@ rejects('incorrect parent', events, x => x[4].payload.step.parentStepId = null, 
 rejects('incorrect progress', events, x => x[8].progress.settledSteps = 10, checkEvents);
 rejects('early final event', events, x => x.splice(2, x.length - 3), checkEvents);
 rejects('invalid step output type', events, x => x[8].payload.step.output = snapshot.result.evaluation, checkEvents);
-console.log(`PASS: all schemas compiled; 8 JSON fixtures; ${events.length} success-path and ${failureEvents.length} failure-path events; SSE parity; memory and simulation invariants; ${rejected} invalid cases rejected.`);
+rejects('premature ready', intakeWaiting, x => x.status = 'ready', checkIntake);
+rejects('invented unknown value', intakeWaiting, x => x.product.pricing.value = {model:'free',amount:0,currency:null,billingPeriod:null}, checkIntake);
+rejects('assistant as user evidence', intakeReady, x => x.product.targetMarket.sourceMessageIds = [x.messages[1].id], checkIntake);
+rejects('omitted missing fields', intakeWaiting, x => x.missingFields = [], checkIntake);
+rejects('continue without description', intakeIncomplete, x => {
+  x.product.productDescription = {status:'unknown',value:null,sourceMessageIds:[]};
+  x.missingFields.push('productDescription');
+}, checkIntake);
+rejects('stale profile revision', startRequest, x => x.intakeRevision = 1, x => checkStart(x, intakeReady));
+rejects('bypass intake gate', startRequest, x => x.intakeRevision = 1, x => checkStart(x, intakeWaiting));
+rejects('client injected profile', startRequest, x => x.product = intakeReady.product, x => validate(typeId('Request'), x));
+rejects('missing consent', intakeIncomplete, x => x.allowIncomplete = false, checkIntake);
+console.log(`PASS: all schemas and fixtures; chat extraction/clarification/consent gates; ${events.length} success-path and ${failureEvents.length} failure-path events; SSE parity; memory and simulation invariants; ${rejected} invalid cases rejected.`);

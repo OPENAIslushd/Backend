@@ -1,6 +1,6 @@
-# Agent ve UI sözleşmesi — v2.0.0
+# Agent ve UI sözleşmesi — v3.0.0
 
-Bu sürüm v1'in yerini alır; geriye uyumlu değildir. UI yalnız Orchestrator Agent'ın HTTP/SSE arayüzüyle konuşur. Research Agent dört uzmanı yönetir. Memory Agent JSON dosyaları okur/yazar. Strategy Agent önce build suggestion/test planı üretir, sonra demo simülasyon sonuçlarını başarı/başarısızlık gerekçeleriyle değerlendirir. Orchestrator hafızayı günceller ve UI'a nihai sonucu gönderir.
+Bu sürüm v2'nin yerini alır; geriye uyumlu değildir. UI önce Orchestrator'ın chat intake arayüzüyle ürün profilini tamamlar; sonra HTTP/SSE analiz arayüzüyle konuşur. [Chat ve eksik bilgi sözleşmesi](intake.md) başlangıç adımıdır. Research Agent dört uzmanı yönetir. Memory Agent JSON dosyaları okur/yazar. Strategy Agent önce build suggestion/test planı üretir, sonra demo simülasyon sonuçlarını başarı/başarısızlık gerekçeleriyle değerlendirir. Orchestrator hafızayı günceller ve UI'a nihai sonucu gönderir.
 
 Bu PR sözleşme, fixture ve doğrulama teslimidir; endpoint/agent runtime uygulaması değildir.
 
@@ -8,10 +8,15 @@ Bu PR sözleşme, fixture ve doğrulama teslimidir; endpoint/agent runtime uygul
 
 | Dosya | Kullanım |
 |---|---|
+| intake.schema.json | Chat, ürün profili, takip soruları ve JSON intake kaydı |
 | analysis.schema.json | İstek, sonuç, snapshot, agent girdileri/çıktıları; `$defs` altında |
 | events.schema.json | Tek UI ilerleme olayı |
 | memory.schema.json | Kalıcı JSON hafıza kaydı |
-| examples/analyze.request.json | UI -> Orchestrator |
+| examples/analyze.request.json | Hazır intakeId/revision -> Orchestrator |
+| examples/intake.needs-input.response.json | Eksik alanlar ve UI soruları |
+| examples/intake.message.request.json | UI chat cevabı |
+| examples/intake.record.json | Konuşma, profil ve tekrar gönderim kayıtları |
+| examples/research.input.json | Yapılandırılmış ürün -> Research |
 | examples/analyze.accepted.json | HTTP 202 kabul yanıtı |
 | examples/ui.events.json | Baştan sona 23 olaylık UI örneği |
 | examples/ui.failure.events.json | Başarısız Strategy, atlanan testler ve hafıza kaydı: 21 olay |
@@ -23,13 +28,15 @@ Bu PR sözleşme, fixture ve doğrulama teslimidir; endpoint/agent runtime uygul
 | examples/analyze.error.response.json | HTTP düzeyinde geçersiz istek |
 | examples/memory.record.json | JSON dosyasına yazılacak kayıt |
 
-Şemalar JSON Schema 2020-12 kullanır. Validator'a üç dosya `$id` değerleriyle birlikte kaydedilir; URN referansları ağdan indirilmez. `analysis.schema.json` kökü Response doğrular; `$defs.Request`, `$defs.Accepted` vb. ayrı doğrulanabilir.
+Şemalar JSON Schema 2020-12 kullanır. Validator'a dört dosya `$id` değerleriyle birlikte kaydedilir; URN referansları ağdan indirilmez. `analysis.schema.json` kökü Response doğrular; `$defs.Request`, `$defs.Accepted` vb. ayrı doğrulanabilir.
 
 ## Agent ağacı ve veri sırası
 
 ```mermaid
 flowchart TD
-  UI[React UI] <-->|HTTP + SSE JSON| O[Orchestrator Agent]
+  UI[React Chatbox] <-->|Mesaj + profil + takip soruları| IN[Orchestrator Intake]
+  IN -->|Profil hazır| O[Orchestrator Agent]
+  UI <-->|HTTP + SSE JSON| O
   O --> R[Research Agent]
   R --> RR[Risk / Reward Analytics Agent]
   R --> MR[Marketing Research Agent]
@@ -46,7 +53,7 @@ flowchart TD
   E -->|Başarı / başarısızlık + nedenleri| O
 ```
 
-Research ve Memory okuma paralel başlayabilir. Research kendi dört uzmanını başlatır ve sonuçlarını birleştirir. Strategy.build iki dalın bitmesini bekler. Testler build suggestion içindeki planla çalışır. Strategy.evaluate test sonuçlarını yorumlar. Memory.update bundan sonra yapılır. `run.finished` ancak hafıza yazma girişimi sonuçlandığında yayınlanır. UI bütün ara adımları da görür.
+Intake tamamlanmadan Research başlamaz. Profil hazır olduktan sonra Research ve Memory okuma paralel başlayabilir. Research kendi dört uzmanını başlatır ve sonuçlarını birleştirir. Strategy.build iki dalın bitmesini bekler. Testler build suggestion içindeki planla çalışır. Strategy.evaluate test sonuçlarını yorumlar. Memory.update bundan sonra yapılır. `run.finished` ancak hafıza yazma girişimi sonuçlandığında yayınlanır. UI bütün ara adımları da görür.
 
 Strategy aynı mantıksal agent'ın iki ayrı fazıdır; build ve evaluation için ayrı prompt/çıktı şeması kullanılır. Simülasyon bir araçtır; yeni bir uzman agent değildir. Build suggestion bir öneridir; bu akış otomatik uygulama geliştirme veya gerçek ürün testi yapmaz.
 
@@ -58,15 +65,15 @@ Strategy aynı mantıksal agent'ın iki ayrı fazıdır; build ve evaluation iç
 | GET /analyses/:runId | 200 Snapshot | Durum, son sequence, 10 adım ve varsa nihai sonuç |
 | GET /analyses/:runId/events | 200 text/event-stream | Adım ve nihai sonuç olaylarını akıt |
 
-İstek tüm alanları içerir: schemaVersion=2.0.0, clientRequestId (UUID), idea, language=tr|en, targetMarket, targetAudience (bilinmiyorsa null), mode=demo|live, testMode=simulation. `mode=live` gerçek araştırma/CLI anlamına gelir; testler her iki modda da simülasyondur. runId, olay sırası ve zamanlar sunucu tarafından üretilir; model tarafından değil. clientRequestId'yi UI bir kere üretir.
+POST /analyze isteği schemaVersion=3.0.0, clientRequestId, intakeId, intakeRevision içerir. Ürün bilgisi istemci tarafından tekrar gönderilmez. Backend hazır intake revizyonunu kilit altında doğrulayıp yapılandırılmış ProductProfile, limitations, allowIncomplete, dil/mod/testMode alanlarını AnalysisInput içine kopyalar. Research ve dört uzman bu donmuş girdiyi kullanır. Tam chat/eksik bilgi endpoint'leri [intake.md](intake.md) içindedir. runId ve zamanları sunucu, clientRequestId'yi UI üretir.
 
 POST isteği 16 KB ile sınırlandırılır. Aynı clientRequestId ve aynı gövde tekrar gelirse mevcut runId/URL'ler 202 ile döner; ikinci iş başlamaz. Aynı clientRequestId farklı gövdeyle gelirse 409 IDEMPOTENCY_CONFLICT. Kontrol tek yazıcı kilidi altında yapılır. Bu eşleme run'ın request.json dosyasından restart sonrası tekrar kurulabilir.
 
-İstek kabul edilmeden önceki hatalar ApiError: 400 INVALID_REQUEST, 413 INVALID_REQUEST, 429 BUSY (Retry-After), 500 STORAGE_FAILED. Bilinmeyen run 404 NOT_FOUND. SSE cursor hatası 400 INVALID_CURSOR. Başlatılmış bir run içindeki agent hataları HTTP 500 olarak yeniden gönderilmez; step.finished ve run.finished içindeki durumlarla taşınır. Snapshot her terminal durum için HTTP 200 döner.
+İstek kabul edilmeden önceki hatalar ApiError: 400 INVALID_REQUEST, 413 INVALID_REQUEST, 409 INTAKE_NOT_READY/REVISION_CONFLICT/IDEMPOTENCY_CONFLICT, 429 BUSY (Retry-After), 500 STORAGE_FAILED. Bilinmeyen intake veya run 404 NOT_FOUND. SSE cursor hatası 400 INVALID_CURSOR. Başlatılmış bir run içindeki agent hataları HTTP 500 olarak yeniden gönderilmez; step.finished ve run.finished içindeki durumlarla taşınır. Snapshot her terminal durum için HTTP 200 döner.
 
 MVP tek aktif run işler. Aynı run'ın idempotent POST tekrarı busy kontrolünden önce çözülür. Analiz işi SSE bağlantısından bağımsızdır: sayfanın kapanması/bağlantının kopması agent'ları durdurmaz. Global timeout işi sonlandırır; istemci yeniden bağlanıp sonucu alabilir.
 
-Demo isteği örnek dosyadaki idea/language/targetMarket/targetAudience kombinasyonunu kullanır; farklı kombinasyon 400. clientRequestId her yeni demo için değişir. Fixture oynatıcısı her olayda runId, request clientRequestId, recordId, timestamps, URL'ler ve süreyi tutarlı yeniden üretir. Live hatası sessizce mock'a dönüşmez. Tüm örnekler kurgusaldır; örnekler arasındaki aynı runId bağımsız alternatif senaryoları temsil eder.
+Demo analizi intake.ready.response.json içindeki profil örneğini kullanır. Farklı profile sabit sonucu yapıştırmayın; tanımlı fixture yoksa 400 dönün. Her yeni demo için clientRequestId değişir. Fixture oynatıcısı runId, intakeId, mesaj/kanıt kimlikleri, recordId, URL'ler ve zamanları tutarlı yeniden üretir. Live hatası sessizce mock'a dönüşmez. Örnekler kurgusaldır; aynı kimlikleri kullanan dosyalar alternatif senaryolar olabilir.
 
 ## UI canlı olayları
 
@@ -138,6 +145,7 @@ Strategy.evaluate aynı scenarioId/criterionId değerlerini korur. Her senaryo i
 
 | Çağrı | Girdi `$defs` | Çıktı `$defs` | Sahip |
 |---|---|---|---|
+| Orchestrator -> ürün bilgisi çıkarımı | Intake.ExtractInput | Intake.ExtractOutput | Kişi 2 |
 | Orchestrator -> Research.run | ResearchInput | ResearchResult | Kişi 3 |
 | Research -> RiskReward.run | SpecialistInput (task=risk_reward) | RiskRewardResult | Kişi 3 |
 | Research -> Marketing.run | SpecialistInput (task=marketing) | MarketingResult | Kişi 3 |
@@ -159,6 +167,7 @@ Research adaptörüne `{signal, runCli, onStep}` enjekte edilir. Uzman başlang�
 
 ```
 data/
+  intakes/<intakeId>.json
   runs/<runId>/request.json
   runs/<runId>/events.json
   runs/<runId>/snapshot.json
@@ -178,4 +187,6 @@ Runtime dosyaları git'e girmez; contracts/examples paylaşılabilir fixture'lar
 
 Repo kökünden `npm install --prefix contracts` ve `npm test --prefix contracts`. Bu bağımlılıklar yalnız sözleşme doğrulamasına aittir. Şema yanında validate.cjs çapraz ID'leri, simülasyon hesaplarını, olay sırası/bağımlılıklarını, hafıza-sonuç eşleşmesini ve bozuk örneklerin reddedilmesini kontrol eder. Backend aynı iş kurallarını runtime'da da uygulamalıdır.
 
-V1 -> v2 değişiklikleri: POST senkron Response yerine 202 Accepted döner; requestId -> runId/clientRequestId; research dört uzman içerir; strategy -> buildSuggestion + evaluation; simulation -> testResults; persistence -> memoryUpdate; SSE/Snapshot ve JSON MemoryRecord eklenir. Frontend/backend aynı v2 commit'ini birlikte kullanmalıdır.
+V1 -> v2 geçmiş değişiklikleri: POST senkron Response yerine 202 Accepted döner; requestId -> runId/clientRequestId; research dört uzman içerir; strategy -> buildSuggestion + evaluation; simulation -> testResults; persistence -> memoryUpdate; SSE/Snapshot ve JSON MemoryRecord eklenir. Frontend/backend aynı v3 commit'ini birlikte kullanmalıdır.
+
+V2 -> v3: Chat intake ve eksik bilgi endpoint'leri eklendi. POST /analyze ham idea/hedef alanları yerine hazır intakeId/revision alır. Sonuçlar ve agent girdileri Request yerine yapılandırılmış AnalysisInput tutar. Mevcut 10 analiz adımı ve SSE olay isimleri korunur; bütün JSON sürümleri 3.0.0 olur.

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:slushd:analysis:2.0.0",
+  "$id": "urn:slushd:analysis:3.0.0",
   "$ref": "#/$defs/Response",
   "$defs": {
     "Error": {
@@ -19,7 +19,9 @@
             "INVALID_OUTPUT",
             "STORAGE_FAILED",
             "RUN_INTERRUPTED",
-            "DEPENDENCY_FAILED"
+            "DEPENDENCY_FAILED",
+            "INTAKE_NOT_READY",
+            "REVISION_CONFLICT"
           ]
         },
         "message": {
@@ -41,59 +43,26 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "clientRequestId": {
           "type": "string",
           "format": "uuid"
         },
-        "idea": {
+        "intakeId": {
           "type": "string",
-          "minLength": 10,
-          "maxLength": 4000
+          "format": "uuid"
         },
-        "language": {
-          "type": "string",
-          "enum": [
-            "tr",
-            "en"
-          ]
-        },
-        "targetMarket": {
-          "type": "string",
-          "minLength": 1
-        },
-        "targetAudience": {
-          "anyOf": [
-            {
-              "type": "string",
-              "minLength": 1
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "mode": {
-          "type": "string",
-          "enum": [
-            "demo",
-            "live"
-          ]
-        },
-        "testMode": {
-          "const": "simulation"
+        "intakeRevision": {
+          "type": "integer",
+          "minimum": 1
         }
       },
       "required": [
         "schemaVersion",
         "clientRequestId",
-        "idea",
-        "language",
-        "targetMarket",
-        "targetAudience",
-        "mode",
-        "testMode"
+        "intakeId",
+        "intakeRevision"
       ],
       "additionalProperties": false
     },
@@ -119,7 +88,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "type": "string",
@@ -151,7 +120,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "anyOf": [
@@ -2149,7 +2118,7 @@
       "type": "object",
       "properties": {
         "input": {
-          "$ref": "#/$defs/Request"
+          "$ref": "#/$defs/AnalysisInput"
         },
         "memoryContext": {
           "$ref": "#/$defs/MemoryContextResult"
@@ -2190,7 +2159,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "type": "string",
@@ -2217,7 +2186,7 @@
           "minimum": 0
         },
         "input": {
-          "$ref": "#/$defs/Request"
+          "$ref": "#/$defs/AnalysisInput"
         },
         "memoryContext": {
           "$ref": "#/$defs/MemoryContextResult"
@@ -2272,7 +2241,7 @@
           "format": "uuid"
         },
         "input": {
-          "$ref": "#/$defs/Request"
+          "$ref": "#/$defs/AnalysisInput"
         }
       },
       "required": [
@@ -2289,7 +2258,7 @@
           "format": "uuid"
         },
         "input": {
-          "$ref": "#/$defs/Request"
+          "$ref": "#/$defs/AnalysisInput"
         },
         "task": {
           "type": "string",
@@ -2348,7 +2317,7 @@
           "format": "uuid"
         },
         "input": {
-          "$ref": "#/$defs/Request"
+          "$ref": "#/$defs/AnalysisInput"
         },
         "memoryContext": {
           "$ref": "#/$defs/MemoryContextResult"
@@ -2390,7 +2359,7 @@
           "format": "uuid"
         },
         "input": {
-          "$ref": "#/$defs/Request"
+          "$ref": "#/$defs/AnalysisInput"
         },
         "research": {
           "$ref": "#/$defs/ResearchResult"
@@ -2415,7 +2384,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "recordId": {
           "type": "string",
@@ -3193,7 +3162,7 @@
       "type": "object",
       "properties": {
         "schemaVersion": {
-          "const": "2.0.0"
+          "const": "3.0.0"
         },
         "runId": {
           "type": "string",
@@ -3239,6 +3208,70 @@
         "lastSequence",
         "steps",
         "result"
+      ],
+      "additionalProperties": false
+    },
+    "AnalysisInput": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "clientRequestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "intakeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "intakeRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "testMode": {
+          "const": "simulation"
+        },
+        "product": {
+          "$ref": "urn:slushd:intake:3.0.0#/$defs/ProductProfile"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "allowIncomplete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientRequestId",
+        "intakeId",
+        "intakeRevision",
+        "language",
+        "mode",
+        "testMode",
+        "product",
+        "limitations",
+        "allowIncomplete"
       ],
       "additionalProperties": false
     }

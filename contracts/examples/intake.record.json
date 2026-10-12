@@ -1,0 +1,371 @@
+{
+  "snapshot": {
+    "schemaVersion": "3.0.0",
+    "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+    "revision": 2,
+    "status": "ready",
+    "language": "tr",
+    "mode": "demo",
+    "testMode": "simulation",
+    "createdAt": "2026-10-12T08:58:00Z",
+    "updatedAt": "2026-10-12T08:59:05Z",
+    "messages": [
+      {
+        "id": "8b3e0adf-e27f-452d-9f26-2277e157e39e",
+        "role": "user",
+        "content": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+        "createdAt": "2026-10-12T08:58:00Z"
+      },
+      {
+        "id": "32e3d908-79f4-40a8-a715-0fca644e717e",
+        "role": "assistant",
+        "content": "Ürün açıklamasını çıkardım. Araştırmayı netleştirmek için aşağıdaki ayrıntıları paylaşabilir misiniz? Bilmediklerinizi boş bırakabilir veya eksik bilgilerle devam edebilirsiniz.",
+        "createdAt": "2026-10-12T08:58:05Z"
+      },
+      {
+        "id": "f8aa69af-1c90-4368-8077-b20229c33351",
+        "role": "user",
+        "content": "Türkiye’deki üniversite öğrencilerini hedefliyorum. Web sitem henüz yok. Mevcut özellikler bütçe girişi, haftalık yemek planı ve alışveriş listesi. Fiyat aylık 200 TRY abonelik. Amacım deneme kullanıcılarını ücretli aboneye dönüştürmek. Bildiğim rakip yok.",
+        "createdAt": "2026-10-12T08:59:00Z"
+      },
+      {
+        "id": "471f17e6-46f9-40e7-b3e7-5a3bb47a40f8",
+        "role": "assistant",
+        "content": "Ürün profiliniz hazır. Web sitesi ve bilinen rakip olmadığı bilgisi korundu; araştırma başlatılabilir.",
+        "createdAt": "2026-10-12T08:59:05Z"
+      }
+    ],
+    "product": {
+      "productDescription": {
+        "status": "provided",
+        "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+        "sourceMessageIds": [
+          "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+        ]
+      },
+      "website": {
+        "status": "not_applicable",
+        "value": null,
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "targetCustomer": {
+        "status": "provided",
+        "value": "Üniversite öğrencileri",
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "targetMarket": {
+        "status": "provided",
+        "value": "Türkiye",
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "currentFeatures": {
+        "status": "provided",
+        "value": [
+          "Bütçe girişi",
+          "Haftalık yemek planı",
+          "Alışveriş listesi"
+        ],
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "pricing": {
+        "status": "provided",
+        "value": {
+          "model": "subscription",
+          "amount": 200,
+          "currency": "TRY",
+          "billingPeriod": "monthly"
+        },
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "userGoal": {
+        "status": "provided",
+        "value": "Deneme kullanıcılarını ücretli aboneye dönüştürmek.",
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      },
+      "knownCompetitors": {
+        "status": "not_applicable",
+        "value": null,
+        "sourceMessageIds": [
+          "f8aa69af-1c90-4368-8077-b20229c33351"
+        ]
+      }
+    },
+    "missingFields": [],
+    "questions": [],
+    "allowIncomplete": false,
+    "limitations": []
+  },
+  "createRequest": {
+    "schemaVersion": "3.0.0",
+    "clientRequestId": "a32d8e23-5a4c-4c0d-adb9-5430ac5e4b7e",
+    "message": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+    "language": "tr",
+    "mode": "demo",
+    "testMode": "simulation"
+  },
+  "createResponse": {
+    "schemaVersion": "3.0.0",
+    "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+    "revision": 1,
+    "status": "needs_input",
+    "language": "tr",
+    "mode": "demo",
+    "testMode": "simulation",
+    "createdAt": "2026-10-12T08:58:00Z",
+    "updatedAt": "2026-10-12T08:58:05Z",
+    "messages": [
+      {
+        "id": "8b3e0adf-e27f-452d-9f26-2277e157e39e",
+        "role": "user",
+        "content": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+        "createdAt": "2026-10-12T08:58:00Z"
+      },
+      {
+        "id": "32e3d908-79f4-40a8-a715-0fca644e717e",
+        "role": "assistant",
+        "content": "Ürün açıklamasını çıkardım. Araştırmayı netleştirmek için aşağıdaki ayrıntıları paylaşabilir misiniz? Bilmediklerinizi boş bırakabilir veya eksik bilgilerle devam edebilirsiniz.",
+        "createdAt": "2026-10-12T08:58:05Z"
+      }
+    ],
+    "product": {
+      "productDescription": {
+        "status": "provided",
+        "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+        "sourceMessageIds": [
+          "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+        ]
+      },
+      "website": {
+        "status": "unknown",
+        "value": null,
+        "sourceMessageIds": []
+      },
+      "targetCustomer": {
+        "status": "unknown",
+        "value": null,
+        "sourceMessageIds": []
+      },
+      "targetMarket": {
+        "status": "unknown",
+        "value": null,
+        "sourceMessageIds": []
+      },
+      "currentFeatures": {
+        "status": "unknown",
+        "value": null,
+        "sourceMessageIds": []
+      },
+      "pricing": {
+        "status": "unknown",
+        "value": null,
+        "sourceMessageIds": []
+      },
+      "userGoal": {
+        "status": "unknown",
+        "value": null,
+        "sourceMessageIds": []
+      },
+      "knownCompetitors": {
+        "status": "unknown",
+        "value": null,
+        "sourceMessageIds": []
+      }
+    },
+    "missingFields": [
+      "website",
+      "targetCustomer",
+      "targetMarket",
+      "currentFeatures",
+      "pricing",
+      "userGoal",
+      "knownCompetitors"
+    ],
+    "questions": [
+      {
+        "id": "question-website",
+        "field": "website",
+        "prompt": "Varsa ürününüzün web adresini paylaşabilir misiniz?",
+        "reason": "Mevcut ürünün bağlamını belirlemek için.",
+        "blocking": false
+      },
+      {
+        "id": "question-targetCustomer",
+        "field": "targetCustomer",
+        "prompt": "Ürünü kimler kullanacak?",
+        "reason": "Müşteri segmentini ve uygun rakipleri seçmek için.",
+        "blocking": false
+      },
+      {
+        "id": "question-targetMarket",
+        "field": "targetMarket",
+        "prompt": "Hangi ülke veya pazarı hedefliyorsunuz?",
+        "reason": "Araştırmayı ilgili pazara sınırlamak için.",
+        "blocking": false
+      },
+      {
+        "id": "question-currentFeatures",
+        "field": "currentFeatures",
+        "prompt": "Şu anda hangi özellikler mevcut?",
+        "reason": "Mevcut ve önerilecek özellikleri ayırmak için.",
+        "blocking": false
+      },
+      {
+        "id": "question-pricing",
+        "field": "pricing",
+        "prompt": "Fiyatlandırma modeli, tutar ve para birimi belli mi?",
+        "reason": "Fiyat karşılaştırması için; bilmiyorsanız eksik bırakılabilir.",
+        "blocking": false
+      },
+      {
+        "id": "question-userGoal",
+        "field": "userGoal",
+        "prompt": "Bu analizle çözmek istediğiniz sorun veya hedef nedir?",
+        "reason": "Önerileri hedefinize göre hazırlamak için.",
+        "blocking": false
+      },
+      {
+        "id": "question-knownCompetitors",
+        "field": "knownCompetitors",
+        "prompt": "Bildiğiniz rakipler var mı?",
+        "reason": "Araştırmaya başlangıç noktası sağlamak için.",
+        "blocking": false
+      }
+    ],
+    "allowIncomplete": false,
+    "limitations": [
+      "Hedef müşteri ve pazar henüz bilinmiyor.",
+      "Fiyat karşılaştırması yapılamaz: fiyatlandırma bilgisi eksik."
+    ]
+  },
+  "processedMessages": [
+    {
+      "request": {
+        "schemaVersion": "3.0.0",
+        "clientMessageId": "f8aa69af-1c90-4368-8077-b20229c33351",
+        "expectedRevision": 1,
+        "action": "reply",
+        "message": "Türkiye’deki üniversite öğrencilerini hedefliyorum. Web sitem henüz yok. Mevcut özellikler bütçe girişi, haftalık yemek planı ve alışveriş listesi. Fiyat aylık 200 TRY abonelik. Amacım deneme kullanıcılarını ücretli aboneye dönüştürmek. Bildiğim rakip yok."
+      },
+      "response": {
+        "schemaVersion": "3.0.0",
+        "intakeId": "317be03c-5ba2-4673-9104-c97b199507e2",
+        "revision": 2,
+        "status": "ready",
+        "language": "tr",
+        "mode": "demo",
+        "testMode": "simulation",
+        "createdAt": "2026-10-12T08:58:00Z",
+        "updatedAt": "2026-10-12T08:59:05Z",
+        "messages": [
+          {
+            "id": "8b3e0adf-e27f-452d-9f26-2277e157e39e",
+            "role": "user",
+            "content": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+            "createdAt": "2026-10-12T08:58:00Z"
+          },
+          {
+            "id": "32e3d908-79f4-40a8-a715-0fca644e717e",
+            "role": "assistant",
+            "content": "Ürün açıklamasını çıkardım. Araştırmayı netleştirmek için aşağıdaki ayrıntıları paylaşabilir misiniz? Bilmediklerinizi boş bırakabilir veya eksik bilgilerle devam edebilirsiniz.",
+            "createdAt": "2026-10-12T08:58:05Z"
+          },
+          {
+            "id": "f8aa69af-1c90-4368-8077-b20229c33351",
+            "role": "user",
+            "content": "Türkiye’deki üniversite öğrencilerini hedefliyorum. Web sitem henüz yok. Mevcut özellikler bütçe girişi, haftalık yemek planı ve alışveriş listesi. Fiyat aylık 200 TRY abonelik. Amacım deneme kullanıcılarını ücretli aboneye dönüştürmek. Bildiğim rakip yok.",
+            "createdAt": "2026-10-12T08:59:00Z"
+          },
+          {
+            "id": "471f17e6-46f9-40e7-b3e7-5a3bb47a40f8",
+            "role": "assistant",
+            "content": "Ürün profiliniz hazır. Web sitesi ve bilinen rakip olmadığı bilgisi korundu; araştırma başlatılabilir.",
+            "createdAt": "2026-10-12T08:59:05Z"
+          }
+        ],
+        "product": {
+          "productDescription": {
+            "status": "provided",
+            "value": "Haftalık bütçeye göre yemek planı ve alışveriş listesi oluşturan bir uygulama geliştiriyorum.",
+            "sourceMessageIds": [
+              "8b3e0adf-e27f-452d-9f26-2277e157e39e"
+            ]
+          },
+          "website": {
+            "status": "not_applicable",
+            "value": null,
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "targetCustomer": {
+            "status": "provided",
+            "value": "Üniversite öğrencileri",
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "targetMarket": {
+            "status": "provided",
+            "value": "Türkiye",
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "currentFeatures": {
+            "status": "provided",
+            "value": [
+              "Bütçe girişi",
+              "Haftalık yemek planı",
+              "Alışveriş listesi"
+            ],
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "pricing": {
+            "status": "provided",
+            "value": {
+              "model": "subscription",
+              "amount": 200,
+              "currency": "TRY",
+              "billingPeriod": "monthly"
+            },
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "userGoal": {
+            "status": "provided",
+            "value": "Deneme kullanıcılarını ücretli aboneye dönüştürmek.",
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          },
+          "knownCompetitors": {
+            "status": "not_applicable",
+            "value": null,
+            "sourceMessageIds": [
+              "f8aa69af-1c90-4368-8077-b20229c33351"
+            ]
+          }
+        },
+        "missingFields": [],
+        "questions": [],
+        "allowIncomplete": false,
+        "limitations": []
+      }
+    }
+  ]
+}

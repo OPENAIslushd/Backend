@@ -1,0 +1,1243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:slushd:intake:3.0.0",
+  "$ref": "#/$defs/Snapshot",
+  "$defs": {
+    "Pricing": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": [
+            "free",
+            "subscription",
+            "one_time",
+            "usage_based",
+            "custom",
+            "undecided"
+          ]
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "billingPeriod": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "monthly",
+                "yearly",
+                "one_time",
+                "per_use",
+                "custom"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "model",
+        "amount",
+        "currency",
+        "billingPeriod"
+      ],
+      "additionalProperties": false
+    },
+    "ProductProfile": {
+      "type": "object",
+      "properties": {
+        "productDescription": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "provided"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 4000
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "not_applicable",
+                    "declined"
+                  ]
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "website": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "provided"
+                },
+                "value": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https?://"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "not_applicable",
+                    "declined"
+                  ]
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "targetCustomer": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "provided"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "not_applicable",
+                    "declined"
+                  ]
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "targetMarket": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "provided"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "not_applicable",
+                    "declined"
+                  ]
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "currentFeatures": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "provided"
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "not_applicable",
+                    "declined"
+                  ]
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "pricing": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "provided"
+                },
+                "value": {
+                  "$ref": "#/$defs/Pricing"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "not_applicable",
+                    "declined"
+                  ]
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "userGoal": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "provided"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "not_applicable",
+                    "declined"
+                  ]
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "knownCompetitors": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "provided"
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "website": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "uri",
+                            "pattern": "^https?://"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "website"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "not_applicable",
+                    "declined"
+                  ]
+                },
+                "value": {
+                  "type": "null"
+                },
+                "sourceMessageIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "sourceMessageIds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "productDescription",
+        "website",
+        "targetCustomer",
+        "targetMarket",
+        "currentFeatures",
+        "pricing",
+        "userGoal",
+        "knownCompetitors"
+      ],
+      "additionalProperties": false
+    },
+    "CreateRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "clientRequestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "testMode": {
+          "const": "simulation"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientRequestId",
+        "message",
+        "language",
+        "mode",
+        "testMode"
+      ],
+      "additionalProperties": false
+    },
+    "MessageRequest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "3.0.0"
+            },
+            "clientMessageId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "action": {
+              "const": "reply"
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "clientMessageId",
+            "expectedRevision",
+            "action",
+            "message"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "3.0.0"
+            },
+            "clientMessageId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "action": {
+              "const": "continue_with_unknowns"
+            },
+            "message": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "clientMessageId",
+            "expectedRevision",
+            "action",
+            "message"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Message": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "user",
+            "assistant"
+          ]
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "content",
+        "createdAt"
+      ],
+      "additionalProperties": false
+    },
+    "Question": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": "string",
+          "enum": [
+            "productDescription",
+            "website",
+            "targetCustomer",
+            "targetMarket",
+            "currentFeatures",
+            "pricing",
+            "userGoal",
+            "knownCompetitors"
+          ]
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blocking": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "field",
+        "prompt",
+        "reason",
+        "blocking"
+      ],
+      "additionalProperties": false
+    },
+    "Snapshot": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "intakeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "needs_input",
+            "ready"
+          ]
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "live"
+          ]
+        },
+        "testMode": {
+          "const": "simulation"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Message"
+          },
+          "minItems": 1
+        },
+        "product": {
+          "$ref": "#/$defs/ProductProfile"
+        },
+        "missingFields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "productDescription",
+              "website",
+              "targetCustomer",
+              "targetMarket",
+              "currentFeatures",
+              "pricing",
+              "userGoal",
+              "knownCompetitors"
+            ]
+          },
+          "minItems": 0
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          },
+          "minItems": 0
+        },
+        "allowIncomplete": {
+          "type": "boolean"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "intakeId",
+        "revision",
+        "status",
+        "language",
+        "mode",
+        "testMode",
+        "createdAt",
+        "updatedAt",
+        "messages",
+        "product",
+        "missingFields",
+        "questions",
+        "allowIncomplete",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "3.0.0"
+        },
+        "intakeId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": [
+                "INVALID_REQUEST",
+                "NOT_FOUND",
+                "REVISION_CONFLICT",
+                "IDEMPOTENCY_CONFLICT",
+                "BUSY",
+                "TIMEOUT",
+                "INVALID_OUTPUT",
+                "STORAGE_FAILED"
+              ]
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1
+            },
+            "retryable": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "retryable"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "intakeId",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "ExtractInput": {
+      "type": "object",
+      "properties": {
+        "intakeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "previousProduct": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProductProfile"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Message"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "intakeId",
+        "language",
+        "previousProduct",
+        "messages"
+      ],
+      "additionalProperties": false
+    },
+    "ExtractOutput": {
+      "type": "object",
+      "properties": {
+        "product": {
+          "$ref": "#/$defs/ProductProfile"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "product",
+        "questions",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "Record": {
+      "type": "object",
+      "properties": {
+        "snapshot": {
+          "$ref": "#/$defs/Snapshot"
+        },
+        "createRequest": {
+          "$ref": "#/$defs/CreateRequest"
+        },
+        "createResponse": {
+          "$ref": "#/$defs/Snapshot"
+        },
+        "processedMessages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "request": {
+                "$ref": "#/$defs/MessageRequest"
+              },
+              "response": {
+                "$ref": "#/$defs/Snapshot"
+              }
+            },
+            "required": [
+              "request",
+              "response"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "snapshot",
+        "createRequest",
+        "createResponse",
+        "processedMessages"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
