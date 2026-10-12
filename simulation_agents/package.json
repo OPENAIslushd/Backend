@@ -1,0 +1,16 @@
+{
+  "name": "advertising-simulation-agents",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "start:memory": "node memory/server.js",
+    "start:strategy": "node strategy/server.js",
+    "start:simulation": "node simulation/server.js",
+    "start:outcome": "node outcome/server.js",
+    "test": "node --test test/*.test.js",
+    "test:containers": "node --test test/container/handoffs.test.js && docker compose up --detach --force-recreate --no-deps --wait --wait-timeout 120 memory && node --test test/container/persistence.test.js"
+  },
+  "dependencies": { "ajv": "8.17.1" }
+}

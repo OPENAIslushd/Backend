@@ -1,0 +1,72 @@
+{
+  "contract_version": "1.0",
+  "run_id": "run-format-example",
+  "business_id": "business-synthetic",
+  "product_id": "product-synthetic",
+  "evaluation_id": "eval-format-example-not-a-real-simulation",
+  "model_version": "numerical-mvp-1.0.0",
+  "currency": "USD",
+  "data_provenance": "synthetic",
+  "status": "insufficient_distinct_candidates",
+  "recommendations": [
+    {
+      "profile": "conservative",
+      "strategy": {
+        "strategy_id": "str-format-example",
+        "revision": 1,
+        "run_id": "run-format-example",
+        "business_id": "business-synthetic",
+        "product_id": "product-synthetic",
+        "name": "Illustrative proof campaign",
+        "generator": "deterministic-diversity-v1",
+        "budget": 12000,
+        "currency": "USD",
+        "objective": "purchases",
+        "audience": "Synthetic adult audience",
+        "region": "Synthetic test region",
+        "start_day": 1,
+        "end_day": 30,
+        "initial_allocation": { "paid_social": 0.2, "paid_search": 0.7, "influencer": 0.1 },
+        "creative": "proof",
+        "assumptions": ["Illustrative format example, not a computed forecast or real campaign."],
+        "adaptation": { "enabled": true, "checkpoint_days": 3, "max_reallocation_fraction": 0.2, "min_clicks_per_channel": 30, "min_purchases_per_channel": 3, "exploration_floor": 0.1 }
+      },
+      "metrics": {
+        "expected_spend": 12000,
+        "expected_purchases": 280,
+        "expected_contribution_profit": 3400,
+        "roi": 0.283333,
+        "acquisition_cost": 42.857143,
+        "profit_p10": -1000,
+        "profit_p50": 3000,
+        "profit_p90": 7000,
+        "profit_stddev": 3000,
+        "probability_of_loss": 0.2
+      },
+      "fixed_metrics": {
+        "expected_spend": 12000,
+        "expected_purchases": 260,
+        "expected_contribution_profit": 2300,
+        "roi": 0.191667,
+        "acquisition_cost": 46.153846,
+        "profit_p10": -1500,
+        "profit_p50": 2100,
+        "profit_p90": 6000,
+        "profit_stddev": 2900,
+        "probability_of_loss": 0.25
+      },
+      "paired_profit_delta": { "mean": 1100, "p10": -500, "p90": 3000 },
+      "reasons": ["Illustrates selection by tenth-percentile contribution profit."],
+      "tradeoffs": ["Conservative does not mean guaranteed safe; this format example still shows a probability of loss."]
+    }
+  ],
+  "warnings": ["Synthetic round-number example only; these values were not produced by an executed simulation.", "Only one distinct candidate is available in this example."],
+  "definitions": {
+    "contribution_profit": "Purchases times contribution per purchase minus campaign spend.",
+    "roi": "Expected contribution profit divided by campaign spend; a ratio.",
+    "acquisition_cost": "Campaign spend divided by expected purchases; null at zero purchases.",
+    "range": "Tenth, median and ninetieth scenario profit percentiles, not confidence bounds.",
+    "probability_of_loss": "Simulated fraction with negative contribution profit, conditional on assumptions."
+  },
+  "assumptions": ["All values are synthetic and illustrative. Contribution per purchase in this example is USD 55."]
+}

@@ -1,0 +1,38 @@
+services:
+  memory:
+    build:
+      context: .
+      dockerfile: memory/Dockerfile
+    environment:
+      PORT: "8080"
+      MEMORY_DB_PATH: /data/memory.sqlite
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?Set SERVICE_TOKEN for all four services}
+    volumes:
+      - memory-data:/data
+    ports: ["127.0.0.1:8081:8080"]
+  strategy:
+    build:
+      context: .
+      dockerfile: strategy/Dockerfile
+    environment:
+      PORT: "8080"
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?Set SERVICE_TOKEN for all four services}
+    ports: ["127.0.0.1:8082:8080"]
+  simulation:
+    build:
+      context: .
+      dockerfile: simulation/Dockerfile
+    environment:
+      PORT: "8080"
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?Set SERVICE_TOKEN for all four services}
+    ports: ["127.0.0.1:8083:8080"]
+  outcome:
+    build:
+      context: .
+      dockerfile: outcome/Dockerfile
+    environment:
+      PORT: "8080"
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?Set SERVICE_TOKEN for all four services}
+    ports: ["127.0.0.1:8084:8080"]
+volumes:
+  memory-data:
