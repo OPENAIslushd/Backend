@@ -177,23 +177,29 @@ async function createApp(options = {}) {
         !UUID.test(parts[1])
       )
         throw new AppError("NOT_FOUND", "Kayıt bulunamadı.", 404);
-      const assets = {
-        "/": ["index.html", "text/html; charset=utf-8"],
-        "/cli": ["cli.html", "text/html; charset=utf-8"],
-        "/cli.js": ["cli.js", "text/javascript; charset=utf-8"],
-        "/ui.js": ["ui.js", "text/javascript; charset=utf-8"],
-        "/ui.css": ["ui.css", "text/css; charset=utf-8"],
-        "/campaign": ["campaign.html", "text/html; charset=utf-8"],
-        "/campaign.js": ["campaign.js", "text/javascript; charset=utf-8"],
-        "/campaign.css": ["campaign.css", "text/css; charset=utf-8"],
-        "/plans.js": ["plans.js", "text/javascript; charset=utf-8"],
-        "/plans.css": ["plans.css", "text/css; charset=utf-8"],
+      // Any flat .html/.js/.css file in public/ is served, so new UI files need no server restart.
+      const pages = {
+        "/": "index.html",
+        "/cli": "cli.html",
+        "/campaign": "campaign.html",
       };
-      if (req.method === "GET" && Object.hasOwn(assets, url.pathname)) {
-        const [file, contentType] = assets[url.pathname];
-        const content = await fs.readFile(
-          path.join(__dirname, "../public", file),
-        );
+      const types = {
+        ".html": "text/html; charset=utf-8",
+        ".js": "text/javascript; charset=utf-8",
+        ".css": "text/css; charset=utf-8",
+      };
+      const asset =
+        pages[url.pathname] ||
+        (/^\/[A-Za-z0-9_-]+\.(?:html|js|css)$/.test(url.pathname) &&
+          url.pathname.slice(1));
+      if (req.method === "GET" && asset) {
+        const contentType = types[path.extname(asset)];
+        let content;
+        try {
+          content = await fs.readFile(path.join(__dirname, "../public", asset));
+        } catch {
+          throw new AppError("NOT_FOUND", "Dosya bulunamadı.", 404);
+        }
         res.writeHead(200, {
           "Content-Type": contentType,
           "Cache-Control": "no-store",
@@ -442,7 +448,7 @@ if (require.main === module) {
   let services = null;
   startServices()
     .then((s) => (services = s))
-    .then(createApp)
+    .then(() => createApp())
     .then(async (app) => {
       const port = Number(process.env.PORT || 3001);
       if (!Number.isInteger(port) || port < 0 || port > 65535)

@@ -164,6 +164,16 @@ function renderResearch(r) {
     }),
   );
 }
+// The plan view lives in plans.js; an older running server may not serve it yet.
+function planView(c, options) {
+  if (typeof window.renderPlans === "function")
+    return window.renderPlans(c, options);
+  return el(
+    "p",
+    { class: "error" },
+    "Plan görünümü yüklenemedi: çalışan sunucu bu sayfadan eski. Sunucuyu yeniden başlatın (npm start) ve sayfayı yenileyin.",
+  );
+}
 function renderRecs(c) {
   if (!c.plans?.length) return;
   if (c.input) {
@@ -179,7 +189,7 @@ function renderRecs(c) {
     "Rakamlar mock varsayımlara dayanır; gerçek kampanya sonucu değildir.";
   $("process").replaceChildren();
   $("recs").replaceChildren(
-    window.renderPlans(c, {
+    planView(c, {
       onSelect: (_, plan) =>
         select({ strategy_id: plan.strategyId, revision: 1 }),
     }) || "",

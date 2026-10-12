@@ -214,6 +214,16 @@ function explanationFor(c, r) {
     (x) => x.strategyId === r.strategy.strategy_id,
   );
 }
+// The plan view lives in plans.js; an older running server may not serve it yet.
+function planView(c, options) {
+  if (typeof window.renderPlans === "function")
+    return window.renderPlans(c, options);
+  return el(
+    "p",
+    { class: "cp-error" },
+    "Plan görünümü yüklenemedi: çalışan sunucu bu sayfadan eski. Sunucuyu yeniden başlatın (npm start) ve sayfayı yenileyin.",
+  );
+}
 function campaignView(c) {
   if (!c) return el("p", {}, "Strateji hazırlanıyor…");
   const cur = c.recommendations?.currency || c.input?.currency || "";
@@ -253,7 +263,7 @@ function campaignView(c) {
           c.input.assumptions.map((a) => el("li", {}, a)),
         ),
       ),
-    window.renderPlans(c, {
+    planView(c, {
       onSelect: (id, plan) =>
         select(id, { strategy_id: plan.strategyId, revision: 1 }),
     }),
