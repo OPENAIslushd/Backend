@@ -1,0 +1,217 @@
+{
+  "schemaVersion": "1.0.0",
+  "requestId": "dc722ed7-196b-4911-9820-66fd641d190b",
+  "status": "completed",
+  "mode": "demo",
+  "createdAt": "2026-10-12T09:00:00Z",
+  "durationMs": 25,
+  "input": {
+    "schemaVersion": "1.0.0",
+    "idea": "Üniversite öğrencileri için bütçeye uygun haftalık yemek planı oluşturan uygulama.",
+    "language": "tr",
+    "targetMarket": "Türkiye",
+    "targetAudience": "Üniversite öğrencileri",
+    "mode": "demo"
+  },
+  "research": {
+    "status": "ok",
+    "origin": "mock",
+    "data": {
+      "competitors": [
+        {
+          "id": "competitor-1",
+          "name": "Örnek Rakip 1 (kurgu)",
+          "website": "https://example.com/competitor-1",
+          "description": "Haftalık menü planlama örneği.",
+          "differentiation": "Öğrenci bütçesine ve yerel marketlere odaklanma hipotezi.",
+          "sourceIds": [
+            "source-1"
+          ],
+          "evidenceType": "mock"
+        },
+        {
+          "id": "competitor-2",
+          "name": "Örnek Rakip 2 (kurgu)",
+          "website": "https://example.com/competitor-2",
+          "description": "Market alışveriş listesi örneği.",
+          "differentiation": "Öğrenci bütçesine ve yerel marketlere odaklanma hipotezi.",
+          "sourceIds": [
+            "source-2"
+          ],
+          "evidenceType": "mock"
+        },
+        {
+          "id": "competitor-3",
+          "name": "Örnek Rakip 3 (kurgu)",
+          "website": "https://example.com/competitor-3",
+          "description": "Beslenme takibi örneği.",
+          "differentiation": "Öğrenci bütçesine ve yerel marketlere odaklanma hipotezi.",
+          "sourceIds": [
+            "source-3"
+          ],
+          "evidenceType": "mock"
+        }
+      ],
+      "trends": [
+        {
+          "id": "trend-1",
+          "description": "Örnek hipotez: öğrenciler yemek maliyetlerini azaltmak istiyor.",
+          "sourceIds": [],
+          "evidenceType": "mock"
+        }
+      ],
+      "riskSignals": [
+        {
+          "id": "signal-1",
+          "description": "Örnek hipotez: öğrencilerin abonelik ödeme isteği düşük olabilir.",
+          "sourceIds": [],
+          "evidenceType": "mock"
+        }
+      ],
+      "sources": [
+        {
+          "id": "source-1",
+          "title": "Kurgu demo kaynağı 1; araştırma kanıtı değildir.",
+          "url": "https://example.com/competitor-1",
+          "accessedAt": null
+        },
+        {
+          "id": "source-2",
+          "title": "Kurgu demo kaynağı 2; araştırma kanıtı değildir.",
+          "url": "https://example.com/competitor-2",
+          "accessedAt": null
+        },
+        {
+          "id": "source-3",
+          "title": "Kurgu demo kaynağı 3; araştırma kanıtı değildir.",
+          "url": "https://example.com/competitor-3",
+          "accessedAt": null
+        }
+      ]
+    },
+    "error": null
+  },
+  "strategy": {
+    "status": "ok",
+    "origin": "mock",
+    "data": {
+      "summary": "Öğrencilerin bütçelerine göre haftalık yemek planı ve alışveriş listesi oluşturan uygulama. Bu çıktı sabit demo verisidir.",
+      "risks": [
+        {
+          "id": "risk-1",
+          "title": "Ödeme isteği",
+          "description": "Öğrenciler aboneliğe bütçe ayırmayabilir.",
+          "severity": "high",
+          "mitigation": "Ücretsiz pilotla ödeme isteğini ölç.",
+          "sourceIds": [],
+          "evidenceType": "mock"
+        },
+        {
+          "id": "risk-2",
+          "title": "Fiyat doğruluğu",
+          "description": "Market fiyatları güncelliğini kaybedebilir.",
+          "severity": "high",
+          "mitigation": "Fiyat tarihini göster ve kullanıcı düzeltmesi al.",
+          "sourceIds": [],
+          "evidenceType": "mock"
+        },
+        {
+          "id": "risk-3",
+          "title": "Kullanıcı devamlılığı",
+          "description": "Haftalık planlama alışkanlığı oluşmayabilir.",
+          "severity": "medium",
+          "mitigation": "İki haftalık kullanım pilotu yap.",
+          "sourceIds": [],
+          "evidenceType": "mock"
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "recommendation-1",
+          "title": "Pilot grup",
+          "action": "20 öğrenci ile bütçe ve ödeme isteği görüşmesi yap.",
+          "priority": "high",
+          "relatedRiskIds": [
+            "risk-1"
+          ]
+        },
+        {
+          "id": "recommendation-2",
+          "title": "Dar kapsam",
+          "action": "Tek şehir ve sınırlı ürün listesi ile başla.",
+          "priority": "high",
+          "relatedRiskIds": [
+            "risk-2"
+          ]
+        },
+        {
+          "id": "recommendation-3",
+          "title": "Tekrar kullanım",
+          "action": "İki hafta boyunca haftalık plan oluşturma oranını ölç.",
+          "priority": "high",
+          "relatedRiskIds": [
+            "risk-3"
+          ]
+        }
+      ]
+    },
+    "error": null
+  },
+  "memory": {
+    "status": "ok",
+    "origin": "mock",
+    "data": {
+      "similarIdeas": [],
+      "matchMethod": "none"
+    },
+    "error": null
+  },
+  "simulation": {
+    "status": "ok",
+    "origin": "derived",
+    "data": {
+      "currency": "TRY",
+      "disclaimer": "Varsayımsal, sabit aylık koşullar altında hesaplanan senaryolardır; başarı olasılığı veya gelir tahmini değildir.",
+      "scenarios": [
+        {
+          "type": "optimistic",
+          "assumptions": {
+            "monthlyVisitors": 1000,
+            "conversionRate": 0.05,
+            "monthlyPrice": 200,
+            "monthlyCosts": 8000,
+            "initialCash": 60000
+          },
+          "payingCustomers": 50,
+          "monthlyRevenue": 10000,
+          "monthlyProfit": 2000,
+          "runwayMonths": null
+        },
+        {
+          "type": "pessimistic",
+          "assumptions": {
+            "monthlyVisitors": 1000,
+            "conversionRate": 0.01,
+            "monthlyPrice": 200,
+            "monthlyCosts": 8000,
+            "initialCash": 60000
+          },
+          "payingCustomers": 10,
+          "monthlyRevenue": 2000,
+          "monthlyProfit": -6000,
+          "runwayMonths": 10.0
+        }
+      ]
+    },
+    "error": null
+  },
+  "persistence": {
+    "saved": false,
+    "recordId": null,
+    "error": null
+  },
+  "warnings": [
+    "DEMO_DATA: Rakipler ve kaynaklar kurgudur; canlı araştırma yapılmadı.",
+    "DEMO_NOT_SAVED: Demo kayıtları canlı geçmişe yazılmaz."
+  ]
+}

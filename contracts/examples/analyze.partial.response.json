@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0.0",
+  "requestId": "dc722ed7-196b-4911-9820-66fd641d190b",
+  "status": "partial",
+  "mode": "live",
+  "createdAt": "2026-10-12T09:00:00Z",
+  "durationMs": 65000,
+  "input": {
+    "schemaVersion": "1.0.0",
+    "idea": "Üniversite öğrencileri için bütçeye uygun haftalık yemek planı oluşturan uygulama.",
+    "language": "tr",
+    "targetMarket": "Türkiye",
+    "targetAudience": "Üniversite öğrencileri",
+    "mode": "live"
+  },
+  "research": {
+    "status": "failed",
+    "origin": "none",
+    "data": null,
+    "error": {
+      "code": "TIMEOUT",
+      "message": "Araştırma zaman sınırını aştı.",
+      "retryable": true
+    }
+  },
+  "strategy": {
+    "status": "ok",
+    "origin": "live",
+    "data": {
+      "summary": "Öğrenci bütçesine göre haftalık yemek planı. Araştırma tamamlanamadığından değerlendirme yalnızca fikir metnine dayalıdır.",
+      "risks": [
+        {
+          "id": "risk-1",
+          "title": "Ödeme isteği",
+          "description": "Öğrenciler aboneliğe bütçe ayırmayabilir.",
+          "severity": "high",
+          "mitigation": "Ücretsiz pilotla ödeme isteğini ölç.",
+          "sourceIds": [],
+          "evidenceType": "hypothesis"
+        },
+        {
+          "id": "risk-2",
+          "title": "Fiyat doğruluğu",
+          "description": "Market fiyatları güncelliğini kaybedebilir.",
+          "severity": "high",
+          "mitigation": "Fiyat tarihini göster ve kullanıcı düzeltmesi al.",
+          "sourceIds": [],
+          "evidenceType": "hypothesis"
+        },
+        {
+          "id": "risk-3",
+          "title": "Kullanıcı devamlılığı",
+          "description": "Haftalık planlama alışkanlığı oluşmayabilir.",
+          "severity": "medium",
+          "mitigation": "İki haftalık kullanım pilotu yap.",
+          "sourceIds": [],
+          "evidenceType": "hypothesis"
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "recommendation-1",
+          "title": "Pilot grup",
+          "action": "20 öğrenci ile bütçe ve ödeme isteği görüşmesi yap.",
+          "priority": "high",
+          "relatedRiskIds": [
+            "risk-1"
+          ]
+        },
+        {
+          "id": "recommendation-2",
+          "title": "Dar kapsam",
+          "action": "Tek şehir ve sınırlı ürün listesi ile başla.",
+          "priority": "high",
+          "relatedRiskIds": [
+            "risk-2"
+          ]
+        },
+        {
+          "id": "recommendation-3",
+          "title": "Tekrar kullanım",
+          "action": "İki hafta boyunca haftalık plan oluşturma oranını ölç.",
+          "priority": "high",
+          "relatedRiskIds": [
+            "risk-3"
+          ]
+        }
+      ]
+    },
+    "error": null
+  },
+  "memory": {
+    "status": "ok",
+    "origin": "live",
+    "data": {
+      "similarIdeas": [],
+      "matchMethod": "none"
+    },
+    "error": null
+  },
+  "simulation": {
+    "status": "ok",
+    "origin": "derived",
+    "data": {
+      "currency": "TRY",
+      "disclaimer": "Varsayımsal, sabit aylık koşullar altında hesaplanan senaryolardır; başarı olasılığı veya gelir tahmini değildir.",
+      "scenarios": [
+        {
+          "type": "optimistic",
+          "assumptions": {
+            "monthlyVisitors": 1000,
+            "conversionRate": 0.05,
+            "monthlyPrice": 200,
+            "monthlyCosts": 8000,
+            "initialCash": 60000
+          },
+          "payingCustomers": 50,
+          "monthlyRevenue": 10000,
+          "monthlyProfit": 2000,
+          "runwayMonths": null
+        },
+        {
+          "type": "pessimistic",
+          "assumptions": {
+            "monthlyVisitors": 1000,
+            "conversionRate": 0.01,
+            "monthlyPrice": 200,
+            "monthlyCosts": 8000,
+            "initialCash": 60000
+          },
+          "payingCustomers": 10,
+          "monthlyRevenue": 2000,
+          "monthlyProfit": -6000,
+          "runwayMonths": 10.0
+        }
+      ]
+    },
+    "error": null
+  },
+  "persistence": {
+    "saved": false,
+    "recordId": null,
+    "error": {
+      "code": "STORAGE_FAILED",
+      "message": "Veritabanına ulaşılamadı.",
+      "retryable": true
+    }
+  },
+  "warnings": [
+    "ÖRNEK DOSYA: Bu yanıt canlı çalıştırılmadı; live/partial durumunun sözleşme örneğidir.",
+    "Araştırma yapılamadı; rakip bilgisi yok."
+  ]
+}

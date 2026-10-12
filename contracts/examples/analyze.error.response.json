@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "requestId": "dc722ed7-196b-4911-9820-66fd641d190b",
+  "status": "failed",
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "idea alanı 10–4000 karakter olmalıdır.",
+    "retryable": false
+  }
+}
