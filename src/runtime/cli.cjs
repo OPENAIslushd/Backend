@@ -36,6 +36,17 @@ function outputSchema(group, type) {
   }
   return walk(root.$defs[type], root);
 }
+// Chat, intake and planning need no tools. Disabling them keeps a prompt (possibly from a
+// public visitor) from making Codex run commands or read files on this machine.
+const NO_TOOLS = [
+  "shell_tool",
+  "unified_exec",
+  "browser_use",
+  "browser_use_external",
+  "computer_use",
+  "in_app_browser",
+  "apps",
+].flatMap((f) => ["--disable", f]);
 async function runCli({
   role,
   prompt,
@@ -47,6 +58,7 @@ async function runCli({
   command = process.env.CODEX_BIN || process.env.CODEX_CLI_PATH || "codex",
   model = process.env.CODEX_MODEL,
   effort,
+  tools = process.env.CODEX_ALLOW_TOOLS === "1",
   args,
   maxOutputBytes = 1024 * 1024,
 }) {
@@ -62,6 +74,7 @@ async function runCli({
     "exec",
     ...(model ? ["--model", model] : []),
     ...(effort ? ["-c", `model_reasoning_effort="${effort}"`] : []),
+    ...(tools ? [] : NO_TOOLS),
     "--ignore-user-config",
     "--ephemeral",
     "--sandbox",

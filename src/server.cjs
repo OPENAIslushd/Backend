@@ -153,7 +153,11 @@ async function createApp(options = {}) {
     try {
       const origin = req.headers.origin;
       if (origin) {
-        const sameOrigin = origin === `http://${req.headers.host}`;
+        // https covers HTTPS tunnels (e.g. ngrok) that forward to this HTTP server.
+        const sameOrigin = [
+          `http://${req.headers.host}`,
+          `https://${req.headers.host}`,
+        ].includes(origin);
         if (!sameOrigin && !allowed.has(origin))
           throw new AppError("INVALID_REQUEST", "Origin izinli değil.", 403);
         res.setHeader("Access-Control-Allow-Origin", origin);

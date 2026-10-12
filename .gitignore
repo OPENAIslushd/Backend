@@ -8,3 +8,6 @@
 
 # macOS
 .DS_Store
+
+# ngrok tunnel credentials (scripts/tunnel.cjs)
+/.ngrok/
