@@ -111,3 +111,25 @@ test("HTTP validation, CORS and JSON limit", async (t) => {
   );
   assert.equal((await fetch(c.base + "/analyses/invalid")).status, 404);
 });
+
+test("playground assets and same-origin form requests use the real intake API", async (t) => {
+  const c = await setup(t);
+  const page = await fetch(c.base + "/");
+  assert.equal(page.status, 200);
+  assert.match(page.headers.get("content-type"), /text\/html/);
+  assert.match(await page.text(), /id="prompt-form"/);
+  for (const asset of ["/ui.js", "/ui.css"]) {
+    const response = await fetch(c.base + asset);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+  }
+  const response = await fetch(c.base + "/intakes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: c.base },
+    body: JSON.stringify(create()),
+  });
+  assert.equal(response.status, 201);
+  assert.equal((await response.json()).status, "needs_input");
+  assert.equal((await fetch(c.base + "/api")).status, 200);
+  assert.equal((await fetch(c.base + "/missing.js")).status, 404);
+});

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Slushd · Fikrini dene</title>
+    <link rel="stylesheet" href="/ui.css" />
+    <script src="/ui.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">slushd<span> / playground</span></a
+      ><span id="connection" class="pill">Bağlanıyor…</span>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">FİKİRDEN İLK KARARA</p>
+        <h1>Aklındaki fikri anlat.</h1>
+        <p>
+          Ürününü birlikte netleştir, araştırmayı incele ve bir sonraki adımı
+          dene.
+        </p>
+      </section>
+      <div class="workspace">
+        <section class="conversation panel" aria-labelledby="chat-title">
+          <div class="panel-heading">
+            <h2 id="chat-title">Sohbet</h2>
+            <button id="reset" class="text-button" type="button">
+              Yeni sohbet ↗
+            </button>
+          </div>
+          <div id="messages" class="messages" aria-live="polite">
+            <div class="welcome">
+              <span class="spark">✳</span>
+              <h3>Bir cümleyle başlayabilirsin.</h3>
+              <p>
+                Ne geliştiriyorsun, kimin için ve hangi sorunu çözmek
+                istiyorsun?
+              </p>
+            </div>
+          </div>
+          <div id="notice" class="notice" role="status">
+            Demo modu: örnek analizler ve varsayımsal simülasyonlar kullanılır.
+          </div>
+          <div id="error" class="error" role="alert" hidden></div>
+          <form id="prompt-form">
+            <label class="sr-only" for="prompt"
+              >Ürün açıklaması veya takip sorularına yanıt</label
+            >
+            <textarea
+              id="prompt"
+              rows="4"
+              maxlength="4000"
+              placeholder="Örneğin: Öğrencilerin bütçesine göre haftalık yemek planı yapan bir uygulama…"
+              required
+            ></textarea>
+            <div class="composer-footer">
+              <span>Enter ile gönder · Shift+Enter ile yeni satır</span
+              ><button id="send" class="primary" type="submit">
+                Gönder <span aria-hidden="true">↑</span>
+              </button>
+            </div>
+          </form>
+          <div class="examples">
+            <button id="example" type="button">＋ Demo fikrini kullan</button
+            ><button id="answer-example" type="button" hidden>
+              ＋ Örnek takip yanıtı
+            </button>
+          </div>
+        </section>
+        <aside class="panel context" aria-labelledby="profile-title">
+          <div class="panel-heading">
+            <h2 id="profile-title">Ürün profili</h2>
+            <span id="profile-status" class="small-status"
+              >Henüz başlamadı</span
+            >
+          </div>
+          <p class="hint">
+            Söylediklerin burada birikir. Bilinmeyen bilgileri doldurmayız.
+          </p>
+          <dl id="profile"></dl>
+          <div id="intake-actions" class="actions" hidden>
+            <button id="continue" class="secondary" type="button">
+              Eksik bilgilerle devam et</button
+            ><button id="analyze" class="primary" type="button" hidden>
+              Araştırmayı başlat →
+            </button>
+            <p class="hint">
+              Araştırma bitince verileri ayrıca onaylayacaksın.
+            </p>
+          </div>
+        </aside>
+      </div>
+      <section
+        id="analysis"
+        class="panel analysis"
+        hidden
+        aria-labelledby="analysis-title"
+      >
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">ANALİZ AKIŞI</p>
+            <h2 id="analysis-title">Araştırılıyor</h2>
+          </div>
+          <span id="progress-count" class="pill"></span>
+        </div>
+        <ol id="steps" class="steps"></ol>
+        <section id="review" hidden>
+          <h3>Devam etmeden önce verileri incele.</h3>
+          <p>Bu onaydan sonra strateji hazırlanır ve simülasyon çalışır.</p>
+          <div id="review-content"></div>
+          <div class="review-actions">
+            <button id="approve" class="primary" type="button">
+              Verileri onayla ve devam et →</button
+            ><button id="correct" class="secondary" type="button">
+              Bilgileri düzelt
+            </button>
+          </div>
+        </section>
+        <section id="result" hidden aria-live="polite"></section>
+        <p id="stream-status" class="hint" role="status"></p>
+        <details id="raw" hidden>
+          <summary>Analiz kaydını göster · JSON</summary>
+          <pre id="raw-output"></pre>
+        </details>
+      </section>
+      <footer>
+        Slushd / Yerel deneme ekranı
+        <span>Gerçek ürün testi veya doğrulanmış pazar tahmini değildir.</span>
+      </footer>
+    </main>
+  </body>
+</html>

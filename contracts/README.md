@@ -19,7 +19,8 @@ Bütün gövdeler `schemaVersion: "4.0.0"` kullanır. Ayrıntılı chat sözleş
 
 | Endpoint | Başarı | Şema / anlam |
 |---|---|---|
-| GET / | 200 | Servis bilgisi ve endpoint listesi; React arayüzü değildir |
+| GET / | 200 | Yerel prompt deneme ekranı (HTML) |
+| GET /api | 200 | Servis bilgisi ve endpoint listesi (JSON) |
 | POST /intakes | 201 | Intake.CreateRequest → Intake.Snapshot |
 | POST /intakes/:id/messages | 200 | Intake.MessageRequest → Intake.Snapshot |
 | GET /intakes/:id | 200 | Intake.Snapshot |

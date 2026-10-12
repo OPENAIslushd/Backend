@@ -15,7 +15,7 @@ npm start
 
 Varsayılan adres `http://127.0.0.1:3001`. İsteğe bağlı `.env.example` dosyasını `.env` olarak kopyalayın; start/dev komutları bu dosyayı yükler. CORS varsayılan olarak localhost:5173 ve localhost:3000'e izin verir. Demo verileri `data/` altında kalır; Git'e girmez.
 
-Bu adres backend API'sidir; React ekranı ayrı frontend sunucusunda açılır. Tarayıcıda `/` servis bilgisi ve endpoint listesini, `/health` sağlık durumunu JSON olarak gösterir. Analiz akışı için POST istekleri veya aşağıdaki smoke komutu kullanılır. Kod değişikliklerinden sonra `npm start` sürecini yeniden başlatın; geliştirme sırasında `npm run dev` otomatik yeniden yükler.
+Bu adreste yerel deneme ekranı açılır: prompt gönder, takip sorularını yanıtla, araştırmayı başlat ve verileri onayla. Tam demo akışı için “Demo fikrini kullan” düğmesine bas. Kendi fikrin için intake yanıtlarını görebilirsin; sabit analiz yalnız desteklenen örnek profilde çalışır. `/api` endpoint listesini, `/health` sağlık durumunu JSON olarak gösterir. Bu küçük deneme ekranı backend ile birlikte servis edilir; ekip React uygulaması ayrı geliştirilebilir. Kod değişikliklerinden sonra `npm start` sürecini yeniden başlatın; geliştirme sırasında `npm run dev` otomatik yeniden yükler.
 
 Başka terminalde uçtan uca demo:
 
@@ -79,4 +79,4 @@ Kabul testleri: eksik bilgi, açıklama engeli, veri uydurmama, tekrar mesaj/ana
 
 Kapsam: tek Node süreci/tek DATA_DIR yazıcısı; yerel hackathon demosu. Kimlik doğrulama ve çok sunuculu dağıtım eklenmedi. Sunucu yeniden başlarsa onay bekleyen run korunur; çalışan yarım run otomatik model tekrarı olmadan sonuçlandırılır. Adapte edilen JS modülleri AbortSignal'a uymalıdır.
 
-Son doğrulama: demo smoke `completed`, memory `completed`, 23 SSE olayı üretti. Sözleşme kontrolleri ve 31 runtime/HTTP/subprocess kabul testi geçti. Canlı CLI çıkarımı **başarılı doğrulanamadı**: güncel masaüstü binary'si ve şema dönüşümüyle son çağrı `429 Too Many Requests` döndürdü. Limit uygun olduğunda `CODEX_MODEL=gpt-6-astra npm run smoke:cli` yeniden çalıştırılmalı; bu başarısızlık demo akışını etkilemez.
+Son doğrulama: demo smoke `completed`, memory `completed`, 23 SSE olayı üretti. Sözleşme kontrolleri ve 32 runtime/HTTP/subprocess kabul testi geçti. Canlı CLI çıkarımı **başarılı doğrulanamadı**: güncel masaüstü binary'si ve şema dönüşümüyle son çağrı `429 Too Many Requests` döndürdü. Limit uygun olduğunda `CODEX_MODEL=gpt-6-astra npm run smoke:cli` yeniden çalıştırılmalı; bu başarısızlık demo akışını etkilemez.

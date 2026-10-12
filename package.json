@@ -11,8 +11,8 @@
     "test": "npm test --prefix contracts && node --test test/*.test.cjs",
     "smoke": "node scripts/smoke.cjs",
     "smoke:cli": "node --env-file-if-exists=.env scripts/cli-smoke.cjs",
-    "format": "prettier --write \"src/**/*.cjs\" \"test/**/*.cjs\" \"scripts/**/*.cjs\" contracts/validate.cjs",
-    "format:check": "prettier --check \"src/**/*.cjs\" \"test/**/*.cjs\" \"scripts/**/*.cjs\" contracts/validate.cjs"
+    "format": "prettier --write \"src/**/*.cjs\" \"test/**/*.cjs\" \"scripts/**/*.cjs\" contracts/validate.cjs \"public/*\"",
+    "format:check": "prettier --check \"src/**/*.cjs\" \"test/**/*.cjs\" \"scripts/**/*.cjs\" contracts/validate.cjs \"public/*\""
   },
   "dependencies": {
     "ajv": "8.20.0",

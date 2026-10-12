@@ -1,4 +1,5 @@
 const http = require("node:http");
+const fs = require("node:fs/promises");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 const { Store } = require("./runtime/store.cjs");
@@ -125,7 +126,8 @@ async function createApp(options = {}) {
     try {
       const origin = req.headers.origin;
       if (origin) {
-        if (!allowed.has(origin))
+        const sameOrigin = origin === `http://${req.headers.host}`;
+        if (!sameOrigin && !allowed.has(origin))
           throw new AppError("INVALID_REQUEST", "Origin izinli değil.", 403);
         res.setHeader("Access-Control-Allow-Origin", origin);
         res.setHeader("Vary", "Origin");
@@ -147,12 +149,30 @@ async function createApp(options = {}) {
         !UUID.test(parts[1])
       )
         throw new AppError("NOT_FOUND", "Kayıt bulunamadı.", 404);
-      if (req.method === "GET" && url.pathname === "/")
+      const assets = {
+        "/": ["index.html", "text/html; charset=utf-8"],
+        "/ui.js": ["ui.js", "text/javascript; charset=utf-8"],
+        "/ui.css": ["ui.css", "text/css; charset=utf-8"],
+      };
+      if (req.method === "GET" && Object.hasOwn(assets, url.pathname)) {
+        const [file, contentType] = assets[url.pathname];
+        const content = await fs.readFile(
+          path.join(__dirname, "../public", file),
+        );
+        res.writeHead(200, {
+          "Content-Type": contentType,
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          "Content-Security-Policy":
+            "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        });
+        return res.end(content);
+      }
+      if (req.method === "GET" && url.pathname === "/api")
         return json(200, {
           service: "Slushd Orchestrator API",
           schemaVersion: VERSION,
-          message:
-            "Backend API çalışıyor. React arayüzü ayrı frontend sunucusunda açılır.",
+          message: "Backend API çalışıyor. Yerel deneme ekranı / adresindedir.",
           health: "/health",
           endpoints: [
             "POST /intakes",
