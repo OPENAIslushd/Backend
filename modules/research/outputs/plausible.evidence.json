@@ -1,0 +1,742 @@
+{
+  "schema_version": "1.0",
+  "is_demo": false,
+  "stage": "site_evidence",
+  "review_status": "needs_review",
+  "status": "partial",
+  "page_title": "Plausible Analytics | Simple, privacy-friendly Google Analytics alternative",
+  "description_candidate": "Plausible is a lightweight and open-source Google Analytics alternative. Your website data is 100% yours and the privacy of your visitors is respected.",
+  "section_candidates": [
+    {
+      "tag": "h3",
+      "text": "Who it's for",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Compare",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Follow Plausible: Twitter , Bluesky , Mastodon and LinkedIn",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h1",
+      "text": "Easy to use and privacy-friendly Google Analytics alternative",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h2",
+      "text": "Why use Plausible Analytics?",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h2",
+      "text": "People ❤️ Plausible",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h2",
+      "text": "It's time to ditch Google Analytics",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Simple analytics at a glance",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Lightweight script that keeps your site speed fast",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "No need for cookie banners or GDPR consent",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h2",
+      "text": "Traffic based plans that match your growth",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Starter",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Growth",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Business",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Enterprise",
+      "source_ids": [
+        "s1"
+      ]
+    },
+    {
+      "tag": "h3",
+      "text": "Ready to ditch Google Analytics? Start your free trial today",
+      "source_ids": [
+        "s1"
+      ]
+    }
+  ],
+  "pricing_candidates": [
+    {
+      "text": "Pricing",
+      "context": [
+        {
+          "tag": "li",
+          "text": "About"
+        },
+        {
+          "tag": "li",
+          "text": "Pricing"
+        },
+        {
+          "tag": "li",
+          "text": "Contact"
+        }
+      ],
+      "source_ids": [
+        "s1"
+      ]
+    }
+  ],
+  "content_blocks": [
+    {
+      "tag": "p",
+      "text": "Simple analytics dashboard"
+    },
+    {
+      "tag": "p",
+      "text": "Get all the important stats on one single page. No training necessary."
+    },
+    {
+      "tag": "p",
+      "text": "Lightweight script"
+    },
+    {
+      "tag": "p",
+      "text": "Loads fast and won't affect your page speed or Core Web Vitals. A fraction of the size of Google Analytics."
+    },
+    {
+      "tag": "p",
+      "text": "Privacy-friendly analytics"
+    },
+    {
+      "tag": "p",
+      "text": "Built with visitor privacy in mind. No cookie banner required."
+    },
+    {
+      "tag": "p",
+      "text": "Open source"
+    },
+    {
+      "tag": "p",
+      "text": "The code is public and auditable. Verify exactly what we collect, and run it yourself if you want to."
+    },
+    {
+      "tag": "p",
+      "text": "EU-hosted"
+    },
+    {
+      "tag": "p",
+      "text": "Built and hosted in the EU. Your data never leaves European-owned infrastructure."
+    },
+    {
+      "tag": "h3",
+      "text": "Who it's for"
+    },
+    {
+      "tag": "li",
+      "text": "Ecommerce"
+    },
+    {
+      "tag": "li",
+      "text": "SaaS"
+    },
+    {
+      "tag": "li",
+      "text": "Agencies"
+    },
+    {
+      "tag": "li",
+      "text": "Creators & publishers"
+    },
+    {
+      "tag": "li",
+      "text": "Public sector"
+    },
+    {
+      "tag": "li",
+      "text": "White-label analytics"
+    },
+    {
+      "tag": "li",
+      "text": "Enterprise"
+    },
+    {
+      "tag": "h3",
+      "text": "Compare"
+    },
+    {
+      "tag": "li",
+      "text": "vs Google Analytics"
+    },
+    {
+      "tag": "li",
+      "text": "Migrate from GA4"
+    },
+    {
+      "tag": "li",
+      "text": "vs Matomo"
+    },
+    {
+      "tag": "li",
+      "text": "vs Cloudflare Analytics"
+    },
+    {
+      "tag": "p",
+      "text": "Documentation"
+    },
+    {
+      "tag": "p",
+      "text": "Everything you need to get up and running with Plausible."
+    },
+    {
+      "tag": "p",
+      "text": "Blog"
+    },
+    {
+      "tag": "p",
+      "text": "Stories about privacy, web analytics and building Plausible."
+    },
+    {
+      "tag": "p",
+      "text": "Tools"
+    },
+    {
+      "tag": "p",
+      "text": "Free calculators and utilities to help you understand your analytics data."
+    },
+    {
+      "tag": "p",
+      "text": "Status"
+    },
+    {
+      "tag": "p",
+      "text": "Check the live status and uptime of Plausible services."
+    },
+    {
+      "tag": "p",
+      "text": "Product updates"
+    },
+    {
+      "tag": "p",
+      "text": "Major new features and improvements."
+    },
+    {
+      "tag": "h3",
+      "text": "Follow Plausible: Twitter , Bluesky , Mastodon and LinkedIn"
+    },
+    {
+      "tag": "li",
+      "text": "Login Start free trial"
+    },
+    {
+      "tag": "h1",
+      "text": "Easy to use and privacy-friendly Google Analytics alternative"
+    },
+    {
+      "tag": "p",
+      "text": "Plausible is powerful, lightweight analytics. No cookies, just insights. Made and hosted in the EU, powered by European-owned infrastructure. 🇪🇺"
+    },
+    {
+      "tag": "h2",
+      "text": "Why use Plausible Analytics?"
+    },
+    {
+      "tag": "p",
+      "text": "Google Analytics is overkill for most site owners. Plausible gives you clear, useful insights without complexity, training or prior analytics experience."
+    },
+    {
+      "tag": "h2",
+      "text": "People ❤️ Plausible"
+    },
+    {
+      "tag": "p",
+      "text": "From small sites to hundreds of millions of monthly visitors, Plausible is trusted by thousands of organizations, including Stripe, Mozilla, MongoDB, Harvard University and Sentry."
+    },
+    {
+      "tag": "h2",
+      "text": "It's time to ditch Google Analytics"
+    },
+    {
+      "tag": "p",
+      "text": "Google Analytics is frustrating to use, difficult to understand, slow to load and privacy-invasive. That's why we built Plausible Analytics, a simple, privacy-first alternative that doesn't cut corners."
+    },
+    {
+      "tag": "p",
+      "text": "Here's what makes Plausible a great Google Analytics alternative and why over 21,000 paying customers trust us with their website and business insights:"
+    },
+    {
+      "tag": "h3",
+      "text": "Simple analytics at a glance"
+    },
+    {
+      "tag": "p",
+      "text": "Plausible is simple web analytics . It is easy to understand and cuts through the noise. Check your site traffic and get the essential insights on one page in one minute. Get an aggregated view of all your sites in a consolidated dashboard. There are no layers of menus and no need to build custom reports, custom dashboards or PowerPoint documents. You can even import your Google Analytics stats."
+    },
+    {
+      "tag": "h3",
+      "text": "Lightweight script that keeps your site speed fast"
+    },
+    {
+      "tag": "p",
+      "text": "Plausible is lightweight web analytics . Our script is 54 times smaller than Google Analytics. Every visitor that loads your site downloads 135KB less JavaScript. Less data transferred means less energy used and less carbon emitted, for every visitor, every day. A site with 100,000 monthly visitors saves around 4 kg of CO2 per year by switching."
+    },
+    {
+      "tag": "h3",
+      "text": "No need for cookie banners or GDPR consent"
+    },
+    {
+      "tag": "p",
+      "text": "Plausible is privacy-friendly web analytics that doesn't process personal data or track individual users. No cookies, no persistent identifiers, no cross-site or cross-device tracking. Your site data is not used for any other purposes. All visitor data is exclusively processed on servers owned and operated by European companies and never leaves the EU."
+    },
+    {
+      "tag": "p",
+      "text": "We invite you to take a look around, explore our live demo and try Plausible for free. We'd be honored to have you as a customer. Thank you."
+    },
+    {
+      "tag": "p",
+      "text": "Uku and Marko Co-founders"
+    },
+    {
+      "tag": "p",
+      "text": "P.S. We're a completely independent, self-funded, bootstrapped and profitable team of 10, running since 2018. No outside investors, no acquisition targets. We choose the subscription business model rather than surveillance capitalism. Our code is open source too, so you're never locked in. Read more about us ."
+    },
+    {
+      "tag": "h2",
+      "text": "Traffic based plans that match your growth"
+    },
+    {
+      "tag": "p",
+      "text": "Sign up for 30-day free trial. No credit card required."
+    },
+    {
+      "tag": "p",
+      "text": "Up to 10k monthly pageviews"
+    },
+    {
+      "tag": "h3",
+      "text": "Starter"
+    },
+    {
+      "tag": "li",
+      "text": "One site"
+    },
+    {
+      "tag": "li",
+      "text": "3 years of data retention"
+    },
+    {
+      "tag": "li",
+      "text": "Intuitive, fast and privacy-friendly dashboard"
+    },
+    {
+      "tag": "li",
+      "text": "Email/Slack reports"
+    },
+    {
+      "tag": "li",
+      "text": "Google Analytics import"
+    },
+    {
+      "tag": "li",
+      "text": "Goals and custom events"
+    },
+    {
+      "tag": "li",
+      "text": "Saved Segments"
+    },
+    {
+      "tag": "li",
+      "text": "Annotations"
+    },
+    {
+      "tag": "h3",
+      "text": "Growth"
+    },
+    {
+      "tag": "li",
+      "text": "Everything in Starter"
+    },
+    {
+      "tag": "li",
+      "text": "Up to 3 sites"
+    },
+    {
+      "tag": "li",
+      "text": "Up to 3 team members"
+    },
+    {
+      "tag": "li",
+      "text": "Team Management"
+    },
+    {
+      "tag": "li",
+      "text": "Shared Links"
+    },
+    {
+      "tag": "li",
+      "text": "Embedded Dashboards"
+    },
+    {
+      "tag": "li",
+      "text": "Shared Segments"
+    },
+    {
+      "tag": "li",
+      "text": "Shared Annotations"
+    },
+    {
+      "tag": "h3",
+      "text": "Business"
+    },
+    {
+      "tag": "li",
+      "text": "Everything in Growth"
+    },
+    {
+      "tag": "li",
+      "text": "Up to 10 sites"
+    },
+    {
+      "tag": "li",
+      "text": "Up to 10 team members"
+    },
+    {
+      "tag": "li",
+      "text": "5 years of data retention"
+    },
+    {
+      "tag": "li",
+      "text": "Custom Properties"
+    },
+    {
+      "tag": "li",
+      "text": "Stats API (600 requests per hour)"
+    },
+    {
+      "tag": "li",
+      "text": "Data Studio Connector"
+    },
+    {
+      "tag": "li",
+      "text": "Ecommerce revenue attribution"
+    },
+    {
+      "tag": "li",
+      "text": "Funnels and user journeys"
+    },
+    {
+      "tag": "li",
+      "text": "Consolidated View"
+    },
+    {
+      "tag": "h3",
+      "text": "Enterprise"
+    },
+    {
+      "tag": "li",
+      "text": "Everything in Business"
+    },
+    {
+      "tag": "li",
+      "text": "10+ sites"
+    },
+    {
+      "tag": "li",
+      "text": "10+ team members"
+    },
+    {
+      "tag": "li",
+      "text": "600+ Stats API requests per hour"
+    },
+    {
+      "tag": "li",
+      "text": "Sites API access"
+    },
+    {
+      "tag": "li",
+      "text": "Single Sign-On (SSO)"
+    },
+    {
+      "tag": "li",
+      "text": "Managed Proxy"
+    },
+    {
+      "tag": "li",
+      "text": "Scheduled raw event data exports"
+    },
+    {
+      "tag": "li",
+      "text": "5+ years of data retention"
+    },
+    {
+      "tag": "li",
+      "text": "Priority support"
+    },
+    {
+      "tag": "h3",
+      "text": "Ready to ditch Google Analytics? Start your free trial today"
+    },
+    {
+      "tag": "p",
+      "text": "Made and hosted in the EU 🇪🇺 Funded entirely by our subscribers."
+    },
+    {
+      "tag": "li",
+      "text": "Simple metrics"
+    },
+    {
+      "tag": "li",
+      "text": "Lightweight script"
+    },
+    {
+      "tag": "li",
+      "text": "Privacy focused"
+    },
+    {
+      "tag": "li",
+      "text": "Open source"
+    },
+    {
+      "tag": "li",
+      "text": "No cookie banner"
+    },
+    {
+      "tag": "li",
+      "text": "Features"
+    },
+    {
+      "tag": "li",
+      "text": "Ecommerce"
+    },
+    {
+      "tag": "li",
+      "text": "SaaS"
+    },
+    {
+      "tag": "li",
+      "text": "Publishers"
+    },
+    {
+      "tag": "li",
+      "text": "Agencies"
+    },
+    {
+      "tag": "li",
+      "text": "Public sector"
+    },
+    {
+      "tag": "li",
+      "text": "White label"
+    },
+    {
+      "tag": "li",
+      "text": "Enterprise"
+    },
+    {
+      "tag": "li",
+      "text": "vs Google Analytics"
+    },
+    {
+      "tag": "li",
+      "text": "Migrate from GA4"
+    },
+    {
+      "tag": "li",
+      "text": "vs Matomo"
+    },
+    {
+      "tag": "li",
+      "text": "vs Cloudflare"
+    },
+    {
+      "tag": "li",
+      "text": "GA4 accuracy"
+    },
+    {
+      "tag": "li",
+      "text": "Paid vs free"
+    },
+    {
+      "tag": "li",
+      "text": "Right for you?"
+    },
+    {
+      "tag": "li",
+      "text": "How to choose"
+    },
+    {
+      "tag": "li",
+      "text": "WordPress plugin"
+    },
+    {
+      "tag": "li",
+      "text": "Google Tag Manager"
+    },
+    {
+      "tag": "li",
+      "text": "Search Console"
+    },
+    {
+      "tag": "li",
+      "text": "Data Studio"
+    },
+    {
+      "tag": "li",
+      "text": "NPM package"
+    },
+    {
+      "tag": "li",
+      "text": "Documentation"
+    },
+    {
+      "tag": "li",
+      "text": "Blog"
+    },
+    {
+      "tag": "li",
+      "text": "Tools"
+    },
+    {
+      "tag": "li",
+      "text": "What's new"
+    },
+    {
+      "tag": "li",
+      "text": "Status"
+    },
+    {
+      "tag": "li",
+      "text": "GitHub"
+    },
+    {
+      "tag": "li",
+      "text": "X (Twitter)"
+    },
+    {
+      "tag": "li",
+      "text": "Bluesky"
+    },
+    {
+      "tag": "li",
+      "text": "Mastodon"
+    },
+    {
+      "tag": "li",
+      "text": "LinkedIn"
+    },
+    {
+      "tag": "li",
+      "text": "About"
+    },
+    {
+      "tag": "li",
+      "text": "Pricing"
+    },
+    {
+      "tag": "li",
+      "text": "Contact"
+    },
+    {
+      "tag": "li",
+      "text": "Privacy policy"
+    },
+    {
+      "tag": "li",
+      "text": "Data policy"
+    },
+    {
+      "tag": "li",
+      "text": "Terms"
+    },
+    {
+      "tag": "li",
+      "text": "DPA"
+    },
+    {
+      "tag": "li",
+      "text": "Security"
+    },
+    {
+      "tag": "li",
+      "text": "Compliance"
+    },
+    {
+      "tag": "li",
+      "text": "Procurement"
+    },
+    {
+      "tag": "li",
+      "text": "Imprint"
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "type": "website",
+      "url": "https://plausible.io/",
+      "title": "Plausible Analytics | Simple, privacy-friendly Google Analytics alternative",
+      "accessed_at": "2026-10-12T08:25:43.960708+00:00"
+    }
+  ],
+  "limitations": [
+    "Yalnızca sağlanan HTML incelendi; JavaScript çalıştırılmadı.",
+    "Başlıklar ürün veya özellik olarak doğrulanmadı; menü ve pazarlama metinleri içerebilir.",
+    "Fiyat adayları eksik olabilir; paket, trafik sınırı ve ödeme dönemi doğrulanmalı.",
+    "Şirket/ürün profiline dönüştürme ve kullanıcı doğrulaması henüz yapılmadı."
+  ]
+}

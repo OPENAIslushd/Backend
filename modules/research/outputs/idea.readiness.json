@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "profile_hash": "1ddf6b47c275c4f82e1c689df9763e995ecaed53df1b5275c752f190927e7e5a",
+  "brief": {
+    "topic": "üniversite öğrencileri AI kariyer rehberliği",
+    "target_market": "Türkiye",
+    "analysis_goal": "Benzer çözümleri ve farklılaşma alanlarını araştırmak"
+  },
+  "mode": "idea",
+  "subject": {
+    "description": "Türkiye'deki üniversite öğrencilerine yapay zekâ destekli kariyer rehberliği sunmak istiyorum.",
+    "target_customers": [
+      "Üniversite öğrencileri"
+    ],
+    "target_market": "Türkiye",
+    "analysis_goal": "Hangi ihtiyaca odaklanmalıyım ve benzer çözümlerden nasıl ayrışabilirim?",
+    "hypotheses": [
+      "Öğrenciler kişiselleştirilmiş staj önerilerine ihtiyaç duyuyor olabilir."
+    ],
+    "source_ids": [
+      "u1"
+    ]
+  },
+  "is_demo": true,
+  "request_id": "c8ede60f5a520b8c26d694a2f29b74cd46f6278db34b72aafe0f3b991342ed7c",
+  "missing_fields": [
+    "profile_confirmation"
+  ],
+  "status": "needs_input",
+  "queries": []
+}

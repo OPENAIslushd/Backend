@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "profile_hash": "970efdab9876736b6d2b7dc4c35a5b2f71ac257c7a596f0a4918eb58f6064995",
+  "brief": {
+    "topic": "privacy friendly website analytics",
+    "target_market": "Global",
+    "analysis_goal": "Benzer çözümlerle ürün konumlandırmasını karşılaştırmak",
+    "own_website": "https://plausible.io/"
+  },
+  "mode": "website",
+  "subject": {
+    "scope": "product",
+    "product_ids": [
+      "plausible_analytics"
+    ],
+    "category": null,
+    "perspective": "brand_owner"
+  },
+  "is_demo": true,
+  "request_id": "dae164a8d18ddeadfef4493b28f0ef66aa9d3da2fc92a478e3f23decd3780a55",
+  "missing_fields": [],
+  "status": "ready",
+  "queries": [
+    "privacy friendly website analytics Global alternatives official features",
+    "privacy friendly website analytics Global pricing official usage limits",
+    "privacy friendly website analytics Global integrations target customers"
+  ],
+  "comparison_dimensions": [
+    "hedef müşteri",
+    "temel çözüm",
+    "özellikler",
+    "fiyat koşulları"
+  ]
+}

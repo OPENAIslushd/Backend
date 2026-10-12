@@ -1,0 +1,415 @@
+{
+  "scope": "research_only",
+  "comparison": {
+    "schema_version": "1.0",
+    "profile_revision": 1,
+    "request_id": "91541a75a737e80f145dcf47cc5a4080ee416579acfa7f17155acbad36185a7e",
+    "is_demo": true,
+    "status": "partial",
+    "own_profile": {
+      "company": {
+        "name": "TakımPlan (kurgusal demo)",
+        "website_url": null,
+        "business_models": []
+      },
+      "idea": null,
+      "products": [
+        {
+          "id": "own_product",
+          "name": "TakımPlan (kurgusal demo)",
+          "product_type": "unknown",
+          "lifecycle": "existing",
+          "url": null,
+          "description": "Küçük ekipler için görev ataması, iş takibi ve proje düzenleme uygulaması.",
+          "category": null,
+          "brand": null,
+          "target_customers": [
+            "Küçük proje ekipleri"
+          ],
+          "features": [],
+          "attributes": [],
+          "variants": [],
+          "pricing": {
+            "status": "unknown",
+            "plans": [],
+            "offers": []
+          },
+          "source_ids": [
+            "user1"
+          ],
+          "unknowns": []
+        }
+      ],
+      "sources": [
+        {
+          "id": "user1",
+          "type": "user_input",
+          "url": null,
+          "title": "Kullanıcının sağladığı bilgiler",
+          "accessed_at": null
+        }
+      ]
+    },
+    "selected_competitors": [
+      {
+        "name": "Trello",
+        "url": "https://trello.com/",
+        "relationship": "candidate",
+        "relevance": {
+          "type": "analyst_inference",
+          "text": "Katalog kategorisi: Proje ve görev yönetimi. Konu veya şirket eşleşmesiyle seçildi; hedef pazar ve birebir uygunluk ayrıca doğrulanmalı."
+        },
+        "facts": [
+          {
+            "dimension": "temel çözüm",
+            "statement": "İşleri ve görevleri düzenlemek için görsel bir çalışma yönetimi uygulaması.",
+            "source_ids": [
+              "projects_trello"
+            ]
+          },
+          {
+            "dimension": "özellikler",
+            "statement": "Panolar, listeler ve kartlarla görevleri düzenleme olanağı sunuluyor.",
+            "source_ids": [
+              "projects_trello"
+            ]
+          }
+        ],
+        "pricing": null,
+        "unknowns": [
+          "Güncel paket fiyatları ve kullanım sınırları",
+          "Hedef pazardaki kullanılabilirlik",
+          "Finansal veriler"
+        ],
+        "id": "a2e1c561a30523af",
+        "sources": [
+          {
+            "id": "projects_trello",
+            "url": "https://trello.com/tour",
+            "kind": "official_page",
+            "title": "Trello resmi ürün sayfası",
+            "accessed_on": "2026-10-12"
+          }
+        ],
+        "financials": {
+          "status": "not_collected_for_this_candidate"
+        }
+      },
+      {
+        "name": "Asana",
+        "url": "https://asana.com/",
+        "relationship": "candidate",
+        "relevance": {
+          "type": "analyst_inference",
+          "text": "Katalog kategorisi: Proje ve görev yönetimi. Konu veya şirket eşleşmesiyle seçildi; hedef pazar ve birebir uygunluk ayrıca doğrulanmalı."
+        },
+        "facts": [
+          {
+            "dimension": "temel çözüm",
+            "statement": "Ekiplerin projelerini ve işlerini takip etmesine yönelik çalışma yönetimi platformu.",
+            "source_ids": [
+              "projects_asana"
+            ]
+          },
+          {
+            "dimension": "özellikler",
+            "statement": "Proje ve görev yönetimi ile ekip çalışmalarının takibine yönelik özellikler sunuluyor.",
+            "source_ids": [
+              "projects_asana"
+            ]
+          }
+        ],
+        "pricing": null,
+        "unknowns": [
+          "Güncel paket fiyatları ve kullanım sınırları",
+          "Hedef pazardaki kullanılabilirlik",
+          "Finansal veriler"
+        ],
+        "id": "90eb0984423e0a92",
+        "sources": [
+          {
+            "id": "projects_asana",
+            "url": "https://asana.com/features",
+            "kind": "official_page",
+            "title": "Asana resmi ürün sayfası",
+            "accessed_on": "2026-10-12"
+          }
+        ],
+        "financials": {
+          "status": "not_collected_for_this_candidate"
+        }
+      }
+    ],
+    "comparison_rows": [
+      {
+        "dimension": "hedef müşteri",
+        "own": {
+          "status": "profile_data",
+          "values": [
+            {
+              "product_id": "own_product",
+              "value": [
+                "Küçük proje ekipleri"
+              ],
+              "source_ids": [
+                "user1"
+              ]
+            }
+          ]
+        },
+        "candidates": [
+          {
+            "candidate_id": "a2e1c561a30523af",
+            "status": "unknown",
+            "facts": []
+          },
+          {
+            "candidate_id": "90eb0984423e0a92",
+            "status": "unknown",
+            "facts": []
+          }
+        ]
+      },
+      {
+        "dimension": "temel çözüm",
+        "own": {
+          "status": "profile_data",
+          "values": [
+            {
+              "product_id": "own_product",
+              "value": "Küçük ekipler için görev ataması, iş takibi ve proje düzenleme uygulaması.",
+              "source_ids": [
+                "user1"
+              ]
+            }
+          ]
+        },
+        "candidates": [
+          {
+            "candidate_id": "a2e1c561a30523af",
+            "status": "reported",
+            "facts": [
+              {
+                "dimension": "temel çözüm",
+                "statement": "İşleri ve görevleri düzenlemek için görsel bir çalışma yönetimi uygulaması.",
+                "source_ids": [
+                  "projects_trello"
+                ]
+              }
+            ]
+          },
+          {
+            "candidate_id": "90eb0984423e0a92",
+            "status": "reported",
+            "facts": [
+              {
+                "dimension": "temel çözüm",
+                "statement": "Ekiplerin projelerini ve işlerini takip etmesine yönelik çalışma yönetimi platformu.",
+                "source_ids": [
+                  "projects_asana"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dimension": "özellikler",
+        "own": {
+          "status": "unknown",
+          "values": []
+        },
+        "candidates": [
+          {
+            "candidate_id": "a2e1c561a30523af",
+            "status": "reported",
+            "facts": [
+              {
+                "dimension": "özellikler",
+                "statement": "Panolar, listeler ve kartlarla görevleri düzenleme olanağı sunuluyor.",
+                "source_ids": [
+                  "projects_trello"
+                ]
+              }
+            ]
+          },
+          {
+            "candidate_id": "90eb0984423e0a92",
+            "status": "reported",
+            "facts": [
+              {
+                "dimension": "özellikler",
+                "statement": "Proje ve görev yönetimi ile ekip çalışmalarının takibine yönelik özellikler sunuluyor.",
+                "source_ids": [
+                  "projects_asana"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dimension": "fiyat koşulları",
+        "own": {
+          "status": "profile_data",
+          "values": [
+            {
+              "product_id": "own_product",
+              "value": {
+                "status": "unknown",
+                "plans": [],
+                "offers": []
+              },
+              "source_ids": [
+                "user1"
+              ]
+            }
+          ]
+        },
+        "candidates": [
+          {
+            "candidate_id": "a2e1c561a30523af",
+            "status": "unknown",
+            "facts": []
+          },
+          {
+            "candidate_id": "90eb0984423e0a92",
+            "status": "unknown",
+            "facts": []
+          }
+        ]
+      }
+    ],
+    "price_comparison": {
+      "status": "not_comparable",
+      "reason": "Rakip paket fiyatları ve eşdeğer koşulları henüz toplanmadı."
+    },
+    "warnings": [
+      "Boş hücre özellik yok demek değildir.",
+      "Rakip adayı sınıflandırması doğrulanmış doğrudan rakip anlamına gelmez.",
+      "Kullanıcı profili ayrı gösterilir; serbest metinden otomatik özellik eşleştirmesi yapılmadı."
+    ]
+  },
+  "downstream_tasks": [
+    "suggestion_generation",
+    "prediction_and_simulation"
+  ],
+  "note": "Bu paket öneri, başarı yüzdesi veya tahmin üretmez.",
+  "is_demo": true,
+  "confirmation_note": "Betikle verilmiş demo onayıdır; gerçek kullanıcı onayı değildir.",
+  "collection_method": "curated_catalog",
+  "input": {
+    "mode": "company",
+    "name": "TakımPlan (kurgusal demo)",
+    "url": "",
+    "topic": "Görev yönetimi",
+    "description": "Küçük ekipler için görev ataması, iş takibi ve proje düzenleme uygulaması.",
+    "audience": "Küçük proje ekipleri",
+    "market": "Global",
+    "goal": "Rakiplerin çözümlerini ve özelliklerini karşılaştırmak"
+  },
+  "profile": {
+    "revision": 1,
+    "profile": {
+      "schema_version": "1.2",
+      "input_mode": "website",
+      "is_demo": true,
+      "review_status": "confirmed",
+      "status": "partial",
+      "company": {
+        "name": "TakımPlan (kurgusal demo)",
+        "website_url": null,
+        "business_models": []
+      },
+      "platform": null,
+      "idea": null,
+      "products": [
+        {
+          "id": "own_product",
+          "name": "TakımPlan (kurgusal demo)",
+          "product_type": "unknown",
+          "lifecycle": "existing",
+          "url": null,
+          "description": "Küçük ekipler için görev ataması, iş takibi ve proje düzenleme uygulaması.",
+          "category": null,
+          "brand": null,
+          "target_customers": [
+            "Küçük proje ekipleri"
+          ],
+          "features": [],
+          "attributes": [],
+          "variants": [],
+          "pricing": {
+            "status": "unknown",
+            "plans": [],
+            "offers": []
+          },
+          "source_ids": [
+            "user1"
+          ],
+          "unknowns": []
+        }
+      ],
+      "market_products": [],
+      "sources": [
+        {
+          "id": "user1",
+          "type": "user_input",
+          "url": null,
+          "title": "Kullanıcının sağladığı bilgiler",
+          "accessed_at": null
+        }
+      ],
+      "unknowns": [
+        "Ürün fiyatları",
+        "Diğer ürünler",
+        "Resmi şirket ve finansal kayıt doğrulaması"
+      ],
+      "warnings": [],
+      "research_status": "not_started",
+      "simulation_status": "not_started",
+      "selection": {
+        "scope": "product",
+        "product_ids": [
+          "own_product"
+        ],
+        "category": null,
+        "perspective": "brand_owner"
+      },
+      "catalog_coverage": {
+        "status": "partial",
+        "discovered_count": 1,
+        "total_count": null
+      },
+      "workflow_revision": 1
+    },
+    "brief": {
+      "topic": "Görev yönetimi",
+      "target_market": "Global",
+      "analysis_goal": "Rakiplerin çözümlerini ve özelliklerini karşılaştırmak",
+      "own_website": ""
+    },
+    "confirmation": {
+      "revision": 1,
+      "confirmed_at": "2026-10-12T10:16:15.490567+00:00"
+    }
+  },
+  "candidate_cards": [
+    {
+      "id": "a2e1c561a30523af",
+      "name": "Trello",
+      "url": "https://trello.com/",
+      "relationship": "candidate",
+      "reason": "Katalog kategorisi: Proje ve görev yönetimi. Konu veya şirket eşleşmesiyle seçildi; hedef pazar ve birebir uygunluk ayrıca doğrulanmalı.",
+      "selected_for_display": true
+    },
+    {
+      "id": "90eb0984423e0a92",
+      "name": "Asana",
+      "url": "https://asana.com/",
+      "relationship": "candidate",
+      "reason": "Katalog kategorisi: Proje ve görev yönetimi. Konu veya şirket eşleşmesiyle seçildi; hedef pazar ve birebir uygunluk ayrıca doğrulanmalı.",
+      "selected_for_display": true
+    }
+  ]
+}

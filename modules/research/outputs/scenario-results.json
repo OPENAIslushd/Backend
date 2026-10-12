@@ -1,0 +1,29 @@
+[
+  {
+    "scenario": "plausible",
+    "validation": "passed",
+    "extraction_status": "partial",
+    "own_products": 1,
+    "market_products": 0,
+    "research": "not_started",
+    "simulation": "not_started"
+  },
+  {
+    "scenario": "trendyol",
+    "validation": "passed",
+    "extraction_status": "partial",
+    "own_products": 0,
+    "market_products": 3,
+    "research": "not_started",
+    "simulation": "not_started"
+  },
+  {
+    "scenario": "idea",
+    "validation": "passed",
+    "extraction_status": "partial",
+    "own_products": 0,
+    "market_products": 0,
+    "research": "not_started",
+    "simulation": "not_started"
+  }
+]

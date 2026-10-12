@@ -1,0 +1,11 @@
+{
+  "platform_name": "Trendyol",
+  "category": "Şapka",
+  "source": {"id": "s1", "type": "web_tool_excerpt", "url": "https://www.trendyol.com/sapka-x-c1181", "title": "Şapka kategorisi", "accessed_at": null, "accessed_on": "2026-10-12", "freshness": "Web aracı önbellekli içerik döndürebilir; canlı fiyat garantisi yok."},
+  "collection": {"method": "manual_transcription_from_web_tool", "direct_http_status": 403, "sample_selection": "Üç seçilmiş liste kaydı; isimler kısaltıldı. Ürün detayları ziyaret edilmedi."},
+  "observations": [
+    {"id": "sample_1", "name": "OnMyHead süet kep", "listing_group": "Tekli ürün adayı", "prices": [{"value": "299", "kind": "displayed", "conditions": "Çok al az öde etiketi var; koşullar doğrulanmadı."}]},
+    {"id": "sample_2", "name": "sf collection Cherry şapka", "listing_group": "Tekli ürün adayı", "prices": [{"value": "199,90", "kind": "displayed"}]},
+    {"id": "sample_3", "name": "sf collection MOM & DAD çift şapka", "listing_group": "İki ürünlü set", "prices": [{"value": "464,90", "kind": "displayed"}, {"value": "450,95", "kind": "member", "conditions": "Trendyol Plus üyeliği"}]}
+  ]
+}

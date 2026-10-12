@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.1",
+  "is_demo": true,
+  "review_status": "needs_review",
+  "company": {
+    "name": "Örnek Yazılım",
+    "website_url": "https://ornek.example",
+    "description": "Küçük işletmeler için iş yönetimi yazılımları.",
+    "source_ids": [
+      "s1"
+    ],
+    "business_models": [
+      "subscription"
+    ]
+  },
+  "products": [
+    {
+      "id": "product_1",
+      "name": "Randevu",
+      "url": "https://ornek.example/randevu",
+      "description": "Salonlar için online randevu yönetimi.",
+      "target_customers": [
+        "Kuaförler",
+        "Güzellik salonları"
+      ],
+      "source_ids": [
+        "s2"
+      ],
+      "features": [
+        {
+          "name": "Online rezervasyon",
+          "source_ids": [
+            "s2"
+          ]
+        }
+      ],
+      "pricing": {
+        "status": "unknown",
+        "plans": [],
+        "source_ids": [],
+        "offers": []
+      },
+      "unknowns": [
+        "Fiyat paketleri",
+        "SMS hatırlatma sunulup sunulmadığı"
+      ],
+      "product_type": "digital",
+      "category": "İş yönetimi yazılımı",
+      "brand": "Örnek Yazılım",
+      "attributes": [],
+      "variants": []
+    },
+    {
+      "id": "product_2",
+      "name": "Stok",
+      "url": "https://ornek.example/stok",
+      "description": "Küçük işletmeler için stok takibi.",
+      "target_customers": null,
+      "source_ids": [
+        "s3"
+      ],
+      "features": [],
+      "pricing": {
+        "status": "unknown",
+        "plans": [],
+        "source_ids": [],
+        "offers": []
+      },
+      "unknowns": [
+        "Hedef müşteri",
+        "Özellikler",
+        "Fiyat paketleri"
+      ],
+      "product_type": "digital",
+      "category": "İş yönetimi yazılımı",
+      "brand": "Örnek Yazılım",
+      "attributes": [],
+      "variants": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "type": "website",
+      "url": "https://ornek.example",
+      "title": "Örnek şirket sayfası",
+      "accessed_at": null
+    },
+    {
+      "id": "s2",
+      "type": "website",
+      "url": "https://ornek.example/randevu",
+      "title": "Örnek randevu ürünü",
+      "accessed_at": null
+    },
+    {
+      "id": "s3",
+      "type": "website",
+      "url": "https://ornek.example/stok",
+      "title": "Örnek stok ürünü",
+      "accessed_at": null
+    }
+  ],
+  "catalog_coverage": {
+    "status": "partial",
+    "discovered_count": 2,
+    "total_count": null,
+    "notes": "Kurgusal örnek; tüm katalog doğrulanmadı."
+  }
+}
